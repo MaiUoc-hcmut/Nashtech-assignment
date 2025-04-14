@@ -1,0 +1,11 @@
+C:\Users\Admin\OneDrive\Documents\NashTech_Training\Assignment\ECommerce.SharedViewModel\bin\Debug\net8.0\ECommerce.SharedViewModel.deps.json
+C:\Users\Admin\OneDrive\Documents\NashTech_Training\Assignment\ECommerce.SharedViewModel\bin\Debug\net8.0\ECommerce.SharedViewModel.dll
+C:\Users\Admin\OneDrive\Documents\NashTech_Training\Assignment\ECommerce.SharedViewModel\bin\Debug\net8.0\ECommerce.SharedViewModel.pdb
+C:\Users\Admin\OneDrive\Documents\NashTech_Training\Assignment\ECommerce.SharedViewModel\obj\Debug\net8.0\ECommerce.SharedViewModel.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Admin\OneDrive\Documents\NashTech_Training\Assignment\ECommerce.SharedViewModel\obj\Debug\net8.0\ECommerce.SharedViewModel.AssemblyInfoInputs.cache
+C:\Users\Admin\OneDrive\Documents\NashTech_Training\Assignment\ECommerce.SharedViewModel\obj\Debug\net8.0\ECommerce.SharedViewModel.AssemblyInfo.cs
+C:\Users\Admin\OneDrive\Documents\NashTech_Training\Assignment\ECommerce.SharedViewModel\obj\Debug\net8.0\ECommerce.SharedViewModel.csproj.CoreCompileInputs.cache
+C:\Users\Admin\OneDrive\Documents\NashTech_Training\Assignment\ECommerce.SharedViewModel\obj\Debug\net8.0\ECommerce.SharedViewModel.dll
+C:\Users\Admin\OneDrive\Documents\NashTech_Training\Assignment\ECommerce.SharedViewModel\obj\Debug\net8.0\refint\ECommerce.SharedViewModel.dll
+C:\Users\Admin\OneDrive\Documents\NashTech_Training\Assignment\ECommerce.SharedViewModel\obj\Debug\net8.0\ECommerce.SharedViewModel.pdb
+C:\Users\Admin\OneDrive\Documents\NashTech_Training\Assignment\ECommerce.SharedViewModel\obj\Debug\net8.0\ref\ECommerce.SharedViewModel.dll
