@@ -3,6 +3,10 @@ using Ecommerce.BackendAPI.Data;
 using Ecommerce.BackendAPI.Interfaces;
 using Ecommerce.BackendAPI.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Ecommerce.BackendAPI.Services;
+using Ecommerce.BackendAPI.Interfaces.Helper;
+using Ecommerce.BackendAPI.Helper;
+using Ecommerce.BackendAPI.FiltersAction;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,8 +16,14 @@ builder.Services.AddControllers().AddJsonOptions(x =>
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 
+builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<VerifyToken>();
+builder.Services.AddScoped<CheckUserExists>();
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<IDependMethod, DependMethod>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IParentCategoryRepo, ParentCategoryRepository>();
 // builder.Services.AddScoped<ICartRepository, CartRepository>();
 
 // Add services to the container.

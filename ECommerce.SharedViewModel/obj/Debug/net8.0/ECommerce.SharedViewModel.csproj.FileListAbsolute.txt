@@ -9,3 +9,4 @@ C:\Users\Admin\OneDrive\Documents\NashTech_Training\Assignment\ECommerce.SharedV
 C:\Users\Admin\OneDrive\Documents\NashTech_Training\Assignment\ECommerce.SharedViewModel\obj\Debug\net8.0\refint\ECommerce.SharedViewModel.dll
 C:\Users\Admin\OneDrive\Documents\NashTech_Training\Assignment\ECommerce.SharedViewModel\obj\Debug\net8.0\ECommerce.SharedViewModel.pdb
 C:\Users\Admin\OneDrive\Documents\NashTech_Training\Assignment\ECommerce.SharedViewModel\obj\Debug\net8.0\ref\ECommerce.SharedViewModel.dll
+C:\Users\Admin\OneDrive\Documents\NashTech_Training\Assignment\ECommerce.SharedViewModel\obj\Debug\net8.0\ECommerce.SharedViewModel.sourcelink.json

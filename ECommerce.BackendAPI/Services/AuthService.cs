@@ -1,4 +1,8 @@
-
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using Microsoft.IdentityModel.Tokens;
+using Ecommerce.SharedViewModel.Models;
 
 namespace Ecommerce.BackendAPI.Services
 {
@@ -20,14 +24,43 @@ namespace Ecommerce.BackendAPI.Services
             return BCrypt.Net.BCrypt.Verify(password, hashedPassword);
         }
 
-        public string GenerateToken(string username)
+        public string GenerateToken(Customer customer)
         {
-            return "";
+            var claims = new[]
+            {
+                new Claim(ClaimTypes.NameIdentifier, customer.Id.ToString()),
+                new Claim(ClaimTypes.Name, customer.Username)
+            };
+            var jwtKey = _configuration["Jwt:Key"] ?? throw new ArgumentNullException("Jwt:Key configuration is missing.");
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var token = new JwtSecurityToken(
+                issuer: _configuration["Jwt:Issuer"],
+                audience: _configuration["Jwt:Audience"],
+                claims: claims,
+                expires: DateTime.Now.AddHours(1),
+                signingCredentials: creds);
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
-
-        public string GenerateRefreshToken()
+        public string GenerateRefreshToken(Customer customer)
         {
-            return "";
+            var claims = new[]
+            {
+                new Claim(ClaimTypes.NameIdentifier, customer.Id.ToString()),
+                new Claim(ClaimTypes.Name, customer.Username)
+            };
+
+            var jwtKey = _configuration["Jwt:Key"] ?? throw new ArgumentNullException("Jwt:Key configuration is missing.");
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var token = new JwtSecurityToken(
+                issuer: _configuration["Jwt:Issuer"],
+                audience: _configuration["Jwt:Audience"],
+                claims: claims,
+                expires: DateTime.Now.AddDays(30),
+                signingCredentials: creds);
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
 }

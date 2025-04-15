@@ -3,6 +3,7 @@ using Ecommerce.SharedViewModel.ParametersType;
 using Ecommerce.BackendAPI.Data;
 using Ecommerce.BackendAPI.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Ecommerce.BackendAPI.Repositories
 {
@@ -14,16 +15,14 @@ namespace Ecommerce.BackendAPI.Repositories
             _context = context;
         }
 
-        public async Task<bool> Register(RegisterParameter request)
+        public async Task<IDbContextTransaction> BeginTransactionAsync()
         {
-            // Check if the username already exists
-            var existingCustomer = await _context.Customers.FindAsync(request.Username);
-            if (existingCustomer != null)
-            {
-                return false; // Username already exists
-            }
+            return await _context.Database.BeginTransactionAsync();
+        }
 
-            // Create a new customer object
+        public async Task<Customer> Register(RegisterParameter request)
+        {
+            
             var customer = new Customer
             {
                 Name = request.Name,
@@ -37,16 +36,15 @@ namespace Ecommerce.BackendAPI.Repositories
             await _context.Customers.AddAsync(customer);
             await _context.SaveChangesAsync();
 
-            return true;
+            return customer;
         }
 
         public async Task<Customer?> Login(LoginParameter request)
         {
-            // Check if the customer exists with the provided username and password
-            var customer = await _context.Customers
-                .FirstOrDefaultAsync(c => c.Username == request.Username && c.Password == request.Password);
-
-            return customer; // Return the customer if found, otherwise null
+            var customer = await _context.Customers.FirstOrDefaultAsync(x => x.Username == request.Username);
+            if (customer == null) return null;
+            bool isValid = BCrypt.Net.BCrypt.Verify(request.Password, customer.Password);
+            return isValid ? customer : null;
         }
     }
 }
