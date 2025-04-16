@@ -24,6 +24,7 @@ builder.Services.AddScoped<IDependMethod, DependMethod>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IParentCategoryRepo, ParentCategoryRepository>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 // builder.Services.AddScoped<ICartRepository, CartRepository>();
 
 // Add services to the container.
