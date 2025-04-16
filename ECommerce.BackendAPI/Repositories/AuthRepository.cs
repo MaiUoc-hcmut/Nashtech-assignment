@@ -26,6 +26,7 @@ namespace Ecommerce.BackendAPI.Repositories
             var customer = new Customer
             {
                 Name = request.Name,
+                Email = request.Email,
                 Username = request.Username,
                 Password = request.Password, 
                 Address = request.Address,

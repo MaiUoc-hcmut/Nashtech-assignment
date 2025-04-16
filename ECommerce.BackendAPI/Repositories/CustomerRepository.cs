@@ -29,10 +29,10 @@ namespace Ecommerce.BackendAPI.Repositories
             return await _context.Customers.AsNoTracking().FirstOrDefaultAsync(c => c.Username == username);
         }
 
-        // public async Task<Customer?> GetCustomerByEmail(string email)
-        // {
-        //     return await _context.Customers.AsNoTracking().FirstOrDefaultAsync(c => c.Email == email);
-        // }
+        public async Task<Customer?> GetCustomerByEmail(string email)
+        {
+            return await _context.Customers.AsNoTracking().FirstOrDefaultAsync(c => c.Email == email);
+        }
 
         public async Task<Customer?> UpdateCustomer(Customer customer)
         {
@@ -40,7 +40,7 @@ namespace Ecommerce.BackendAPI.Repositories
             if (existingCustomer == null) return null;
 
             existingCustomer.Username = customer.Username;
-            // existingCustomer.Email = customer.Email;
+            existingCustomer.Email = customer.Email;
             existingCustomer.Name = customer.Name;
             existingCustomer.Address = customer.Address;
             existingCustomer.PhoneNumber = customer.PhoneNumber;

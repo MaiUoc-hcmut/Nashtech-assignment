@@ -1,6 +1,7 @@
 using Ecommerce.BackendAPI.Interfaces;
 using Ecommerce.SharedViewModel.Models;
 using Ecommerce.BackendAPI.Data;
+using Ecommerce.SharedViewModel.ParametersType;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -30,19 +31,18 @@ namespace Ecommerce.BackendAPI.Repositories
             return await _context.ParentCategories.FirstOrDefaultAsync(pc => pc.Name == name);
         }
 
-        public async Task<ParentCategory> CreateParentCategory(string name)
+        public async Task<ParentCategory> CreateParentCategory(string Name)
         {
-            var parentCategory = new ParentCategory { Name = name };
+            var parentCategory = new ParentCategory { Name = Name };
             await _context.ParentCategories.AddAsync(parentCategory);
             await _context.SaveChangesAsync();
             return parentCategory;
         }
 
-        public async Task<ParentCategory> UpdateParentCategory(ParentCategory parentCategory)
+        public async Task<bool> UpdateParentCategory(ParentCategory parentCategory)
         {
             _context.ParentCategories.Update(parentCategory);
-            await _context.SaveChangesAsync();
-            return parentCategory;
+            return await Save();
         }
 
         public async Task<bool> DeleteParentCategory(int id)
@@ -51,8 +51,13 @@ namespace Ecommerce.BackendAPI.Repositories
             if (parentCategory == null) return false;
 
             _context.ParentCategories.Remove(parentCategory);
-            await _context.SaveChangesAsync();
-            return true;
+            return await Save();
         }
+    
+        public async Task<bool> Save()
+        {
+            return await _context.SaveChangesAsync() > 0;
+        }
+    
     }
 }

@@ -1,6 +1,9 @@
 using Ecommerce.BackendAPI.Interfaces;
 using Ecommerce.SharedViewModel.Models;
+using Ecommerce.SharedViewModel.DTOs;
+using Ecommerce.SharedViewModel.ParametersType;
 using Microsoft.AspNetCore.Mvc;
+using AutoMapper;
 
 
 
@@ -11,9 +14,11 @@ namespace Ecommerce.BackendAPI.Controllers
     public class ParentCategoryController : ControllerBase
     {
         private readonly IParentCategoryRepo _parentCategoryRepo;
+        private readonly IMapper _mapper;
 
-        public ParentCategoryController(IParentCategoryRepo parentCategoryRepo)
+        public ParentCategoryController(IParentCategoryRepo parentCategoryRepo, IMapper mapper)
         {
+            _mapper = mapper;
             _parentCategoryRepo = parentCategoryRepo;
         }
 
@@ -36,7 +41,7 @@ namespace Ecommerce.BackendAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateParentCategory([FromBody] string request)
+        public async Task<IActionResult> CreateParentCategory([FromBody] ParentCategoryDTO request)
         {
             if (request == null)
             {
@@ -53,7 +58,39 @@ namespace Ecommerce.BackendAPI.Controllers
             }
 
             var createdParentCategory = await _parentCategoryRepo.CreateParentCategory(request.Name);
-            return Ok(createdParentCategory);
+
+            var response = new ParentCategoryDTO
+            {
+                Id = createdParentCategory.Id,
+                Name = createdParentCategory.Name
+            };
+            return Ok(response);
+        }
+    
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateParentCategory(int id, [FromBody] ParentCategoryDTO request)
+        {
+            var parentCategory = _mapper.Map<ParentCategory>(request);
+            parentCategory.Id = id;
+
+            if (!await _parentCategoryRepo.UpdateParentCategory(parentCategory)) 
+            {
+                return NotFound($"Parent category with ID {id} not found.");
+            }
+
+            return Ok($"Parent category {request.Name} updated successfully.");
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteParentCategory(int id)
+        {
+            if (!await _parentCategoryRepo.DeleteParentCategory(id))
+            {
+                return NotFound($"Parent category with ID {id} not found.");
+            }
+
+            return Ok($"Parent category with ID {id} deleted successfully.");
         }
     }
 }
