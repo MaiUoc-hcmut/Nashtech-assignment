@@ -19,6 +19,7 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<VerifyToken>();
 builder.Services.AddScoped<CheckUserExists>();
+// builder.Services.AddScoped<CloudinaryMiddleware>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IDependMethod, DependMethod>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
@@ -45,6 +46,8 @@ builder.Services.AddCors(options =>
         });
 });
 
+builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -53,6 +56,19 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseWhen(
+    context => 
+        (
+            context.Request.Path.StartsWithSegments("/api/Product") || 
+            context.Request.Path.StartsWithSegments("/api/File")
+        )
+        && context.Request.Method == "POST", 
+    appBuilder =>
+    {
+        appBuilder.UseFileUpload();
+    }
+);
 
 app.UseHttpsRedirection();
 app.MapControllers();
