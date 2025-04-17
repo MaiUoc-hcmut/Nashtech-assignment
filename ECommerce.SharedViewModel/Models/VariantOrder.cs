@@ -1,10 +1,10 @@
 namespace Ecommerce.SharedViewModel.Models
 {
-    public class ProductOrder
+    public class VariantOrder
     {        
-        public int ProductId { get; set; }
+        public int VariantId { get; set; }
         public int OrderId { get; set; }
-        public Product Product { get; set; }
+        public Variant Variant { get; set; }
         public Order Order { get; set; }
     }
 }

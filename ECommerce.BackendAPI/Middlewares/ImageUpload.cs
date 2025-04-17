@@ -5,12 +5,12 @@ using Microsoft.Extensions.Options;
 using System.IO;
 using System.Threading.Tasks;
 
-public class CloudinaryMiddleware
+public class UploadImagesForProductAndVariant
 {
     private readonly RequestDelegate _next;
     private readonly Cloudinary _cloudinary;
 
-    public CloudinaryMiddleware(RequestDelegate next, IOptions<CloudinarySettings> cloudinaryConfig)
+    public UploadImagesForProductAndVariant(RequestDelegate next, IOptions<CloudinarySettings> cloudinaryConfig)
     {
         _next = next;
         var account = new Account(
@@ -25,32 +25,55 @@ public class CloudinaryMiddleware
     {
         if (context.Request.HasFormContentType && context.Request.Form.Files.Count > 0)
         {
-            var file = context.Request.Form.Files[0];
-            if (file.Length > 0)
+            var uploadedUrls = new Dictionary<string, string>();
+            foreach (var file in context.Request.Form.Files)
             {
-                using var stream = file.OpenReadStream();
-                var uploadParams = new ImageUploadParams
+                if (file.Length > 0)
                 {
-                    File = new FileDescription(file.FileName, stream),
-                    Folder = "products" // Optional: Specify a folder in Cloudinary
-                };
+                    var fileNameParts = file.FileName.Split('!');
+                    if (fileNameParts.Length < 3) 
+                    {
+                        context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                        await context.Response.WriteAsync("Invalid file name format.");
+                        return;
+                    }
 
-                var uploadResult = await _cloudinary.UploadAsync(uploadParams);
+                    var prefix = fileNameParts[0];
+                    var variantKey = fileNameParts[1];
+                    var fileName = fileNameParts[2];
 
-                if (uploadResult.StatusCode == System.Net.HttpStatusCode.OK)
-                {
-                    // Attach the URL to the request for further processing
-                    context.Items["ImageUrl"] = uploadResult.SecureUrl.ToString();
-                }
-                else
-                {
-                    context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-                    await context.Response.WriteAsync("Image upload failed.");
-                    return;
+                    using var stream = file.OpenReadStream();
+                    var uploadParams = new ImageUploadParams
+                    {
+                        File = new FileDescription(fileName, stream),
+                        Folder = prefix 
+                    };
+
+                    var uploadResult = await _cloudinary.UploadAsync(uploadParams);
+
+                    if (uploadResult.StatusCode == System.Net.HttpStatusCode.OK)
+                    {
+                        if (prefix == "product")
+                        {
+                            uploadedUrls["product"] = uploadResult.SecureUrl.ToString();
+                        }
+                        else 
+                        {
+                            uploadedUrls[variantKey] = uploadResult.SecureUrl.ToString();
+                        }
+                    }
+                    else
+                    {
+                        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                        await context.Response.WriteAsync($"Image upload failed for file: {file.FileName}");
+                        return;
+                    }
+                    
                 }
             }
+            context.Items["UploadedUrls"] = uploadedUrls;
+            
         }
-
         await _next(context);
     }
 }
@@ -58,8 +81,8 @@ public class CloudinaryMiddleware
 
 public static class ImageUpload
 {
-    public static IApplicationBuilder UseFileUpload(this IApplicationBuilder builder)
+    public static IApplicationBuilder UploadProducts(this IApplicationBuilder builder)
     {
-        return builder.UseMiddleware<CloudinaryMiddleware>();
+        return builder.UseMiddleware<UploadImagesForProductAndVariant>();
     }
 }

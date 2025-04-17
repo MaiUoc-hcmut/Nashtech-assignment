@@ -21,15 +21,14 @@ namespace Ecommerce.BackendAPI.Repositories
             return await _context.Products.FindAsync(id);
         }
 
-        // public async Task<IEnumerable<Product>> GetAllProducts()
-        // {
-        //     return await _context.Products.ToListAsync();
-        // }
+        public async Task<IEnumerable<Product>> GetAllProducts()
+        {
+            return await _context.Products.ToListAsync();
+        }
 
-        // public async Task AddProductAsync(Product product)
-        // {
-        //     await _context.Products.AddAsync(product);
-        //     await _context.SaveChangesAsync();
-        // }
+        public async Task<bool> Save()
+        {
+            return await _context.SaveChangesAsync() > 0;
+        }
     }
 }

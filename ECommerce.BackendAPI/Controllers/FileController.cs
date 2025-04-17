@@ -15,9 +15,9 @@ namespace Ecommerce.BackendAPI.Controllers
                 return BadRequest("No file uploaded.");
             }
 
-            var url = HttpContext.Items["ImageUrl"] as string;
+            var url = HttpContext.Items["UploadedUrls"] as Dictionary<string, string>;
 
-            return Ok($"File uploaded successfully. URL: {url}");
+            return Ok(url);
         }
     }
 }

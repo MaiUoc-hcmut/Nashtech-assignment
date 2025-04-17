@@ -10,6 +10,7 @@ namespace Ecommerce.BackendAPI.Data
         }
 
         public DbSet<Product> Products { get; set; }
+        public DbSet<Variant> Variants { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<ParentCategory> ParentCategories { get; set; }
         public DbSet<Customer> Customers { get; set; }
@@ -20,38 +21,38 @@ namespace Ecommerce.BackendAPI.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<ProductCategory>()
-                .HasKey(pc => new { pc.ProductId, pc.CategoryId });
-            modelBuilder.Entity<ProductCategory>()
-                .HasOne(p => p.Product)
-                .WithMany(pc => pc.ProductCategories)
-                .HasForeignKey(pc => pc.ProductId);
-            modelBuilder.Entity<ProductCategory>()
+            modelBuilder.Entity<VariantCategory>()
+                .HasKey(vc => new { vc.VariantId, vc.CategoryId });
+            modelBuilder.Entity<VariantCategory>()
+                .HasOne(v => v.Variant)
+                .WithMany(vc => vc.VariantCategories)
+                .HasForeignKey(vc => vc.VariantId);
+            modelBuilder.Entity<VariantCategory>()
                 .HasOne(c => c.Category)
-                .WithMany(pc => pc.ProductCategories)
-                .HasForeignKey(pc => pc.CategoryId);
+                .WithMany(vc => vc.VariantCategories)
+                .HasForeignKey(vc => vc.CategoryId);
 
-            modelBuilder.Entity<ProductOrder>()
-                .HasKey(po => new { po.ProductId, po.OrderId });
-            modelBuilder.Entity<ProductOrder>()
-                .HasOne(p => p.Product)
-                .WithMany(po => po.ProductOrders)
-                .HasForeignKey(po => po.ProductId);
-            modelBuilder.Entity<ProductOrder>()
+            modelBuilder.Entity<VariantOrder>()
+                .HasKey(vo => new { vo.VariantId, vo.OrderId });
+            modelBuilder.Entity<VariantOrder>()
+                .HasOne(v => v.Variant)
+                .WithMany(vo => vo.VariantOrders)
+                .HasForeignKey(vo => vo.VariantId);
+            modelBuilder.Entity<VariantOrder>()
                 .HasOne(o => o.Order)
-                .WithMany(po => po.ProductOrders)
-                .HasForeignKey(po => po.OrderId);
+                .WithMany(vo => vo.VariantOrders)
+                .HasForeignKey(vo => vo.OrderId);
 
-            modelBuilder.Entity<ProductCart>()
-                .HasKey(pc => new { pc.ProductId, pc.CartId });
-            modelBuilder.Entity<ProductCart>()
-                .HasOne(p => p.Product)
-                .WithMany(pc => pc.ProductCarts)
-                .HasForeignKey(pc => pc.ProductId);
-            modelBuilder.Entity<ProductCart>()
+            modelBuilder.Entity<VariantCart>()
+                .HasKey(vc => new { vc.VariantId, vc.CartId });
+            modelBuilder.Entity<VariantCart>()
+                .HasOne(v => v.Variant)
+                .WithMany(vc => vc.VariantCarts)
+                .HasForeignKey(vc => vc.VariantId);
+            modelBuilder.Entity<VariantCart>()
                 .HasOne(c => c.Cart)
-                .WithMany(pc => pc.ProductCarts)
-                .HasForeignKey(pc => pc.CartId);
+                .WithMany(vc => vc.VariantCarts)
+                .HasForeignKey(vc => vc.CartId);
 
             modelBuilder.Entity<Cart>()
                 .HasOne(c => c.Customer)

@@ -65,6 +65,10 @@ namespace ECommerce.BackendAPI.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -151,57 +155,9 @@ namespace ECommerce.BackendAPI.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("StockQuantity")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.ToTable("Products");
-                });
-
-            modelBuilder.Entity("Ecommerce.SharedViewModel.Models.ProductCart", b =>
-                {
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CartId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ProductId", "CartId");
-
-                    b.HasIndex("CartId");
-
-                    b.ToTable("ProductCart");
-                });
-
-            modelBuilder.Entity("Ecommerce.SharedViewModel.Models.ProductCategory", b =>
-                {
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CategoryId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ProductId", "CategoryId");
-
-                    b.HasIndex("CategoryId");
-
-                    b.ToTable("ProductCategory");
-                });
-
-            modelBuilder.Entity("Ecommerce.SharedViewModel.Models.ProductOrder", b =>
-                {
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("OrderId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ProductId", "OrderId");
-
-                    b.HasIndex("OrderId");
-
-                    b.ToTable("ProductOrder");
                 });
 
             modelBuilder.Entity("Ecommerce.SharedViewModel.Models.Review", b =>
@@ -232,6 +188,79 @@ namespace ECommerce.BackendAPI.Migrations
                     b.HasIndex("ProductId");
 
                     b.ToTable("Reviews");
+                });
+
+            modelBuilder.Entity("Ecommerce.SharedViewModel.Models.Variant", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SKU")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("StockQuantity")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("Variants");
+                });
+
+            modelBuilder.Entity("Ecommerce.SharedViewModel.Models.VariantCart", b =>
+                {
+                    b.Property<int>("VariantId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CartId")
+                        .HasColumnType("int");
+
+                    b.HasKey("VariantId", "CartId");
+
+                    b.HasIndex("CartId");
+
+                    b.ToTable("VariantCart");
+                });
+
+            modelBuilder.Entity("Ecommerce.SharedViewModel.Models.VariantCategory", b =>
+                {
+                    b.Property<int>("VariantId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.HasKey("VariantId", "CategoryId");
+
+                    b.HasIndex("CategoryId");
+
+                    b.ToTable("VariantCategory");
+                });
+
+            modelBuilder.Entity("Ecommerce.SharedViewModel.Models.VariantOrder", b =>
+                {
+                    b.Property<int>("VariantId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int");
+
+                    b.HasKey("VariantId", "OrderId");
+
+                    b.HasIndex("OrderId");
+
+                    b.ToTable("VariantOrder");
                 });
 
             modelBuilder.Entity("Ecommerce.SharedViewModel.Models.Cart", b =>
@@ -267,63 +296,6 @@ namespace ECommerce.BackendAPI.Migrations
                     b.Navigation("Customer");
                 });
 
-            modelBuilder.Entity("Ecommerce.SharedViewModel.Models.ProductCart", b =>
-                {
-                    b.HasOne("Ecommerce.SharedViewModel.Models.Cart", "Cart")
-                        .WithMany("ProductCarts")
-                        .HasForeignKey("CartId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Ecommerce.SharedViewModel.Models.Product", "Product")
-                        .WithMany("ProductCarts")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Cart");
-
-                    b.Navigation("Product");
-                });
-
-            modelBuilder.Entity("Ecommerce.SharedViewModel.Models.ProductCategory", b =>
-                {
-                    b.HasOne("Ecommerce.SharedViewModel.Models.Category", "Category")
-                        .WithMany("ProductCategories")
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Ecommerce.SharedViewModel.Models.Product", "Product")
-                        .WithMany("ProductCategories")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Category");
-
-                    b.Navigation("Product");
-                });
-
-            modelBuilder.Entity("Ecommerce.SharedViewModel.Models.ProductOrder", b =>
-                {
-                    b.HasOne("Ecommerce.SharedViewModel.Models.Order", "Order")
-                        .WithMany("ProductOrders")
-                        .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Ecommerce.SharedViewModel.Models.Product", "Product")
-                        .WithMany("ProductOrders")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Order");
-
-                    b.Navigation("Product");
-                });
-
             modelBuilder.Entity("Ecommerce.SharedViewModel.Models.Review", b =>
                 {
                     b.HasOne("Ecommerce.SharedViewModel.Models.Customer", "Customer")
@@ -343,14 +315,82 @@ namespace ECommerce.BackendAPI.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("Ecommerce.SharedViewModel.Models.Variant", b =>
+                {
+                    b.HasOne("Ecommerce.SharedViewModel.Models.Product", "Product")
+                        .WithMany("Variants")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("Ecommerce.SharedViewModel.Models.VariantCart", b =>
+                {
+                    b.HasOne("Ecommerce.SharedViewModel.Models.Cart", "Cart")
+                        .WithMany("VariantCarts")
+                        .HasForeignKey("CartId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Ecommerce.SharedViewModel.Models.Variant", "Variant")
+                        .WithMany("VariantCarts")
+                        .HasForeignKey("VariantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Cart");
+
+                    b.Navigation("Variant");
+                });
+
+            modelBuilder.Entity("Ecommerce.SharedViewModel.Models.VariantCategory", b =>
+                {
+                    b.HasOne("Ecommerce.SharedViewModel.Models.Category", "Category")
+                        .WithMany("VariantCategories")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Ecommerce.SharedViewModel.Models.Variant", "Variant")
+                        .WithMany("VariantCategories")
+                        .HasForeignKey("VariantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+
+                    b.Navigation("Variant");
+                });
+
+            modelBuilder.Entity("Ecommerce.SharedViewModel.Models.VariantOrder", b =>
+                {
+                    b.HasOne("Ecommerce.SharedViewModel.Models.Order", "Order")
+                        .WithMany("VariantOrders")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Ecommerce.SharedViewModel.Models.Variant", "Variant")
+                        .WithMany("VariantOrders")
+                        .HasForeignKey("VariantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+
+                    b.Navigation("Variant");
+                });
+
             modelBuilder.Entity("Ecommerce.SharedViewModel.Models.Cart", b =>
                 {
-                    b.Navigation("ProductCarts");
+                    b.Navigation("VariantCarts");
                 });
 
             modelBuilder.Entity("Ecommerce.SharedViewModel.Models.Category", b =>
                 {
-                    b.Navigation("ProductCategories");
+                    b.Navigation("VariantCategories");
                 });
 
             modelBuilder.Entity("Ecommerce.SharedViewModel.Models.Customer", b =>
@@ -365,7 +405,7 @@ namespace ECommerce.BackendAPI.Migrations
 
             modelBuilder.Entity("Ecommerce.SharedViewModel.Models.Order", b =>
                 {
-                    b.Navigation("ProductOrders");
+                    b.Navigation("VariantOrders");
                 });
 
             modelBuilder.Entity("Ecommerce.SharedViewModel.Models.ParentCategory", b =>
@@ -375,13 +415,18 @@ namespace ECommerce.BackendAPI.Migrations
 
             modelBuilder.Entity("Ecommerce.SharedViewModel.Models.Product", b =>
                 {
-                    b.Navigation("ProductCarts");
-
-                    b.Navigation("ProductCategories");
-
-                    b.Navigation("ProductOrders");
-
                     b.Navigation("Reviews");
+
+                    b.Navigation("Variants");
+                });
+
+            modelBuilder.Entity("Ecommerce.SharedViewModel.Models.Variant", b =>
+                {
+                    b.Navigation("VariantCarts");
+
+                    b.Navigation("VariantCategories");
+
+                    b.Navigation("VariantOrders");
                 });
 #pragma warning restore 612, 618
         }
