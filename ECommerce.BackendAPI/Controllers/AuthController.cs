@@ -61,6 +61,7 @@ namespace ECommerce.BackendAPI.Controllers
                 };
 
                 await _dependMethod.CreateCartWhenRegister(registeredUser);
+                await transaction.CommitAsync();
 
                 return Ok(response);
             }
