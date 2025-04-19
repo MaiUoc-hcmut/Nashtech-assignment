@@ -23,6 +23,7 @@ builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IDependMethod, DependMethod>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IVariantRepository, VariantRepository>();
 builder.Services.AddScoped<IParentCategoryRepo, ParentCategoryRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 // builder.Services.AddScoped<ICartRepository, CartRepository>();
@@ -59,7 +60,8 @@ if (app.Environment.IsDevelopment())
 app.UseWhen(
     context => 
         (
-            // context.Request.Path.StartsWithSegments("/api/Product") || 
+            context.Request.Path.StartsWithSegments("/api/Product") || 
+            context.Request.Path.StartsWithSegments("/api/Variant") ||
             context.Request.Path.StartsWithSegments("/api/File")
         )
         && context.Request.Method == "POST", 

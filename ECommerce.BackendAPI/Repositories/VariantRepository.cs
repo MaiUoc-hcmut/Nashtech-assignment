@@ -2,6 +2,7 @@ using Ecommerce.BackendAPI.Interfaces;
 using Ecommerce.SharedViewModel.Models;
 using Microsoft.EntityFrameworkCore;
 using Ecommerce.BackendAPI.Data;
+using Microsoft.EntityFrameworkCore.Storage;
 
 
 namespace Ecommerce.BackendAPI.Repositories
@@ -15,6 +16,11 @@ namespace Ecommerce.BackendAPI.Repositories
             _context = context;
         }
 
+        public async Task<IDbContextTransaction> BeginTransactionAsync()
+        {
+            return await _context.Database.BeginTransactionAsync();
+        }
+
         public async Task<Variant?> GetVariantById(int id)
         {
             return await _context.Variants.FindAsync(id);
@@ -25,7 +31,7 @@ namespace Ecommerce.BackendAPI.Repositories
             return await _context.Variants.Where(v => v.Product.Id == productId).ToListAsync();
         }
 
-        public async Task<bool> AddVariant(Variant variant)
+        public async Task<bool> CreateVariant(Variant variant)
         {
             await _context.Variants.AddAsync(variant);
             return await Save();

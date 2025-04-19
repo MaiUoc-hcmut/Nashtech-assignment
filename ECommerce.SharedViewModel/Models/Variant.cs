@@ -6,6 +6,7 @@ namespace Ecommerce.SharedViewModel.Models
         public required string SKU { get; set; }
         public decimal Price { get; set; }
         public int StockQuantity { get; set; }
+        public string ImageUrl { get; set; } = string.Empty;
         public Product Product { get; set; }
         public ICollection<VariantCategory> VariantCategories { get; set; }
         public ICollection<VariantOrder> VariantOrders { get; set; }

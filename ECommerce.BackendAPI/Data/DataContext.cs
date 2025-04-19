@@ -58,6 +58,19 @@ namespace Ecommerce.BackendAPI.Data
                 .HasOne(c => c.Customer)
                 .WithOne(cu => cu.cart)
                 .HasForeignKey<Cart>(c => c.Id);
+
+
+            modelBuilder.Entity<Product>()
+                .Property(p => p.Price)
+                .HasPrecision(18, 2);
+            
+            modelBuilder.Entity<Variant>()
+                .Property(p => p.Price)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<Order>()
+                .Property(p => p.Amount)
+                .HasPrecision(18, 2);
         }   
     }
 }
