@@ -52,6 +52,7 @@ namespace Ecommerce.BackendAPI.Controllers
 
         [HttpPut("{id}")]
         [ServiceFilter(typeof(VerifyToken))]
+        [ServiceFilter(typeof(VerifyWhenUpdateAndDeleteReview))]
         public async Task<IActionResult> UpdateReview(int id, [FromBody] ReviewDTO reviewDto)
         {
             if (reviewDto == null) return BadRequest("Review cannot be null");
@@ -68,6 +69,8 @@ namespace Ecommerce.BackendAPI.Controllers
         }
 
         [HttpDelete("{id}")]
+        [ServiceFilter(typeof(VerifyToken))]
+        [ServiceFilter(typeof(VerifyWhenUpdateAndDeleteReview))]
         public async Task<IActionResult> DeleteReview(int id)
         {
             var deleted = await _reviewRepository.DeleteReview(id);
