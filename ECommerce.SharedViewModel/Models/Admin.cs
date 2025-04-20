@@ -1,6 +1,6 @@
 namespace Ecommerce.SharedViewModel.Models
 {
-    public class Admin
+    public class Admin : IUserInterface
     {
         public int Id { get; set; }
         public string Email { get; set; } = string.Empty;

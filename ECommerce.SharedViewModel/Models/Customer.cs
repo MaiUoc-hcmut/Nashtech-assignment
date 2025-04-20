@@ -1,6 +1,6 @@
 namespace Ecommerce.SharedViewModel.Models
 {
-    public class Customer
+    public class Customer : IUserInterface
     {
         public int Id { get; set; }
         public required string Email { get; set; }

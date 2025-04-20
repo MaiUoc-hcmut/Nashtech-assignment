@@ -42,10 +42,18 @@ namespace Ecommerce.BackendAPI.Repositories
 
         public async Task<Customer?> Login(LoginParameter request)
         {
-            var customer = await _context.Customers.FirstOrDefaultAsync(x => x.Username == request.Username);
+            var customer = await _context.Customers.FirstOrDefaultAsync(x => x.Email == request.Email);
             if (customer == null) return null;
             bool isValid = BCrypt.Net.BCrypt.Verify(request.Password, customer.Password);
             return isValid ? customer : null;
+        }
+    
+        public async Task<Admin?> AdminLogin(LoginParameter request)
+        {
+            var admin = await _context.Admins.FirstOrDefaultAsync(x => x.Email == request.Email);
+            if (admin == null) return null;
+            bool isValid = BCrypt.Net.BCrypt.Verify(request.Password, admin.Password);
+            return isValid ? admin : null;
         }
     }
 }

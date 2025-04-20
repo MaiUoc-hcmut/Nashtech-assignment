@@ -10,5 +10,6 @@ namespace Ecommerce.BackendAPI.Interfaces
         Task<IDbContextTransaction> BeginTransactionAsync();
         Task<Customer> Register(RegisterParameter request);
         Task<Customer?> Login(LoginParameter request);
+        Task<Admin?> AdminLogin(LoginParameter request);
     }
 }

@@ -98,6 +98,31 @@ namespace ECommerce.BackendAPI.Controllers
         }
 
 
+        [HttpPost("/admin/login")]
+        public async Task<IActionResult> AdminLogin([FromBody] LoginParameter request)
+        {
+            var admin = await _authRepository.AdminLogin(request);
+
+            if (admin == null)
+            {
+                return Unauthorized(new { message = "Invalid username or password." });
+            }
+
+            var token = _authService.GenerateToken(admin);
+            var refreshToken = _authService.GenerateRefreshToken(admin);
+
+            var response = new LoginResponse
+            {
+                Success = true,
+                Message = "Login successful.",
+                Token = token,
+                RefreshToken = refreshToken,
+                Customer = _mapper.Map<CustomerDTO>(admin)
+            };
+
+            return Ok(response);
+        }
+
         // [HttpPost("refresh-token")]
         // public IActionResult RefreshToken([FromBody] RefreshTokenParameter request)
         // {

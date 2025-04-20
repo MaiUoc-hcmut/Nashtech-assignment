@@ -24,12 +24,12 @@ namespace Ecommerce.BackendAPI.Services
             return BCrypt.Net.BCrypt.Verify(password, hashedPassword);
         }
 
-        public string GenerateToken(Customer customer)
+        public string GenerateToken(IUserInterface user)
         {
             var claims = new[]
             {
-                new Claim(ClaimTypes.NameIdentifier, customer.Id.ToString()),
-                new Claim(ClaimTypes.Name, customer.Username)
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Email, user.Email)
             };
             var jwtKey = _configuration["Jwt:Key"] ?? throw new ArgumentNullException("Jwt:Key configuration is missing.");
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
@@ -42,12 +42,12 @@ namespace Ecommerce.BackendAPI.Services
                 signingCredentials: creds);
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
-        public string GenerateRefreshToken(Customer customer)
+        public string GenerateRefreshToken(IUserInterface user)
         {
             var claims = new[]
             {
-                new Claim(ClaimTypes.NameIdentifier, customer.Id.ToString()),
-                new Claim(ClaimTypes.Name, customer.Username)
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Email, user.Email)
             };
 
             var jwtKey = _configuration["Jwt:Key"] ?? throw new ArgumentNullException("Jwt:Key configuration is missing.");

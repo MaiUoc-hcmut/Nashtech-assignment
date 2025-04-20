@@ -19,6 +19,7 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<VerifyToken>();
 builder.Services.AddScoped<CheckUserExists>();
+builder.Services.AddScoped<CategoryAndParentFilter>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IDependMethod, DependMethod>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
