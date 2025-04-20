@@ -25,7 +25,16 @@ namespace Ecommerce.BackendAPI.Controllers
         public async Task<IActionResult> GetReviewsByProductId(int productId)
         {
             var reviews = await _reviewRepository.GetReviewsByProductId(productId);
-            return Ok(reviews);
+            var averageRating = reviews.Average(r => r.Rating);
+            var totalReviews = reviews.Count();
+            var ratingsCount = reviews.GroupBy(r => r.Rating)
+                .ToDictionary(g => g.Key, g => g.Count());
+            return Ok(new {
+                Reviews = reviews,
+                AverageRating = averageRating,
+                TotalReviews = totalReviews,
+                RatingsCount = ratingsCount
+            });
         }
 
         [HttpGet("{id}")]
