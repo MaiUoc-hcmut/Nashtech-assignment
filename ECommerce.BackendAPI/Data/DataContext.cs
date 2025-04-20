@@ -18,6 +18,9 @@ namespace Ecommerce.BackendAPI.Data
         public DbSet<Order> Orders { get; set; }
         public DbSet<Cart> Carts { get; set; }
         public DbSet<Review> Reviews { get; set; }
+        public DbSet<VariantCategory> VariantCategories { get; set; }
+        public DbSet<VariantOrder> VariantOrders { get; set; }
+        public DbSet<VariantCart> VariantCarts { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

@@ -15,19 +15,24 @@ builder.Services.AddControllers().AddJsonOptions(x =>
                 x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-
+// Add custom filters and services
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<VerifyToken>();
 builder.Services.AddScoped<CheckUserExists>();
 builder.Services.AddScoped<CategoryAndParentFilter>();
+builder.Services.AddScoped<AddToCartFilter>();
+builder.Services.AddScoped<RemoveFromCartFilter>();
+
+// Add custom repositories
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<IAdminRepository, AdminRepository>();
 builder.Services.AddScoped<IDependMethod, DependMethod>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IVariantRepository, VariantRepository>();
 builder.Services.AddScoped<IParentCategoryRepo, ParentCategoryRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
-// builder.Services.AddScoped<ICartRepository, CartRepository>();
+builder.Services.AddScoped<ICartRepository, CartRepository>();
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
