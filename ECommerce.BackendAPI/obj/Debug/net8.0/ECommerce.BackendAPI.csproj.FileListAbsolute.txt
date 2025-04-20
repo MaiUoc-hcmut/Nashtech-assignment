@@ -174,3 +174,6 @@ C:\Users\Admin\OneDrive\Documents\NashTech_Training\Assignment\ECommerce.Backend
 C:\Users\Admin\OneDrive\Documents\NashTech_Training\Assignment\ECommerce.BackendAPI\obj\Debug\net8.0\ECommerce.BackendAPI.sourcelink.json
 C:\Users\Admin\OneDrive\Documents\NashTech_Training\Assignment\ECommerce.BackendAPI\bin\Debug\net8.0\CloudinaryDotNet.dll
 C:\Users\Admin\OneDrive\Documents\NashTech_Training\Assignment\ECommerce.BackendAPI\bin\Debug\net8.0\Newtonsoft.Json.dll
+C:\Users\Admin\OneDrive\Documents\NashTech_Training\Assignment\ECommerce.BackendAPI\bin\Debug\net8.0\Scrutor.dll
+C:\Users\Admin\OneDrive\Documents\NashTech_Training\Assignment\ECommerce.BackendAPI\bin\Debug\net8.0\Swashbuckle.AspNetCore.Filters.dll
+C:\Users\Admin\OneDrive\Documents\NashTech_Training\Assignment\ECommerce.BackendAPI\bin\Debug\net8.0\Swashbuckle.AspNetCore.Filters.Abstractions.dll

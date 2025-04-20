@@ -41,7 +41,7 @@ namespace Ecommerce.BackendAPI.Controllers
         public async Task<ActionResult> CreateVariant
         (
             [FromForm] VariantDTO variantDto, 
-            [FromForm] IFormFile? image,
+            // [FromForm] IFormFile? image,
             [FromForm] string Categories
         )
         {
@@ -72,7 +72,12 @@ namespace Ecommerce.BackendAPI.Controllers
         }
     
         [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateVariant(int id, [FromForm] VariantDTO variantDto, [FromForm] IFormFile? image)
+        public async Task<ActionResult> UpdateVariant
+        (
+            int id, 
+            [FromForm] VariantDTO variantDto
+            // [FromForm] IFormFile? image
+        )
         {
             if (variantDto == null) return BadRequest("Invalid variant data.");
 

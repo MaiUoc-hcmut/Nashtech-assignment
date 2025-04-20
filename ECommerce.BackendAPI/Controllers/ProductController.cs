@@ -73,7 +73,7 @@ namespace Ecommerce.BackendAPI.Controllers
                     return BadRequest("Product data is null.");
                 }
 
-                var urls = HttpContext.Items["urls"] as Dictionary<string, string>;
+                var urls = HttpContext.Items["UploadedUrls"] as Dictionary<string, string>;
                 if (urls != null && urls.TryGetValue("product", out var productUrl))
                 {
                     productDto.ImageUrl = productUrl;
@@ -82,6 +82,7 @@ namespace Ecommerce.BackendAPI.Controllers
                 {
                     productDto.ImageUrl = "";
                 }
+
                 IList<CreateVariantsOfProductParameter> variantList = new List<CreateVariantsOfProductParameter>();
                 if (!string.IsNullOrEmpty(variants))
                 {
