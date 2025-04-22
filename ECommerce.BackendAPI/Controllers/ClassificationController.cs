@@ -37,8 +37,8 @@ namespace Ecommerce.BackendAPI.Controllers
         }
 
         [HttpPost]
-        [ServiceFilter(typeof(VerifyToken))]
-        [ServiceFilter(typeof(CategoryAndParentAndClassificationFilter))]
+        // [ServiceFilter(typeof(VerifyToken))]
+        // [ServiceFilter(typeof(CategoryAndParentAndClassificationFilter))]
         public async Task<IActionResult> CreateClassification(string Name)
         {
             if (Name == null) return BadRequest(new { Error = "Name must be not null" });

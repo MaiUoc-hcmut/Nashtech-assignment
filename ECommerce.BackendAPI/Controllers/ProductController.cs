@@ -37,9 +37,22 @@ namespace Ecommerce.BackendAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllProducts()
+        public async Task<IActionResult> GetAllProducts
+        (
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10,
+            [FromQuery] string sortBy = "UpdatedAt",
+            [FromQuery] bool isAsc = true,
+            [FromQuery] int? classificationId = null
+        )
         {
-            var products = await _productRepository.GetAllProducts();
+            var products = await _productRepository.GetAllProducts
+                (
+                    pageNumber, 
+                    pageSize, 
+                    sortBy, 
+                    isAsc
+                );
             return Ok(products);
         }
 
@@ -51,13 +64,39 @@ namespace Ecommerce.BackendAPI.Controllers
             {
                 return NotFound();
             }
+            
+            List<object>? variants = null;
             if (includeVariant != null && includeVariant.ToLower() == "true")
             {
-                var variants = await _variantRepository.GetVariantsByProductId(id);
-                product.Variants = variants.ToList();
+                var variantEntities = await _variantRepository.GetVariantsByProductId(id);
+                variants = variantEntities.Select(v => new
+                {
+                    v.Id,
+                    v.SKU,
+                    v.Price,
+                    v.StockQuantity,
+                    v.ImageUrl,
+                    v.CreatedAt,
+                    v.UpdatedAt
+                }).ToList<object>();
             }
-
-            return Ok(product);
+            
+            return Ok(new {
+                product.Id,
+                product.Name,
+                product.Price,
+                product.Description,
+                product.ImageUrl,
+                product.CreatedAt,
+                product.UpdatedAt,
+                AverageRating = product.Reviews != null && product.Reviews.Any() 
+                    ? product.Reviews.Average(r => r.Rating) 
+                    : 0,
+                TotalOrders = product.Variants
+                        .SelectMany(v => v.VariantOrders)
+                        .Count(),
+                Variants = variants
+            });
         }
         
         [HttpPost]
@@ -89,16 +128,6 @@ namespace Ecommerce.BackendAPI.Controllers
                 var classificationIdList = JsonSerializer.Deserialize<List<int>>(classifications);
                 if (classificationIdList == null || classificationIdList.Count == 0) return BadRequest(new { Error = "Classification is required" });
 
-                var productClassifications = new List<ProductClassification>();
-                foreach (int Id in classificationIdList) {
-                    var classification = _classificationRepository.GetClassificationById(Id);
-                    if (classification == null) return BadRequest(new { Error = $"Classification with Id = {Id} not found" });
-                    productClassifications.Add(new ProductClassification
-                    {
-                        ClassificationId = Id
-                    });
-                }
-
                 IList<CreateVariantsOfProductParameter> variantList = new List<CreateVariantsOfProductParameter>();
                 if (!string.IsNullOrEmpty(variants))
                 {
@@ -110,11 +139,16 @@ namespace Ecommerce.BackendAPI.Controllers
                     {
                         return BadRequest($"Invalid JSON format for variants: {ex.Message}");
                     }  
-                }                
+                }           
+                var classificationList = new List<Classification>();
+                foreach (int Id in classificationIdList) {
+                    var classification = await _classificationRepository.GetClassificationById(Id);
+                    if (classification == null) return BadRequest(new { Error = $"Classification with Id = {Id} not found"});
+                    classificationList.Add(classification);
+                }
 
                 var product = _mapper.Map<Product>(productDto);
-                product.ProductClassifications = productClassifications;
-                var productCreated = await _productRepository.CreateProduct(product);
+                var productCreated = await _productRepository.CreateProduct(product, classificationList);
 
                 if (variantList.Count > 0)
                 {
