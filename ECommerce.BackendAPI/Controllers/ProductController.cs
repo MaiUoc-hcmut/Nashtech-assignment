@@ -17,6 +17,7 @@ namespace Ecommerce.BackendAPI.Controllers
         private readonly IProductRepository _productRepository;
         private readonly IVariantRepository _variantRepository;
         private readonly ICategoryRepository _categoryRepository;
+        private readonly IClassificationRepository _classificationRepository;
         private readonly IMapper _mapper;
 
         public ProductController
@@ -24,12 +25,14 @@ namespace Ecommerce.BackendAPI.Controllers
             IProductRepository productRepository, 
             IVariantRepository variantRepository,
             ICategoryRepository categoryRepository,
+            IClassificationRepository classificationRepository,
             IMapper mapper
         )
         {
             _productRepository = productRepository;
             _variantRepository = variantRepository;
             _categoryRepository = categoryRepository;
+            _classificationRepository = classificationRepository;
             _mapper = mapper;
         }
 
@@ -61,16 +64,16 @@ namespace Ecommerce.BackendAPI.Controllers
         public async Task<IActionResult> CreateProduct
         (
             [FromForm] ProductDTO productDto, 
-            [FromForm] IEnumerable<IFormFile> images,
+            [FromForm] string classifications,
             [FromForm] string? variants = null
         )
         {
             var transaction = await _productRepository.BeginTransactionAsync();
             try
             {
-                if (productDto == null)
+                if (productDto == null || classifications == null)
                 {
-                    return BadRequest("Product data is null.");
+                    return BadRequest("Product data or classification is null.");
                 }
 
                 var urls = HttpContext.Items["UploadedUrls"] as Dictionary<string, string>;
@@ -81,6 +84,19 @@ namespace Ecommerce.BackendAPI.Controllers
                 else
                 {
                     productDto.ImageUrl = "";
+                }
+
+                var classificationIdList = JsonSerializer.Deserialize<List<int>>(classifications);
+                if (classificationIdList == null || classificationIdList.Count == 0) return BadRequest(new { Error = "Classification is required" });
+
+                var productClassifications = new List<ProductClassification>();
+                foreach (int Id in classificationIdList) {
+                    var classification = _classificationRepository.GetClassificationById(Id);
+                    if (classification == null) return BadRequest(new { Error = $"Classification with Id = {Id} not found" });
+                    productClassifications.Add(new ProductClassification
+                    {
+                        ClassificationId = Id
+                    });
                 }
 
                 IList<CreateVariantsOfProductParameter> variantList = new List<CreateVariantsOfProductParameter>();
@@ -97,6 +113,7 @@ namespace Ecommerce.BackendAPI.Controllers
                 }                
 
                 var product = _mapper.Map<Product>(productDto);
+                product.ProductClassifications = productClassifications;
                 var productCreated = await _productRepository.CreateProduct(product);
 
                 if (variantList.Count > 0)
@@ -111,11 +128,6 @@ namespace Ecommerce.BackendAPI.Controllers
                         var variantCategories = new List<VariantCategory>();
                         foreach (var categoryId in variant.Categories)
                         {
-                            // var category = await _categoryRepository.GetCategoryById(categoryId);
-                            // if (category == null)
-                            // {
-                            //     throw new Exception($"Category with ID {categoryId} does not exist.");
-                            // }
                             variantCategories.Add(new VariantCategory { CategoryId = categoryId });
                         }
                         var variantEntity = _mapper.Map<Variant>(variant);

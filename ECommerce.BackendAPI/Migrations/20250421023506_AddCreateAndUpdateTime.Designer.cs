@@ -4,6 +4,7 @@ using Ecommerce.BackendAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ECommerce.BackendAPI.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20250421023506_AddCreateAndUpdateTime")]
+    partial class AddCreateAndUpdateTime
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -89,23 +92,6 @@ namespace ECommerce.BackendAPI.Migrations
                     b.HasIndex("ParentCategoryId");
 
                     b.ToTable("Categories");
-                });
-
-            modelBuilder.Entity("Ecommerce.SharedViewModel.Models.Classification", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Classifications");
                 });
 
             modelBuilder.Entity("Ecommerce.SharedViewModel.Models.Customer", b =>
@@ -234,21 +220,6 @@ namespace ECommerce.BackendAPI.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Products");
-                });
-
-            modelBuilder.Entity("Ecommerce.SharedViewModel.Models.ProductClassification", b =>
-                {
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ClassificationId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ProductId", "ClassificationId");
-
-                    b.HasIndex("ClassificationId");
-
-                    b.ToTable("ProductClassifications");
                 });
 
             modelBuilder.Entity("Ecommerce.SharedViewModel.Models.Review", b =>
@@ -422,25 +393,6 @@ namespace ECommerce.BackendAPI.Migrations
                     b.Navigation("Customer");
                 });
 
-            modelBuilder.Entity("Ecommerce.SharedViewModel.Models.ProductClassification", b =>
-                {
-                    b.HasOne("Ecommerce.SharedViewModel.Models.Product", "Product")
-                        .WithMany("ProductClassifications")
-                        .HasForeignKey("ClassificationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Ecommerce.SharedViewModel.Models.Classification", "Classification")
-                        .WithMany("ProductClassifications")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Classification");
-
-                    b.Navigation("Product");
-                });
-
             modelBuilder.Entity("Ecommerce.SharedViewModel.Models.Review", b =>
                 {
                     b.HasOne("Ecommerce.SharedViewModel.Models.Customer", "Customer")
@@ -538,11 +490,6 @@ namespace ECommerce.BackendAPI.Migrations
                     b.Navigation("VariantCategories");
                 });
 
-            modelBuilder.Entity("Ecommerce.SharedViewModel.Models.Classification", b =>
-                {
-                    b.Navigation("ProductClassifications");
-                });
-
             modelBuilder.Entity("Ecommerce.SharedViewModel.Models.Customer", b =>
                 {
                     b.Navigation("Orders");
@@ -565,8 +512,6 @@ namespace ECommerce.BackendAPI.Migrations
 
             modelBuilder.Entity("Ecommerce.SharedViewModel.Models.Product", b =>
                 {
-                    b.Navigation("ProductClassifications");
-
                     b.Navigation("Reviews");
 
                     b.Navigation("Variants");

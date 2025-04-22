@@ -11,6 +11,7 @@ namespace Ecommerce.BackendAPI.Data
 
         public DbSet<Product> Products { get; set; }
         public DbSet<Variant> Variants { get; set; }
+        public DbSet<Classification> Classifications { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<ParentCategory> ParentCategories { get; set; }
         public DbSet<Customer> Customers { get; set; }
@@ -21,6 +22,7 @@ namespace Ecommerce.BackendAPI.Data
         public DbSet<VariantCategory> VariantCategories { get; set; }
         public DbSet<VariantOrder> VariantOrders { get; set; }
         public DbSet<VariantCart> VariantCarts { get; set; }
+        public DbSet<ProductClassification> ProductClassifications { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -58,6 +60,17 @@ namespace Ecommerce.BackendAPI.Data
                 .WithMany(vc => vc.VariantCarts)
                 .HasForeignKey(vc => vc.CartId);
 
+            modelBuilder.Entity<ProductClassification>()
+                .HasKey(pc => new { pc.ProductId, pc.ClassificationId});
+            modelBuilder.Entity<ProductClassification>()
+                .HasOne(p => p.Product)
+                .WithMany(pc => pc.ProductClassifications)
+                .HasForeignKey(pc => pc.ClassificationId);
+            modelBuilder.Entity<ProductClassification>()
+                .HasOne(c => c.Classification)
+                .WithMany(pc => pc.ProductClassifications)
+                .HasForeignKey(pc => pc.ProductId);
+
             modelBuilder.Entity<Cart>()
                 .HasOne(c => c.Customer)
                 .WithOne(cu => cu.cart)
@@ -69,11 +82,11 @@ namespace Ecommerce.BackendAPI.Data
                 .HasPrecision(18, 2);
             
             modelBuilder.Entity<Variant>()
-                .Property(p => p.Price)
+                .Property(v => v.Price)
                 .HasPrecision(18, 2);
 
             modelBuilder.Entity<Order>()
-                .Property(p => p.Amount)
+                .Property(o => o.Amount)
                 .HasPrecision(18, 2);
         }   
     }

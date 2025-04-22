@@ -47,7 +47,7 @@ namespace Ecommerce.BackendAPI.Controllers
         }
 
         [HttpPost]
-        [ServiceFilter(typeof(CategoryAndParentFilter))]
+        [ServiceFilter(typeof(CategoryAndParentAndClassificationFilter))]
         public async Task<IActionResult> CreateCategory([FromBody] CategoryDTO categoryDto, [FromQuery] int parentId)
         {
             if (categoryDto == null) return BadRequest("Invalid category data");
@@ -60,8 +60,7 @@ namespace Ecommerce.BackendAPI.Controllers
         }
 
         [HttpPut("{id}")]
-        [ServiceFilter(typeof(CategoryAndParentFilter))]
-        public async Task<IActionResult> UpdateCategory(int id, [FromBody] CategoryDTO categoryDto)
+        [ServiceFilter(typeof(CategoryAndParentAndClassificationFilter))]        public async Task<IActionResult> UpdateCategory(int id, [FromBody] CategoryDTO categoryDto)
         {
             if (categoryDto == null || id != categoryDto.Id) return BadRequest("Invalid category data");
 
@@ -72,7 +71,7 @@ namespace Ecommerce.BackendAPI.Controllers
         }
         
         [HttpDelete("{id}")]
-        [ServiceFilter(typeof(CategoryAndParentFilter))]
+        [ServiceFilter(typeof(CategoryAndParentAndClassificationFilter))]
         public async Task<IActionResult> DeleteCategory(int id)
         {
             var deleted = await _categoryRepository.DeleteCategory(id);

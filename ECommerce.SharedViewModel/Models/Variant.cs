@@ -11,5 +11,7 @@ namespace Ecommerce.SharedViewModel.Models
         public ICollection<VariantCategory> VariantCategories { get; set; }
         public ICollection<VariantOrder> VariantOrders { get; set; }
         public ICollection<VariantCart> VariantCarts { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     }
 }

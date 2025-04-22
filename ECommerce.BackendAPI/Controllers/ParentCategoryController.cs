@@ -42,7 +42,7 @@ namespace Ecommerce.BackendAPI.Controllers
         }
 
         [HttpPost]
-        [ServiceFilter(typeof(CategoryAndParentFilter))]
+        [ServiceFilter(typeof(CategoryAndParentAndClassificationFilter))]
         public async Task<IActionResult> CreateParentCategory([FromBody] ParentCategoryDTO request)
         {
             if (request == null)
@@ -71,7 +71,7 @@ namespace Ecommerce.BackendAPI.Controllers
     
 
         [HttpPut("{id}")]
-        [ServiceFilter(typeof(CategoryAndParentFilter))]
+        [ServiceFilter(typeof(CategoryAndParentAndClassificationFilter))]
         public async Task<IActionResult> UpdateParentCategory(int id, [FromBody] ParentCategoryDTO request)
         {
             var parentCategory = _mapper.Map<ParentCategory>(request);
@@ -86,7 +86,7 @@ namespace Ecommerce.BackendAPI.Controllers
         }
 
         [HttpDelete("{id}")]
-        [ServiceFilter(typeof(CategoryAndParentFilter))]
+        [ServiceFilter(typeof(CategoryAndParentAndClassificationFilter))]
         public async Task<IActionResult> DeleteParentCategory(int id)
         {
             if (!await _parentCategoryRepo.DeleteParentCategory(id))

@@ -15,6 +15,7 @@ namespace Ecommerce.BackendAPI.Helper
             CreateMap<Variant, CreateVariantsOfProductParameter>().ReverseMap();
             CreateMap<Category, CategoryDTO>().ReverseMap();
             CreateMap<ParentCategory, ParentCategoryDTO>().ReverseMap();
+            CreateMap<Classification, ClassificationDTO>().ReverseMap();
             CreateMap<Customer, CustomerDTO>().ReverseMap();
             CreateMap<Order, OrderDTO>().ReverseMap();
             CreateMap<Cart, CartDTO>().ReverseMap();

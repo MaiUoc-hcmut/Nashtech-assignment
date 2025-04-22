@@ -27,9 +27,22 @@ namespace Ecommerce.BackendAPI.Repositories
             return await _context.Products.FindAsync(id);
         }
 
-        public async Task<IEnumerable<Product>> GetAllProducts()
+        public async Task<IEnumerable<Product>> GetAllProducts
+        (
+            int pageNumber = 1,
+            int pageSize = 10,
+            string sortBy = "UpdatedAt",
+            bool isAsc = true
+        )
         {
-            return await _context.Products.ToListAsync();
+            var query = _context.Products.AsQueryable();
+
+            query = isAsc
+                ? query.OrderBy(p => EF.Property<object>(p, sortBy))
+                : query.OrderByDescending(p => EF.Property<object>(p, sortBy));
+
+            query = query.Skip((pageNumber - 1) * pageSize).Take(pageSize);
+            return await query.ToListAsync();
         }
 
         public async Task<Product> CreateProduct(Product product)

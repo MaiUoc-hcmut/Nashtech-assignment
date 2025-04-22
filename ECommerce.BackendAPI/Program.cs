@@ -21,9 +21,15 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<VerifyToken>();
 builder.Services.AddScoped<CheckUserExists>();
-builder.Services.AddScoped<CategoryAndParentFilter>();
+builder.Services.AddScoped<CategoryAndParentAndClassificationFilter>();
+
+// Cart filter
 builder.Services.AddScoped<AddToCartFilter>();
 builder.Services.AddScoped<RemoveFromCartFilter>();
+
+// Order filter
+builder.Services.AddScoped<GetOrderFilter>();
+builder.Services.AddScoped<CreateOrderFilter>();
 
 // Add custom repositories
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
@@ -35,6 +41,7 @@ builder.Services.AddScoped<IVariantRepository, VariantRepository>();
 builder.Services.AddScoped<IParentCategoryRepo, ParentCategoryRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ICartRepository, CartRepository>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

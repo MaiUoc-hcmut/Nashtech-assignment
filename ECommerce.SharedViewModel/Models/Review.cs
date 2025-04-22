@@ -7,5 +7,7 @@ namespace Ecommerce.SharedViewModel.Models
         public required string Text { get; set; }
         public required Product Product { get; set; }
         public required Customer Customer { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     }
 }

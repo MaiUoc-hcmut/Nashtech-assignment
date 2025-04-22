@@ -6,5 +6,7 @@ namespace Ecommerce.SharedViewModel.Models
         public int CartId { get; set; }
         public Variant Variant { get; set; }
         public Cart Cart { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     }
 }

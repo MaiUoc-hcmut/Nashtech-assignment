@@ -13,5 +13,7 @@ namespace Ecommerce.SharedViewModel.Models
         public ICollection<Order> Orders { get; set; }
         public ICollection<Review> Reviews { get; set; }
         public Cart cart { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     }
 }

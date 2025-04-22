@@ -5,12 +5,12 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Ecommerce.BackendAPI.FiltersAction
 {
-    public class CategoryAndParentFilter : ActionFilterAttribute
+    public class CategoryAndParentAndClassificationFilter : ActionFilterAttribute
     {
         private readonly ICategoryRepository _categoryRepository;
         private readonly IAdminRepository _adminRepository;
 
-        public CategoryAndParentFilter(ICategoryRepository categoryRepository, IAdminRepository adminRepository)
+        public CategoryAndParentAndClassificationFilter(ICategoryRepository categoryRepository, IAdminRepository adminRepository)
         {
             _adminRepository = adminRepository;
             _categoryRepository = categoryRepository;
