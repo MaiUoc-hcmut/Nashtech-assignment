@@ -43,7 +43,9 @@ namespace Ecommerce.BackendAPI.Controllers
             [FromQuery] int pageSize = 10,
             [FromQuery] string sortBy = "UpdatedAt",
             [FromQuery] bool isAsc = true,
-            [FromQuery] int? classificationId = null
+            [FromQuery] int? classificationId = null,
+            [FromQuery] decimal minPrice = 0,
+            [FromQuery] decimal maxPrice = 999999999
         )
         {
             var products = await _productRepository.GetAllProducts
@@ -51,7 +53,10 @@ namespace Ecommerce.BackendAPI.Controllers
                     pageNumber, 
                     pageSize, 
                     sortBy, 
-                    isAsc
+                    isAsc,
+                    classificationId,
+                    minPrice,
+                    maxPrice
                 );
             return Ok(products);
         }

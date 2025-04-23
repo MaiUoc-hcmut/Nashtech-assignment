@@ -16,7 +16,9 @@ namespace Ecommerce.BackendAPI.Interfaces
             int pageSize = 10,
             string sortBy = "Price",
             bool isAsc = true,
-            int? classificationId = null
+            int? classificationId = null,
+            decimal minPrice = 0,
+            decimal maxPrice = 999999999
         );
         Task<Product?> GetProductById(int id);
         Task<Product> CreateProduct(Product product, IList<Classification> classificationList);

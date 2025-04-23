@@ -54,7 +54,9 @@ namespace Ecommerce.BackendAPI.Repositories
             int pageSize = 10,
             string sortBy = "UpdatedAt",
             bool isAsc = true,
-            int? classificationId = null
+            int? classificationId = null,
+            decimal minPrice = 0,
+            decimal maxPrice = 999999999
         )
         {
             var query = _context.Products
@@ -68,6 +70,8 @@ namespace Ecommerce.BackendAPI.Repositories
             {
                 query = query.Where(p => p.ProductClassifications.Any(pc => pc.ClassificationId == classificationId.Value));
             }
+
+            query = query.Where(p => p.Price >= minPrice && p.Price <= maxPrice);
 
             query = isAsc
                 ? query.OrderBy(p => EF.Property<object>(p, sortBy))
