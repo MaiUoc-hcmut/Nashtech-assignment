@@ -2,7 +2,6 @@ using Ecommerce.SharedViewModel.DTOs;
 using Ecommerce.SharedViewModel.Models;
 using Ecommerce.BackendAPI.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using AutoMapper;
 using Ecommerce.BackendAPI.FiltersAction;
 
 

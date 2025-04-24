@@ -1,9 +1,7 @@
 using Ecommerce.SharedViewModel.Models;
-using Ecommerce.SharedViewModel.DTOs;
 using Ecommerce.BackendAPI.Interfaces;
 using Ecommerce.BackendAPI.FiltersAction;
 using Microsoft.AspNetCore.Mvc;
-using AutoMapper;
 using Ecommerce.SharedViewModel.ParametersType;
 
 
@@ -14,20 +12,19 @@ namespace Ecommerce.BackendAPI.Controllers
     public class OrderController : ControllerBase
     {
         private readonly IOrderRepository _orderRepository;
-        private readonly IMapper _mapper;
 
-        public OrderController(IOrderRepository orderRepository, IMapper mapper)
+        public OrderController(IOrderRepository orderRepository)
         {
             _orderRepository = orderRepository;
-            _mapper = mapper;
         }
 
         [HttpGet()]
+        [ServiceFilter(typeof(VerifyToken))]
+        [ServiceFilter(typeof(GetAllOrdersFilter))]
         public async Task<IActionResult> GetAllOrders()
         {
             var orders = await _orderRepository.GetAllOrders();
-            var orderDtos = _mapper.Map<IEnumerable<OrderDTO>>(orders);
-            return Ok(orderDtos);
+            return Ok(orders);
         }
 
         [HttpGet("{orderId}")]

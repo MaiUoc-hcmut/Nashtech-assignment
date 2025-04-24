@@ -1,10 +1,9 @@
 {
   "version": 2,
-  "dgSpecHash": "UBvHeJd/P6A=",
+  "dgSpecHash": "AgaNzEU3TdE=",
   "success": true,
   "projectFilePath": "C:\\Users\\Admin\\OneDrive\\Documents\\NashTech_Training\\Assignment\\ECommerce.BackendAPI\\ECommerce.BackendAPI.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\Admin\\.nuget\\packages\\automapper\\14.0.0\\automapper.14.0.0.nupkg.sha512",
     "C:\\Users\\Admin\\.nuget\\packages\\azure.core\\1.38.0\\azure.core.1.38.0.nupkg.sha512",
     "C:\\Users\\Admin\\.nuget\\packages\\azure.identity\\1.11.4\\azure.identity.1.11.4.nupkg.sha512",
     "C:\\Users\\Admin\\.nuget\\packages\\bcrypt.net-next\\4.0.3\\bcrypt.net-next.4.0.3.nupkg.sha512",

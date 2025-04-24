@@ -2,7 +2,6 @@ using Ecommerce.BackendAPI.Interfaces;
 using Ecommerce.SharedViewModel.DTOs;
 using Ecommerce.SharedViewModel.Models;
 using Microsoft.AspNetCore.Mvc;
-using AutoMapper;
 using Ecommerce.BackendAPI.FiltersAction;
 using Ecommerce.SharedViewModel.ParametersType;
 
@@ -14,23 +13,27 @@ namespace Ecommerce.BackendAPI.Controllers
     public class CustomerController : ControllerBase
     {
         private readonly ICustomerRepository _customerRepository;
-        private readonly IMapper _mapper;
 
-        public CustomerController(ICustomerRepository customerRepository, IMapper mapper)
+        public CustomerController(ICustomerRepository customerRepository)
         {
-            _mapper = mapper;
             _customerRepository = customerRepository;
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetCustomerById(int id)
         {
-            var customer = _mapper.Map<CustomerDTO>(await _customerRepository.GetCustomerById(id));
+            var customer = await _customerRepository.GetCustomerById(id);
             if (customer == null)
             {
                 return NotFound(new { Message = "Customer not found." });
             }
-            return Ok(customer);
+            return Ok(new {
+                Name = customer.Name,
+                Email = customer.Email,
+                UserName = customer.Username,
+                Address = customer.Address,
+                PhoneNumber = customer.PhoneNumber
+            });
         }
 
         [HttpPut("{id}")]
@@ -46,7 +49,15 @@ namespace Ecommerce.BackendAPI.Controllers
                 return Unauthorized(new { Message = "You are not authorized to update this customer." });
             }
             
-            var customer = _mapper.Map<Customer>(customerDTO);
+            var customer = new UpdateCustomerParameter 
+            {
+                Id = userId,
+                Name = customerDTO.Name,
+                Email = customerDTO.Email,
+                Username = customerDTO.Username,
+                PhoneNumber = customerDTO.PhoneNumber,
+                Address = customerDTO.Address
+            };
             customer.Id = userId;
             var updatedCustomer = await _customerRepository.UpdateCustomer(customer);
             if (updatedCustomer == null)
@@ -54,7 +65,14 @@ namespace Ecommerce.BackendAPI.Controllers
                 return NotFound(new { Message = "Customer not found." });
             }
 
-            return Ok(_mapper.Map<CustomerDTO>(updatedCustomer));
+            return Ok(new {
+                Id = updatedCustomer.Id,
+                Name = updatedCustomer.Name,
+                Email = updatedCustomer.Email,
+                Username = updatedCustomer.Username,
+                PhoneNumber = updatedCustomer.PhoneNumber,
+                Address = updatedCustomer.Address
+            });
         }
     
 

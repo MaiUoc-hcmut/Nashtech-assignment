@@ -34,7 +34,7 @@ namespace Ecommerce.BackendAPI.Repositories
             return await _context.Customers.AsNoTracking().FirstOrDefaultAsync(c => c.Email == email);
         }
 
-        public async Task<Customer?> UpdateCustomer(Customer customer)
+        public async Task<Customer?> UpdateCustomer(UpdateCustomerParameter customer)
         {
             var existingCustomer = await _context.Customers.FindAsync(customer.Id);
             if (existingCustomer == null) return null;

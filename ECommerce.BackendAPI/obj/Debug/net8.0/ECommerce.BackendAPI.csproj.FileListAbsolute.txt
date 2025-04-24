@@ -44,7 +44,6 @@ C:\Users\Admin\OneDrive\Documents\NashTech_Training\Assignment\ECommerce.Backend
 C:\Users\Admin\OneDrive\Documents\NashTech_Training\Assignment\ECommerce.BackendAPI\obj\Debug\net8.0\ECommerce.BackendAPI.pdb
 C:\Users\Admin\OneDrive\Documents\NashTech_Training\Assignment\ECommerce.BackendAPI\obj\Debug\net8.0\ECommerce.BackendAPI.genruntimeconfig.cache
 C:\Users\Admin\OneDrive\Documents\NashTech_Training\Assignment\ECommerce.BackendAPI\obj\Debug\net8.0\ref\ECommerce.BackendAPI.dll
-C:\Users\Admin\OneDrive\Documents\NashTech_Training\Assignment\ECommerce.BackendAPI\bin\Debug\net8.0\AutoMapper.dll
 C:\Users\Admin\OneDrive\Documents\NashTech_Training\Assignment\ECommerce.BackendAPI\bin\Debug\net8.0\BCrypt.Net-Next.dll
 C:\Users\Admin\OneDrive\Documents\NashTech_Training\Assignment\ECommerce.BackendAPI\bin\Debug\net8.0\Azure.Core.dll
 C:\Users\Admin\OneDrive\Documents\NashTech_Training\Assignment\ECommerce.BackendAPI\bin\Debug\net8.0\Azure.Identity.dll

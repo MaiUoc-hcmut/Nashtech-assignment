@@ -3,7 +3,6 @@ using Ecommerce.SharedViewModel.DTOs;
 using Ecommerce.BackendAPI.Interfaces;
 using Ecommerce.BackendAPI.FiltersAction;
 using Microsoft.AspNetCore.Mvc;
-using AutoMapper;
 
 
 namespace Ecommerce.BackendAPI.Controllers
@@ -13,11 +12,9 @@ namespace Ecommerce.BackendAPI.Controllers
     public class ReviewController : ControllerBase
     {
         private readonly IReviewRepository _reviewRepository;
-        private readonly IMapper _mapper;
 
-        public ReviewController(IReviewRepository reviewRepository, IMapper mapper)
+        public ReviewController(IReviewRepository reviewRepository)
         {
-            _mapper = mapper;
             _reviewRepository = reviewRepository;
         }
 
@@ -51,7 +48,10 @@ namespace Ecommerce.BackendAPI.Controllers
         public async Task<IActionResult> AddReview([FromBody] ReviewDTO reviewDto)
         {
             if (reviewDto == null) return BadRequest("Review cannot be null");
-            var review = _mapper.Map<Review>(reviewDto);
+            var review = new Review {
+                Rating = reviewDto.Rating,
+                Text = reviewDto.Text
+            };
             review.Customer = HttpContext.Items["Customer"] as Customer ?? throw new InvalidOperationException("Customer is not available in HttpContext.");
             review.Product = HttpContext.Items["Product"] as Product ?? throw new InvalidOperationException("Product is not available in HttpContext.");
 
@@ -65,11 +65,11 @@ namespace Ecommerce.BackendAPI.Controllers
         public async Task<IActionResult> UpdateReview(int id, [FromBody] ReviewDTO reviewDto)
         {
             if (reviewDto == null) return BadRequest("Review cannot be null");
-            var review = _mapper.Map<Review>(reviewDto);
-            review.Id = id;
-
-            var userId = HttpContext.Items["UserId"] as string;
-            if (userId == null) return Unauthorized("User not authenticated");
+            var review = new Review {
+                Id = id,
+                Rating = reviewDto.Rating,
+                Text = reviewDto.Text
+            };
 
 
             var updated = await _reviewRepository.UpdateReview(review);

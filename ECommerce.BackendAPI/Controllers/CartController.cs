@@ -2,7 +2,6 @@ using Ecommerce.BackendAPI.Interfaces;
 using Ecommerce.SharedViewModel.Models;
 using Ecommerce.SharedViewModel.ParametersType;
 using Microsoft.AspNetCore.Mvc;
-using AutoMapper;
 using Ecommerce.BackendAPI.FiltersAction;
 
 
@@ -13,12 +12,10 @@ namespace Ecommerce.BackendAPI.Controllers
     public class CartController : ControllerBase
     {
         private readonly ICartRepository _cartRepository;
-        private readonly IMapper _mapper;
 
-        public CartController(ICartRepository cartRepository, IMapper mapper)
+        public CartController(ICartRepository cartRepository)
         {
             _cartRepository = cartRepository;
-            _mapper = mapper;
         }
 
         [HttpGet("{customerId}")]

@@ -2,7 +2,6 @@ using Ecommerce.SharedViewModel.Models;
 using Ecommerce.SharedViewModel.DTOs;
 using Ecommerce.BackendAPI.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using AutoMapper;
 using System.Text.Json;
 
 
@@ -13,12 +12,12 @@ namespace Ecommerce.BackendAPI.Controllers
     public class VariantController : ControllerBase
     {
         private readonly IVariantRepository _variantRepository;
-        private readonly IMapper _mapper;
+        private readonly IProductRepository _productRepository;
 
-        public VariantController(IVariantRepository variantRepository, IMapper mapper)
+        public VariantController(IVariantRepository variantRepository, IProductRepository productRepository)
         {
-            _mapper = mapper;
             _variantRepository = variantRepository;
+            _productRepository = productRepository;
         }
 
         [HttpGet("{id}")]
@@ -32,7 +31,16 @@ namespace Ecommerce.BackendAPI.Controllers
         [HttpGet("product/{productId}")]
         public async Task<ActionResult<IEnumerable<Variant>>> GetVariantsByProductId(int productId)
         {
-            var variants = _mapper.Map<IEnumerable<Variant>>(await _variantRepository.GetVariantsByProductId(productId));
+            var response = await _variantRepository.GetVariantsByProductId(productId);
+            var variants = response.Select(v => new Variant {
+                Id = v.Id,
+                SKU = v.SKU,
+                Price = v.Price,
+                StockQuantity = v.StockQuantity,
+                ImageUrl = v.ImageUrl,
+                CreatedAt = v.CreatedAt,
+                UpdatedAt = v.UpdatedAt,
+            }).ToList();
             if (variants == null || !variants.Any()) return NotFound();
             return Ok(variants);
         }
@@ -42,13 +50,22 @@ namespace Ecommerce.BackendAPI.Controllers
         (
             [FromForm] VariantDTO variantDto, 
             // [FromForm] IFormFile? image,
-            [FromForm] string Categories
+            [FromForm] string Categories,
+            [FromForm] int productId
         )
         {
             if (variantDto == null) return BadRequest("Invalid variant data.");
             if (Categories == null) return BadRequest("Invalid category data.");
 
-            var variant = _mapper.Map<Variant>(variantDto);
+            var product = await _productRepository.GetProductById(productId);
+            if (product == null) return BadRequest(new { Error = "Invalid productId" });
+
+            var variant = new Variant {
+                SKU = variantDto.SKU,
+                StockQuantity = variantDto.StockQuantity,
+                Price = variantDto.Price,
+                Product = product
+            };
             var url = HttpContext.Items["Url"] as string;
 
             var categories = JsonSerializer.Deserialize<List<VariantCategory>>(Categories);
@@ -86,8 +103,16 @@ namespace Ecommerce.BackendAPI.Controllers
 
             var url = HttpContext.Items["Url"] as string;
             variant.ImageUrl = url != null ? url : variant.ImageUrl;
+            foreach (var property in typeof(VariantDTO).GetProperties())
+            {
+                var variantProperty = typeof(Variant).GetProperty(property.Name);
+                if (variantProperty != null && variantProperty.CanWrite)
+                {
+                    var value = property.GetValue(variantDto);
+                    variantProperty.SetValue(variant, value);
+                }
+            }
 
-            _mapper.Map(variantDto, variant);
             await _variantRepository.UpdateVariant(variant);
             return Ok("Variant updated successfully.");
         }

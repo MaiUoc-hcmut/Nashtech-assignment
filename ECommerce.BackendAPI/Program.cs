@@ -7,15 +7,12 @@ using Ecommerce.BackendAPI.Services;
 using Ecommerce.BackendAPI.Interfaces.Helper;
 using Ecommerce.BackendAPI.Helper;
 using Ecommerce.BackendAPI.FiltersAction;
-using Swashbuckle.AspNetCore.SwaggerGen;
-using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers().AddJsonOptions(x =>
                 x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 // Add custom filters and services
 builder.Services.AddScoped<AuthService>();
@@ -29,6 +26,7 @@ builder.Services.AddScoped<RemoveFromCartFilter>();
 
 // Order filter
 builder.Services.AddScoped<GetOrderFilter>();
+builder.Services.AddScoped<GetAllOrdersFilter>();
 builder.Services.AddScoped<CreateOrderFilter>();
 
 // Add custom repositories
@@ -57,12 +55,17 @@ builder.Services.AddDbContext<DataContext>(options =>
 ));
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAllOrigins",
+    options.AddPolicy("AllowReactApp",
         builder =>
         {
-            builder.AllowAnyOrigin()
-                   .AllowAnyMethod()
-                   .AllowAnyHeader();
+            builder.WithOrigins
+            (
+                "http://localhost:5173",
+                "http://localhost:5122"
+            ) // Your React app's origin
+               .AllowAnyMethod() // Allow GET, POST, etc.
+               .AllowAnyHeader() // Allow headers like Authorization
+               .AllowCredentials(); // If using cookies or auth headers
         });
 });
 
@@ -76,6 +79,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors("AllowReactApp");
 
 app.UseWhen(
     context => 

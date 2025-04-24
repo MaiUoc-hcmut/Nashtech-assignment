@@ -1,7 +1,5 @@
 using Ecommerce.BackendAPI.Interfaces;
-using Ecommerce.SharedViewModel.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Ecommerce.BackendAPI.Controllers
 {

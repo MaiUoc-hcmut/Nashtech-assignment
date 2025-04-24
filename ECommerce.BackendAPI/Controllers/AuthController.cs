@@ -3,11 +3,8 @@ using Ecommerce.SharedViewModel.ParametersType;
 using Ecommerce.BackendAPI.Interfaces;
 using Ecommerce.BackendAPI.Services;
 using Microsoft.AspNetCore.Mvc;
-using AutoMapper;
 using Ecommerce.SharedViewModel.DTOs;
-using Ecommerce.SharedViewModel.Models;
 using Ecommerce.BackendAPI.Interfaces.Helper;
-using Ecommerce.BackendAPI.FiltersAction;
 
 
 namespace ECommerce.BackendAPI.Controllers
@@ -18,21 +15,18 @@ namespace ECommerce.BackendAPI.Controllers
     {
         private readonly IAuthRepository _authRepository;
         private readonly AuthService _authService;
-        private readonly IMapper _mapper;
         private readonly IDependMethod _dependMethod;
 
         public AuthController
         (
             IAuthRepository authRepository, 
             AuthService authService, 
-            IMapper mapper,
             IDependMethod dependMethod
         )
         
         {
             _authRepository = authRepository;
             _authService = authService;
-            _mapper = mapper;
             _dependMethod = dependMethod;
         }
 
@@ -52,12 +46,18 @@ namespace ECommerce.BackendAPI.Controllers
                     return BadRequest("Registration failed.");
                 }
 
-                var customerDTO = _mapper.Map<CustomerDTO>(registeredUser);
                 var response = new RegisterResponse
                 {
                     Success = true,
                     Message = "Registration successful.",
-                    Customer = customerDTO
+                    Customer = {
+                        Id = registeredUser.Id,
+                        Name = registeredUser.Name,
+                        Email = registeredUser.Email,
+                        Username = registeredUser.Username,
+                        PhoneNumber = registeredUser.PhoneNumber,
+                        Address = registeredUser.Address
+                    }
                 };
 
                 await _dependMethod.CreateCartWhenRegister(registeredUser);
@@ -91,7 +91,14 @@ namespace ECommerce.BackendAPI.Controllers
                 Message = "Login successful.",
                 Token = token,
                 RefreshToken = refreshToken,
-                Customer = _mapper.Map<CustomerDTO>(customer)
+                Customer = {
+                    Id = customer.Id,
+                    Name = customer.Name,
+                    Email = customer.Email,
+                    Username = customer.Username,
+                    PhoneNumber = customer.PhoneNumber,
+                    Address = customer.Address
+                }
             };
 
             return Ok(response);
@@ -117,7 +124,13 @@ namespace ECommerce.BackendAPI.Controllers
                 Message = "Login successful.",
                 Token = token,
                 RefreshToken = refreshToken,
-                Customer = _mapper.Map<CustomerDTO>(admin)
+                Admin = {
+                    Id = admin.Id,
+                    Name = admin.Name,
+                    Email = admin.Email,
+                    PhoneNumber = admin.PhoneNumber,
+                    Address = admin.Address
+                }
             };
 
             return Ok(response);

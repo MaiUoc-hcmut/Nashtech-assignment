@@ -1,9 +1,7 @@
 using Ecommerce.BackendAPI.Interfaces;
 using Ecommerce.SharedViewModel.Models;
 using Ecommerce.SharedViewModel.DTOs;
-using Ecommerce.SharedViewModel.ParametersType;
 using Microsoft.AspNetCore.Mvc;
-using AutoMapper;
 using Ecommerce.BackendAPI.FiltersAction;
 
 
@@ -15,11 +13,9 @@ namespace Ecommerce.BackendAPI.Controllers
     public class ParentCategoryController : ControllerBase
     {
         private readonly IParentCategoryRepo _parentCategoryRepo;
-        private readonly IMapper _mapper;
 
-        public ParentCategoryController(IParentCategoryRepo parentCategoryRepo, IMapper mapper)
+        public ParentCategoryController(IParentCategoryRepo parentCategoryRepo)
         {
-            _mapper = mapper;
             _parentCategoryRepo = parentCategoryRepo;
         }
 
@@ -74,8 +70,10 @@ namespace Ecommerce.BackendAPI.Controllers
         [ServiceFilter(typeof(CategoryAndParentAndClassificationFilter))]
         public async Task<IActionResult> UpdateParentCategory(int id, [FromBody] ParentCategoryDTO request)
         {
-            var parentCategory = _mapper.Map<ParentCategory>(request);
-            parentCategory.Id = id;
+            var parentCategory = new ParentCategory {
+                Name = request.Name,
+                Id = id
+            };
 
             if (!await _parentCategoryRepo.UpdateParentCategory(parentCategory)) 
             {

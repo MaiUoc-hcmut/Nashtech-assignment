@@ -87,6 +87,36 @@ namespace Ecommerce.BackendAPI.FiltersAction
         }
     }
 
+    public class GetAllOrdersFilter : ActionFilterAttribute
+    {
+        private readonly IAdminRepository _adminrepository;
+
+        public GetAllOrdersFilter(IAdminRepository adminRepository)
+        {
+            _adminrepository = adminRepository;
+        }
+
+        public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+        {
+            var httpContext = context.HttpContext;
+            var adminId = httpContext.Items["UserId"]?.ToString();
+            if (adminId == null)
+            {
+                context.Result = new NotFoundObjectResult(new { Error = "Invalid admin id" });
+                return;
+            }
+
+            var admin = await _adminrepository.GetAdminById(int.Parse(adminId));
+            if (admin == null)
+            {
+                context.Result = new NotFoundObjectResult(new { Error = "Admin not found" });
+                return;
+            }
+
+            await next();
+        }
+    }
+
     public class CreateOrderFilter : ActionFilterAttribute
     {
         private readonly ICustomerRepository _customerRepository;

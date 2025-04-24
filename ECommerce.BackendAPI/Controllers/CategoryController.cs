@@ -1,8 +1,6 @@
 using Ecommerce.SharedViewModel.DTOs;
 using Ecommerce.BackendAPI.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Ecommerce.SharedViewModel.Models;
-using AutoMapper;
 using Ecommerce.BackendAPI.FiltersAction;
 
 
@@ -14,26 +12,24 @@ namespace Ecommerce.BackendAPI.Controllers
     {
         private readonly ICategoryRepository _categoryRepository;
         private readonly IParentCategoryRepo _parentCategoryRepo;
-        private readonly IMapper _mapper;
 
-        public CategoryController(ICategoryRepository categoryRepository, IParentCategoryRepo parentCategoryRepo, IMapper mapper)
+        public CategoryController(ICategoryRepository categoryRepository, IParentCategoryRepo parentCategoryRepo)
         {
             _categoryRepository = categoryRepository;
             _parentCategoryRepo = parentCategoryRepo;
-            _mapper = mapper;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAllCategories()
         {
-            var categories = _mapper.Map<IList<CategoryDTO>>(await _categoryRepository.GetAllCategories());
+            var categories = await _categoryRepository.GetAllCategories();
             return Ok(categories);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetCategoryById(int id)
         {
-            var category = _mapper.Map<CategoryDTO>(await _categoryRepository.GetCategoryById(id));
+            var category = await _categoryRepository.GetCategoryById(id);
             if (category == null) return NotFound("Category not found");
             return Ok(category);
         }
@@ -41,7 +37,7 @@ namespace Ecommerce.BackendAPI.Controllers
         [HttpGet("GetCategoriesByParentId/{parentId}")]
         public async Task<IActionResult> GetCategoriesByParentId(int parentId)
         {
-            var categories = _mapper.Map<IList<CategoryDTO>>(await _categoryRepository.GetCategoriesByParentId(parentId));
+            var categories = await _categoryRepository.GetCategoriesByParentId(parentId);
             if (categories == null || categories.Count == 0) return NotFound("No categories found for this parent ID");
             return Ok(categories);
         }

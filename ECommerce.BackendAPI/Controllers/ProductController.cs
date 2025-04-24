@@ -3,9 +3,7 @@ using Ecommerce.BackendAPI.Interfaces;
 using Ecommerce.SharedViewModel.Models;
 using Ecommerce.SharedViewModel.DTOs;
 using Ecommerce.SharedViewModel.ParametersType;
-using AutoMapper;
 using System.Text.Json;
-using Microsoft.AspNetCore.Http;
 
 
 namespace Ecommerce.BackendAPI.Controllers
@@ -18,22 +16,19 @@ namespace Ecommerce.BackendAPI.Controllers
         private readonly IVariantRepository _variantRepository;
         private readonly ICategoryRepository _categoryRepository;
         private readonly IClassificationRepository _classificationRepository;
-        private readonly IMapper _mapper;
 
         public ProductController
         (
             IProductRepository productRepository, 
             IVariantRepository variantRepository,
             ICategoryRepository categoryRepository,
-            IClassificationRepository classificationRepository,
-            IMapper mapper
+            IClassificationRepository classificationRepository
         )
         {
             _productRepository = productRepository;
             _variantRepository = variantRepository;
             _categoryRepository = categoryRepository;
             _classificationRepository = classificationRepository;
-            _mapper = mapper;
         }
 
         [HttpGet]
@@ -152,24 +147,33 @@ namespace Ecommerce.BackendAPI.Controllers
                     classificationList.Add(classification);
                 }
 
-                var product = _mapper.Map<Product>(productDto);
+                var product = new Product {
+                    Name = productDto.Name,
+                    Price = productDto.Price,
+                    Description = productDto.Description
+                };
                 var productCreated = await _productRepository.CreateProduct(product, classificationList);
 
                 if (variantList.Count > 0)
                 {
-                    foreach (var variant in variantList)
+                    foreach (var variantDto in variantList)
                     {
-                        if (urls != null && urls.TryGetValue(variant.Key, out var variantUrl))
+                        if (urls != null && urls.TryGetValue(variantDto.Key, out var variantUrl))
                         {
-                            variant.ImageUrl = variantUrl;
+                            variantDto.ImageUrl = variantUrl;
                         }
 
                         var variantCategories = new List<VariantCategory>();
-                        foreach (var categoryId in variant.Categories)
+                        foreach (var categoryId in variantDto.Categories)
                         {
                             variantCategories.Add(new VariantCategory { CategoryId = categoryId });
                         }
-                        var variantEntity = _mapper.Map<Variant>(variant);
+                        var variantEntity = new Variant {
+                            SKU = variantDto.SKU,
+                            Price = variantDto.Price,
+                            StockQuantity = variantDto.StockQuantity,
+                            ImageUrl = variantDto.ImageUrl
+                        };
                         variantEntity.Product = productCreated;
                         variantEntity.VariantCategories = variantCategories;
                         await _variantRepository.CreateVariant(variantEntity);
@@ -195,8 +199,12 @@ namespace Ecommerce.BackendAPI.Controllers
                 return BadRequest("Product data is null.");
             }
 
-            var product = _mapper.Map<Product>(productDto);
-            product.Id = id;
+            var product = new Product {
+                Name = productDto.Name,
+                Price = productDto.Price,
+                Description = productDto.Description,
+                Id = id
+            };
 
             if (!await _productRepository.UpdateProduct(product))
             {
