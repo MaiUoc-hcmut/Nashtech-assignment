@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ECommerce.SharedViewModel")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f99e79a99f5154f582c2298a9b1baadd3996536b")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8a3605dfcea85fec9d56b4e514e4aa7a5fb7d2ed")]
 [assembly: System.Reflection.AssemblyProductAttribute("ECommerce.SharedViewModel")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ECommerce.SharedViewModel")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
