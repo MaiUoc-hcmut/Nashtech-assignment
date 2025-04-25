@@ -192,7 +192,7 @@ namespace Ecommerce.BackendAPI.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateProduct(int id, [FromBody] ProductDTO productDto)
+        public async Task<IActionResult> UpdateProduct(int id, [FromForm] ProductDTO productDto)
         {
             if (productDto == null)
             {

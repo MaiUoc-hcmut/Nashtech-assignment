@@ -31,7 +31,7 @@ namespace Ecommerce.BackendAPI.Repositories
             return await _context.Categories.Where(c => c.ParentCategory.Id == parentId).ToListAsync();
         }
 
-        public async Task<Category> CreateCategory(CategoryDTO request, ParentCategory parentCategory)
+        public async Task<Category?> CreateCategory(CategoryDTO request, ParentCategory parentCategory)
         {
             var category = new Category
             {
@@ -39,19 +39,18 @@ namespace Ecommerce.BackendAPI.Repositories
                 ParentCategory = parentCategory
             };
 
-            await _context.Categories.AddAsync(category);
-            await _context.SaveChangesAsync();
-            return category;
+            var response = await _context.Categories.AddAsync(category);
+            return (await SaveAsync() == true) ? response.Entity : null;
         }
 
-        public async Task<bool> UpdateCategory(CategoryDTO request)
+        public async Task<Category?> UpdateCategory(CategoryDTO request)
         {
             var category = await _context.Categories.FindAsync(request.Id);
-            if (category == null) return false;
+            if (category == null) return null;
 
             category.Name = request.Name;
             _context.Categories.Update(category);
-            return await _context.SaveChangesAsync() > 0;
+            return (await SaveAsync() == true) ? category : null;
         }
 
         public async Task<bool> DeleteCategory(int id)
@@ -63,7 +62,7 @@ namespace Ecommerce.BackendAPI.Repositories
             return await _context.SaveChangesAsync() > 0;
         }
 
-        public async Task<bool> Save()
+        public async Task<bool> SaveAsync()
         {
             return await _context.SaveChangesAsync() > 0;
         }

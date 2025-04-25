@@ -9,9 +9,9 @@ namespace Ecommerce.BackendAPI.Interfaces
         Task<IList<Category>> GetAllCategories();
         Task<Category?> GetCategoryById(int id);
         Task<IList<Category>> GetCategoriesByParentId(int parentId);
-        Task<Category> CreateCategory(CategoryDTO category, ParentCategory parentCategory);
-        Task<bool> UpdateCategory(CategoryDTO category);
+        Task<Category?> CreateCategory(CategoryDTO category, ParentCategory parentCategory);
+        Task<Category?> UpdateCategory(CategoryDTO category);
         Task<bool> DeleteCategory(int id);
-        Task<bool> Save();
+        Task<bool> SaveAsync();
     }
 }

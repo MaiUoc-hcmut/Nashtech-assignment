@@ -8,8 +8,8 @@ namespace Ecommerce.BackendAPI.Interfaces
     {
         Task<IEnumerable<Classification>> GetAllClassifications();
         Task<Classification?> GetClassificationById(int Id);
-        Task<bool> CreateClassification(Classification classification);
-        Task<bool> UpdateClassification(ClassificationDTO request);
+        Task<Classification?> CreateClassification(Classification classification);
+        Task<Classification?> UpdateClassification(ClassificationDTO request);
         Task<bool> DeleteClassification(Classification classification);
         Task<bool> SaveAsync();
     }

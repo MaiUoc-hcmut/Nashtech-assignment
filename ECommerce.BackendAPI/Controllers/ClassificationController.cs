@@ -38,36 +38,36 @@ namespace Ecommerce.BackendAPI.Controllers
         [HttpPost]
         // [ServiceFilter(typeof(VerifyToken))]
         // [ServiceFilter(typeof(CategoryAndParentAndClassificationFilter))]
-        public async Task<IActionResult> CreateClassification(string Name)
+        public async Task<IActionResult> CreateClassification([FromBody] ClassificationDTO request)
         {
-            if (Name == null) return BadRequest(new { Error = "Name must be not null" });
+            if (request == null) return BadRequest(new { Error = "Name must be not null" });
 
             var classification = new Classification
             {
-                Name = Name
+                Name = request.Name,
+                Description = request.Description
             };
 
-            await _classificationRepository.CreateClassification(classification);
-            return Ok(new { Message = "Classification successfully created" });
+            var response = await _classificationRepository.CreateClassification(classification);
+            return Ok(response);
         }
 
         [HttpPut("{Id}")]
-        [ServiceFilter(typeof(VerifyToken))]
-        [ServiceFilter(typeof(CategoryAndParentAndClassificationFilter))]
+        // [ServiceFilter(typeof(VerifyToken))]
+        // [ServiceFilter(typeof(CategoryAndParentAndClassificationFilter))]
         public async Task<IActionResult> UpdateClassification(int Id, ClassificationDTO request)
         {
-            if (Id != request.Id || request == null)   return BadRequest("Invalid category data");
+            if (request == null)   return BadRequest("Invalid category data");
+            request.Id = Id;
 
-            if (!await _classificationRepository.UpdateClassification(request)) {
-                return NotFound(new { Error = "Classification not found" });
-            }
-
-            return Ok(new { Message = "Classification successfully updated"});
+            var response = await _classificationRepository.UpdateClassification(request);
+            if (response == null) return NotFound(new { Error = "Classification not found" });
+            return Ok(response);
         }
 
-        [HttpDelete]
-        [ServiceFilter(typeof(VerifyToken))]
-        [ServiceFilter(typeof(CategoryAndParentAndClassificationFilter))]
+        [HttpDelete("{Id}")]
+        // [ServiceFilter(typeof(VerifyToken))]
+        // [ServiceFilter(typeof(CategoryAndParentAndClassificationFilter))]
         public async Task<IActionResult> DeleteClassification(int Id)
         {
             var classification = HttpContext.Items["Classification"] as Classification;

@@ -43,7 +43,8 @@ namespace Ecommerce.BackendAPI.Controllers
         }
 
         [HttpPost]
-        [ServiceFilter(typeof(CategoryAndParentAndClassificationFilter))]
+        // [ServiceFilter(typeof(VerifyToken))]
+        // [ServiceFilter(typeof(CategoryAndParentAndClassificationFilter))]
         public async Task<IActionResult> CreateCategory([FromBody] CategoryDTO categoryDto, [FromQuery] int parentId)
         {
             if (categoryDto == null) return BadRequest("Invalid category data");
@@ -51,23 +52,26 @@ namespace Ecommerce.BackendAPI.Controllers
             var parentCategory = await _parentCategoryRepo.GetParentCategoryById(parentId);
             if (parentCategory == null) return NotFound("Parent category not found");
 
-            await _categoryRepository.CreateCategory(categoryDto, parentCategory);
-            return Ok("Category created successfully");
+            var categoryCreated = await _categoryRepository.CreateCategory(categoryDto, parentCategory);
+            return Ok(categoryCreated);
         }
 
         [HttpPut("{id}")]
-        [ServiceFilter(typeof(CategoryAndParentAndClassificationFilter))]        public async Task<IActionResult> UpdateCategory(int id, [FromBody] CategoryDTO categoryDto)
+        // [ServiceFilter(typeof(VerifyToken))]
+        // [ServiceFilter(typeof(CategoryAndParentAndClassificationFilter))]        
+        public async Task<IActionResult> UpdateCategory(int id, [FromBody] CategoryDTO categoryDto)
         {
             if (categoryDto == null || id != categoryDto.Id) return BadRequest("Invalid category data");
 
-            var updated = await _categoryRepository.UpdateCategory(categoryDto);
-            if (!updated) return NotFound("Category not found or update failed");
+            var categoryUpdated = await _categoryRepository.UpdateCategory(categoryDto);
+            if (categoryUpdated == null) return NotFound("Category not found or update failed");
 
-            return Ok("Category updated successfully");
+            return Ok(categoryUpdated);
         }
         
         [HttpDelete("{id}")]
-        [ServiceFilter(typeof(CategoryAndParentAndClassificationFilter))]
+        // [ServiceFilter(typeof(VerifyToken))]
+        // [ServiceFilter(typeof(CategoryAndParentAndClassificationFilter))]
         public async Task<IActionResult> DeleteCategory(int id)
         {
             var deleted = await _categoryRepository.DeleteCategory(id);

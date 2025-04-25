@@ -21,9 +21,8 @@ namespace Ecommerce.BackendAPI.FiltersAction
         public override void OnActionExecuting(ActionExecutingContext context)
         {
             var httpContext = context.HttpContext;
-            if (httpContext.Request.Headers.TryGetValue("Authorization", out var tokenHeader))
+            if (httpContext.Request.Cookies.TryGetValue("access_token", out var token))
             {
-                string token = tokenHeader.ToString().Replace("Bearer ", "").Trim();
                 try
                 {
                     var jwtKey = _configuration["Jwt:Key"];

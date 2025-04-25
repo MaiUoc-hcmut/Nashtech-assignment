@@ -31,18 +31,16 @@ namespace Ecommerce.BackendAPI.Repositories
             return await _context.ParentCategories.FirstOrDefaultAsync(pc => pc.Name == name);
         }
 
-        public async Task<ParentCategory> CreateParentCategory(string Name)
+        public async Task<ParentCategory?> CreateParentCategory(string Name)
         {
-            var parentCategory = new ParentCategory { Name = Name };
-            await _context.ParentCategories.AddAsync(parentCategory);
-            await _context.SaveChangesAsync();
-            return parentCategory;
+            var parentCategory = await _context.ParentCategories.AddAsync(new ParentCategory { Name = Name });
+            return (await SaveAsync() == true) ? parentCategory.Entity : null;
         }
 
-        public async Task<bool> UpdateParentCategory(ParentCategory parentCategory)
+        public async Task<ParentCategory?> UpdateParentCategory(ParentCategory parentCategory)
         {
-            _context.ParentCategories.Update(parentCategory);
-            return await Save();
+            var response = _context.ParentCategories.Update(parentCategory);
+            return (await SaveAsync() == true) ? response.Entity : null;
         }
 
         public async Task<bool> DeleteParentCategory(int id)
@@ -51,10 +49,10 @@ namespace Ecommerce.BackendAPI.Repositories
             if (parentCategory == null) return false;
 
             _context.ParentCategories.Remove(parentCategory);
-            return await Save();
+            return await SaveAsync();
         }
     
-        public async Task<bool> Save()
+        public async Task<bool> SaveAsync()
         {
             return await _context.SaveChangesAsync() > 0;
         }

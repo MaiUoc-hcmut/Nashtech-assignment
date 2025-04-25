@@ -26,20 +26,22 @@ namespace Ecommerce.BackendAPI.Repositories
             return await _context.Classifications.FindAsync(Id);
         }
 
-        public async Task<bool> CreateClassification(Classification classification)
+        public async Task<Classification?> CreateClassification(Classification classification)
         {
-            await _context.Classifications.AddAsync(classification);
-            return await SaveAsync();
+            var response = await _context.Classifications.AddAsync(classification);
+            return (await SaveAsync() == true) ? response.Entity : null;
         }
 
-        public async Task<bool> UpdateClassification(ClassificationDTO request)
+        public async Task<Classification?> UpdateClassification(ClassificationDTO request)
         {
             var classification = await _context.Classifications.FindAsync(request.Id);
-            if (classification == null) return false;
+            if (classification == null) return null;
 
             classification.Name = request.Name;
+            classification.Description = request.Description;
             _context.Classifications.Update(classification);
-            return await SaveAsync();
+            
+            return (await SaveAsync() == true) ? classification : null;
         }
 
         public async Task<bool> DeleteClassification(Classification classification)

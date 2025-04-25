@@ -89,8 +89,8 @@ namespace ECommerce.BackendAPI.Controllers
             {
                 Success = true,
                 Message = "Login successful.",
-                Token = token,
-                RefreshToken = refreshToken,
+                // Token = token,
+                // RefreshToken = refreshToken,
                 Customer = {
                     Id = customer.Id,
                     Name = customer.Name,
@@ -100,6 +100,12 @@ namespace ECommerce.BackendAPI.Controllers
                     Address = customer.Address
                 }
             };
+
+            Response.Cookies.Append("acces_token", token, new CookieOptions {
+                HttpOnly = true,
+                SameSite = SameSiteMode.Strict,
+                MaxAge = TimeSpan.FromHours(1)
+            });
 
             return Ok(response);
         }
@@ -122,8 +128,8 @@ namespace ECommerce.BackendAPI.Controllers
             {
                 Success = true,
                 Message = "Login successful.",
-                Token = token,
-                RefreshToken = refreshToken,
+                // Token = token,
+                // RefreshToken = refreshToken,
                 Admin = {
                     Id = admin.Id,
                     Name = admin.Name,
@@ -132,6 +138,12 @@ namespace ECommerce.BackendAPI.Controllers
                     Address = admin.Address
                 }
             };
+
+            Response.Cookies.Append("acces_token", token, new CookieOptions {
+                HttpOnly = true,
+                SameSite = SameSiteMode.Strict,
+                MaxAge = TimeSpan.FromHours(1)
+            });
 
             return Ok(response);
         }
