@@ -56,13 +56,8 @@ namespace Ecommerce.BackendAPI.Controllers
             }
 
             var createdParentCategory = await _parentCategoryRepo.CreateParentCategory(request.Name);
-
-            var response = new ParentCategoryDTO
-            {
-                Id = createdParentCategory.Id,
-                Name = createdParentCategory.Name
-            };
-            return Ok(response);
+            if (createdParentCategory == null) return BadRequest("Can not create parent category");
+            return Ok(createdParentCategory);
         }
     
 
@@ -75,12 +70,12 @@ namespace Ecommerce.BackendAPI.Controllers
                 Id = id
             };
 
-            if (!await _parentCategoryRepo.UpdateParentCategory(parentCategory)) 
-            {
+            var response = await _parentCategoryRepo.UpdateParentCategory(parentCategory);
+            if (response == null) {
                 return NotFound($"Parent category with ID {id} not found.");
             }
 
-            return Ok($"Parent category {request.Name} updated successfully.");
+            return Ok(response);
         }
 
         [HttpDelete("{id}")]
