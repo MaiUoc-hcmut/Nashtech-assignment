@@ -1,4 +1,7 @@
 using Ecommerce.BackendAPI.Interfaces;
+using Ecommerce.SharedViewModel.DTOs;
+using Ecommerce.SharedViewModel.Models;
+using Ecommerce.BackendAPI.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Ecommerce.BackendAPI.Controllers
@@ -8,10 +11,12 @@ namespace Ecommerce.BackendAPI.Controllers
     public class AdminController : ControllerBase
     {
         private readonly IAdminRepository _adminRepository;
+        private readonly AuthService _authService;
 
-        public AdminController(IAdminRepository adminRepository)
+        public AdminController(IAdminRepository adminRepository, AuthService authService)
         {
             _adminRepository = adminRepository;
+            _authService = authService;
         }
 
         [HttpGet("{id}")]
@@ -23,6 +28,22 @@ namespace Ecommerce.BackendAPI.Controllers
                 return NotFound(new { Message = "Customer not found" });
             }
             return Ok(admin);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateAdminAccount(AdminDTO request) 
+        {
+            var admin = new Admin
+            {
+                Name = request.Name,
+                Email = request.Email,
+                Password = _authService.HashPassword(request.Password),
+                PhoneNumber = request.PhoneNumber,
+                Address = request.Address,
+            };
+
+            var response = await _adminRepository.CreateAdminAccount(admin);
+            return Ok();
         }
     }
 }

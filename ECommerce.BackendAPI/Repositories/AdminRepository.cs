@@ -21,5 +21,16 @@ namespace Ecommerce.BackendAPI.Repositories
         {
             return await _context.Admins.FindAsync(Id);
         }
+
+        public async Task<Admin?> CreateAdminAccount(Admin admin)
+        {
+            var response = await _context.Admins.AddAsync(admin);
+            return (await SaveAsync() == true) ? response.Entity : null;
+        }
+
+        public async Task<bool> SaveAsync()
+        {
+            return await _context.SaveChangesAsync() > 0;
+        }
     }
 }

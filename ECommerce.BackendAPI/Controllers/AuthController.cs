@@ -83,22 +83,20 @@ namespace ECommerce.BackendAPI.Controllers
             }
 
             var token = _authService.GenerateToken(customer);
-            var refreshToken = _authService.GenerateRefreshToken(customer);
 
             var response = new LoginResponse
             {
                 Success = true,
                 Message = "Login successful.",
-                // Token = token,
-                // RefreshToken = refreshToken,
-                Customer = {
+                Customer = customer != null ? new CustomerDTO
+                {
                     Id = customer.Id,
                     Name = customer.Name,
                     Email = customer.Email,
                     Username = customer.Username,
                     PhoneNumber = customer.PhoneNumber,
                     Address = customer.Address
-                }
+                } : null
             };
 
             Response.Cookies.Append("acces_token", token, new CookieOptions {
@@ -122,21 +120,19 @@ namespace ECommerce.BackendAPI.Controllers
             }
 
             var token = _authService.GenerateToken(admin);
-            var refreshToken = _authService.GenerateRefreshToken(admin);
 
             var response = new LoginResponse
             {
                 Success = true,
                 Message = "Login successful.",
-                // Token = token,
-                // RefreshToken = refreshToken,
-                Admin = {
+                Admin = admin != null ? new AdminDTO {
                     Id = admin.Id,
                     Name = admin.Name,
                     Email = admin.Email,
+                    Password = admin.Password,
                     PhoneNumber = admin.PhoneNumber,
                     Address = admin.Address
-                }
+                } : null
             };
 
             Response.Cookies.Append("acces_token", token, new CookieOptions {
