@@ -1,8 +1,14 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import axiosConfig from '../../config/axios.config';
 
 // Define types for your state
 interface Category {
   id: number;
+  name: string;
+  description: string;
+}
+
+interface AddCategory {
   name: string;
   description: string;
 }
@@ -24,9 +30,37 @@ const initialState: CategoriesState = {
 export const fetchCategories = createAsyncThunk(
   'categories/fetchCategories',
   async () => {
-    const response = await fetch('http://localhost:5113/api/Category');
-    if (!response.ok) throw new Error('Failed to fetch categories');
-    return response.json();
+    const response = await axiosConfig.get('http://localhost:5113/api/Category');
+    if (response.status !== 200) throw new Error('Failed to fetch categories');
+    return response.data;
+  }
+);
+
+export const addCategory = createAsyncThunk(
+  'categories/addCategory',
+  async(payload: AddCategory) => {
+    const response = await axiosConfig.post('http://localhost:5113/api/Category', payload);
+    if (response.status !== 200) throw new Error('Failed to add categories');
+    return response.data;
+  }
+);
+
+export const updateCategory = createAsyncThunk(
+  'categories/updateCategory',
+  async(payload: Category) => {
+    const { id, ...categoryData } = payload;
+    const response = await axiosConfig.put(`http://localhost:5113/api/Category/${id}`, categoryData);
+    if (response.status !== 200) throw new Error('Failed to edit categories');
+    return response.data;
+  }
+);
+
+export const deleteCategory = createAsyncThunk(
+  'categories/deleteCategory',
+  async(id: number) => {
+    const response = await axiosConfig.delete(`http://localhost:5113/api/Category/${id}`);
+    if (response.status !== 200) throw new Error('Failed to edit categories');
+    return id;
   }
 );
 
@@ -49,9 +83,57 @@ const categoriesSlice = createSlice({
         state.status = 'succeeded';
         state.categories = action.payload;
         state.error = null;
-        console.log(action.payload);
       })
       .addCase(fetchCategories.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message || 'Something went wrong';
+      })
+      .addCase(addCategory.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(addCategory.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.categories.push(action.payload);
+        state.error = null;
+        console.log(action.payload);
+      })
+      .addCase(addCategory.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message || 'Something went wrong';
+      })
+      .addCase(updateCategory.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(updateCategory.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.error = null;
+
+        const index = state.categories.findIndex(
+          (category) => category.id === action.payload.id
+        );
+        if (index !== -1) {
+          state.categories[index] = action.payload;
+        }
+      })
+      .addCase(updateCategory.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message || 'Something went wrong';
+      })
+      .addCase(deleteCategory.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(deleteCategory.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.error = null;
+
+        const index = state.categories.findIndex(
+          (category) => category.id === action.payload
+        );
+        if (index !== -1) {
+          state.categories.splice(index, 1);
+        }
+      })
+      .addCase(deleteCategory.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.error.message || 'Something went wrong';
       });

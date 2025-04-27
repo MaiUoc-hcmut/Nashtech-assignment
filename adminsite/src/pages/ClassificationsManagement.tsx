@@ -1,32 +1,83 @@
 import { useState, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../redux/hooks/redux';
-import { fetchClassifications } from '../redux/features/classifications/classificationsSlice';
+import { fetchClassifications, updateClassification, deleteClassification, addClassification } from '../redux/features/classifications/classificationsSlice';
 import { ClassificationNCateGoryNParent } from '../types/dashboardTypes';
 import { Trash2, Edit, Plus } from 'lucide-react';
+import { useForm } from 'react-hook-form';
 
 const ClassificationsManagement: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingClassification, setEditingClassification] = useState<ClassificationNCateGoryNParent | null>(null);
-  const [formData, setFormData] = useState<{ name: string; description: string }>({ name: '', description: '' });
+  const [isPending, setIsPending] = useState(false);
 
   
   const dispatch = useAppDispatch();
   const { classifications, status, error } = useAppSelector((state) => state.classifications);
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors }
+  } = useForm<{ name: string; description: string }>({
+    defaultValues: {
+      name: '',
+      description: '',
+    }
+  });
 
   // Fetch classifications on mount
   useEffect(() => {
     if (status == "idle") {
       dispatch(fetchClassifications());
     }
+
+    if (status == "loading") {
+      setIsPending(true);
+    }
+
+    if (status != "loading") {
+      setIsPending(false);
+    }
   }, [dispatch, status, classifications]);
 
-  
-  if (status === 'loading') return <div>Loading...</div>;
-  if (status === 'failed') return <div>Error: {error}</div>;
+  const onSubmit = handleSubmit(async (data) => {
+    if (editingClassification) {
+      // Update existing classification
+      await dispatch(updateClassification({
+        id: editingClassification.id,
+        ...data
+      })).unwrap();
+    } 
+    else {
+      // Add new classification
+      await dispatch(addClassification({
+        ...data
+      })).unwrap();
+    }
+    
+    setIsModalOpen(false);
+    reset();
+  });
+
+  const handleDelete = async (id: number) => {
+    await dispatch(deleteClassification(id)).unwrap();
+  }
+
 
   const openModal = (classification?: ClassificationNCateGoryNParent) => {
     setEditingClassification(classification || null);
-    setFormData(classification ? { name: classification.name, description: classification.description } : { name: '', description: '' });
+    if (classification) {
+      reset({
+        name: classification.name,
+        description: classification.description
+      });
+    } else {
+      reset({
+        name: '',
+        description: ''
+      });
+    }
     setIsModalOpen(true);
   };
 
@@ -44,6 +95,7 @@ const ClassificationsManagement: React.FC = () => {
       </div>
 
       {error && <p className="text-red-500 mb-4">{error}</p>}
+      {isPending && <p className="text-blue-500 mb-4">Loading Classifications...</p>}
 
       <table className="w-full table-auto">
         <thead>
@@ -73,6 +125,7 @@ const ClassificationsManagement: React.FC = () => {
                     <Edit size={20} />
                   </button>
                   <button
+                  onClick={() => handleDelete(classification.id)}
                     className="text-red-600 hover:text-red-800"
                   >
                     <Trash2 size={20} />
@@ -90,39 +143,46 @@ const ClassificationsManagement: React.FC = () => {
             <h3 className="text-lg font-semibold mb-4">
               {editingClassification ? 'Edit Classification' : 'Add Classification'}
             </h3>
-            <div className="space-y-4">
+            <form onSubmit={onSubmit} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700">Name</label>
                 <input
                   type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className={`mt-1 block w-full border ${errors.name ? 'border-red-500' : 'border-gray-300'} rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                  {...register("name", { 
+                    required: "Name is required",
+                    minLength: { value: 2, message: "Name must be at least 2 characters" }
+                  })}
                 />
+                {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">Description</label>
                 <textarea
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className={`mt-1 block w-full border ${errors.description ? 'border-red-500' : 'border-gray-300'} rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                  {...register("description", { 
+                    required: "Description is required"
+                  })}
                 />
+                {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>}
               </div>
               {error && <p className="text-red-500 text-sm">{error}</p>}
               <div className="flex justify-end space-x-2">
                 <button
+                  type="button"
                   onClick={() => setIsModalOpen(false)}
                   className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100"
                 >
                   Cancel
                 </button>
                 <button
+                  type="submit"
                   className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
                 >
                   {editingClassification ? 'Update' : 'Add'}
                 </button>
               </div>
-            </div>
+            </form>
           </div>
         </div>
       )}

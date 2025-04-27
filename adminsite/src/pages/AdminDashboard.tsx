@@ -69,26 +69,24 @@ const AdminDashboard: React.FC = () => {
   ]);
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      <main className="flex-1 overflow-auto transition-all duration-300 ml-16">
-        <div className="container mx-auto px-4 py-8 mr-16">
-          <h1 className="text-3xl font-bold text-gray-800 mb-8">Dashboard</h1>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-            <StatsCard title="Daily Sales" value={stats.dailySales} icon="ShoppingBag" />
-            <StatsCard title="Pending Orders" value={stats.pendingOrders} icon="Package" />
-            <StatsCard title="Low Stock Items" value={stats.lowStock} icon="AlertCircle" />
-            <StatsCard title="New Customers" value={stats.newCustomers} icon="Users" />
-            <StatsCard title="Revenue" value={`$${stats.totalRevenue.toLocaleString()}`} icon="DollarSign" />
-          </div>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <SalesChart data={salesData} />
-            <LowStockItems items={lowStockItems} />
-            <RecentOrders orders={recentOrders} />
-            <RecentReviews reviews={recentReviews} />
-          </div>
+    <main className="flex-1 overflow-auto transition-all duration-300 ml-16">
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold text-gray-800 mb-8">Dashboard</h1>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+          <StatsCard title="Daily Sales" value={stats.dailySales} icon="ShoppingBag" />
+          <StatsCard title="Pending Orders" value={stats.pendingOrders} icon="Package" />
+          <StatsCard title="Low Stock Items" value={stats.lowStock} icon="AlertCircle" />
+          <StatsCard title="New Customers" value={stats.newCustomers} icon="Users" />
+          <StatsCard title="Revenue" value={`$${stats.totalRevenue.toLocaleString()}`} icon="DollarSign" />
         </div>
-      </main>
-    </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <SalesChart data={salesData} />
+          <LowStockItems items={lowStockItems} />
+          <RecentOrders orders={recentOrders} />
+          <RecentReviews reviews={recentReviews} />
+        </div>
+      </div>
+    </main>
   );
 };
 
