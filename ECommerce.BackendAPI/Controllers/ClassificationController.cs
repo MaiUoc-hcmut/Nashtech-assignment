@@ -36,8 +36,8 @@ namespace Ecommerce.BackendAPI.Controllers
         }
 
         [HttpPost]
-        // [ServiceFilter(typeof(VerifyToken))]
-        // [ServiceFilter(typeof(CategoryAndParentAndClassificationFilter))]
+        [ServiceFilter(typeof(VerifyToken))]
+        [ServiceFilter(typeof(VerifyAdmin))]
         public async Task<IActionResult> CreateClassification([FromBody] ClassificationDTO request)
         {
             if (request == null) return BadRequest(new { Error = "Name must be not null" });
@@ -53,8 +53,9 @@ namespace Ecommerce.BackendAPI.Controllers
         }
 
         [HttpPut("{Id}")]
-        // [ServiceFilter(typeof(VerifyToken))]
-        // [ServiceFilter(typeof(CategoryAndParentAndClassificationFilter))]
+        [ServiceFilter(typeof(VerifyToken))]
+        [ServiceFilter(typeof(VerifyAdmin))]
+        [ServiceFilter(typeof(CategoryAndParentAndClassificationFilter))]
         public async Task<IActionResult> UpdateClassification(int Id, ClassificationDTO request)
         {
             if (request == null)   return BadRequest("Invalid category data");
@@ -66,8 +67,9 @@ namespace Ecommerce.BackendAPI.Controllers
         }
 
         [HttpDelete("{Id}")]
-        // [ServiceFilter(typeof(VerifyToken))]
-        // [ServiceFilter(typeof(CategoryAndParentAndClassificationFilter))]
+        [ServiceFilter(typeof(VerifyToken))]
+        [ServiceFilter(typeof(VerifyAdmin))]
+        [ServiceFilter(typeof(CategoryAndParentAndClassificationFilter))]
         public async Task<IActionResult> DeleteClassification(int Id)
         {
             var classification = HttpContext.Items["Classification"] as Classification;

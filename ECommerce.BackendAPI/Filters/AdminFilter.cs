@@ -21,9 +21,18 @@ namespace Ecommerce.BackendAPI.FiltersAction
         {
             var httpContext = context.HttpContext;
 
+            bool isValidateEndpoint = httpContext.Request.Path.Value?.Contains("validate", StringComparison.OrdinalIgnoreCase) ?? false;
+
             var Id = httpContext.Items["UserId"]?.ToString();
             if (Id == null)
             {
+                if (isValidateEndpoint)
+                {
+                    httpContext.Items["isAuthenticated"] = false;
+                    await next();
+                    return;
+                }
+
                 context.Result = new BadRequestObjectResult(new { Error = "User ID is missing or invalid." });
                 return;
             }
@@ -31,9 +40,19 @@ namespace Ecommerce.BackendAPI.FiltersAction
             var admin = await _adminrepository.GetAdminById(int.Parse(Id));
             if (admin == null) 
             {
+                if (isValidateEndpoint)
+                {
+                    httpContext.Items["IsAuthenticated"] = false;
+                    await next();
+                    return;
+                }
+
                 context.Result = new BadRequestObjectResult(new { Error = "You do not have authorize to do this action" });
                 return;
             }
+
+            httpContext.Items["admin"] = admin;
+            httpContext.Items["isAuthenticated"] = true;
 
             await next();
         }

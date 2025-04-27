@@ -26,10 +26,10 @@ namespace Ecommerce.BackendAPI.Controllers
             return Ok(categories);
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetCategoryById(int id)
+        [HttpGet("{Id}")]
+        public async Task<IActionResult> GetCategoryById(int Id)
         {
-            var category = await _categoryRepository.GetCategoryById(id);
+            var category = await _categoryRepository.GetCategoryById(Id);
             if (category == null) return NotFound("Category not found");
             return Ok(category);
         }
@@ -43,8 +43,8 @@ namespace Ecommerce.BackendAPI.Controllers
         }
 
         [HttpPost]
-        // [ServiceFilter(typeof(VerifyToken))]
-        // [ServiceFilter(typeof(CategoryAndParentAndClassificationFilter))]
+        [ServiceFilter(typeof(VerifyToken))]
+        [ServiceFilter(typeof(VerifyAdmin))]
         public async Task<IActionResult> CreateCategory([FromBody] CategoryDTO categoryDto, [FromQuery] int parentId)
         {
             if (categoryDto == null) return BadRequest("Invalid category data");
@@ -56,25 +56,28 @@ namespace Ecommerce.BackendAPI.Controllers
             return Ok(categoryCreated);
         }
 
-        [HttpPut("{id}")]
-        // [ServiceFilter(typeof(VerifyToken))]
-        // [ServiceFilter(typeof(CategoryAndParentAndClassificationFilter))]        
-        public async Task<IActionResult> UpdateCategory(int id, [FromBody] CategoryDTO categoryDto)
+        [HttpPut("{Id}")]
+        [ServiceFilter(typeof(VerifyToken))]
+        [ServiceFilter(typeof(VerifyAdmin))]   
+        [ServiceFilter(typeof(CategoryAndParentAndClassificationFilter))]     
+        public async Task<IActionResult> UpdateCategory(int Id, [FromBody] CategoryDTO request)
         {
-            if (categoryDto == null || id != categoryDto.Id) return BadRequest("Invalid category data");
+            if (request == null) return BadRequest("Invalid category data");
+            request.Id = Id;
 
-            var categoryUpdated = await _categoryRepository.UpdateCategory(categoryDto);
+            var categoryUpdated = await _categoryRepository.UpdateCategory(request);
             if (categoryUpdated == null) return NotFound("Category not found or update failed");
 
             return Ok(categoryUpdated);
         }
         
-        [HttpDelete("{id}")]
-        // [ServiceFilter(typeof(VerifyToken))]
-        // [ServiceFilter(typeof(CategoryAndParentAndClassificationFilter))]
-        public async Task<IActionResult> DeleteCategory(int id)
+        [HttpDelete("{Id}")]
+        [ServiceFilter(typeof(VerifyToken))]
+        [ServiceFilter(typeof(VerifyAdmin))]
+        [ServiceFilter(typeof(CategoryAndParentAndClassificationFilter))]
+        public async Task<IActionResult> DeleteCategory(int Id)
         {
-            var deleted = await _categoryRepository.DeleteCategory(id);
+            var deleted = await _categoryRepository.DeleteCategory(Id);
             if (!deleted) return NotFound("Category not found or delete failed");
 
             return Ok("Category deleted successfully");

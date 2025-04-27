@@ -36,6 +36,7 @@ namespace Ecommerce.BackendAPI.Repositories
             var category = new Category
             {
                 Name = request.Name,
+                Description = request.Description,
                 ParentCategory = parentCategory
             };
 
@@ -49,6 +50,7 @@ namespace Ecommerce.BackendAPI.Repositories
             if (category == null) return null;
 
             category.Name = request.Name;
+            category.Description = request.Description;
             _context.Categories.Update(category);
             return (await SaveAsync() == true) ? category : null;
         }

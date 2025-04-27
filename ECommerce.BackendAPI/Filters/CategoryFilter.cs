@@ -8,29 +8,51 @@ namespace Ecommerce.BackendAPI.FiltersAction
     public class CategoryAndParentAndClassificationFilter : ActionFilterAttribute
     {
         private readonly ICategoryRepository _categoryRepository;
-        private readonly IAdminRepository _adminRepository;
+        private readonly IClassificationRepository _classificationRepository;
 
-        public CategoryAndParentAndClassificationFilter(ICategoryRepository categoryRepository, IAdminRepository adminRepository)
+        public CategoryAndParentAndClassificationFilter(ICategoryRepository categoryRepository, IClassificationRepository classificationRepository)
         {
-            _adminRepository = adminRepository;
             _categoryRepository = categoryRepository;
+            _classificationRepository = classificationRepository;
         }
 
         public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
             var httpContext = context.HttpContext;
-            var UserId = httpContext.Items["UserId"]?.ToString();
-            if (UserId == null)
+            var Id = context.RouteData.Values["Id"]?.ToString();
+            var isCategoryEndpoint = httpContext.Request.Path.Value?.Contains("Category", StringComparison.OrdinalIgnoreCase) ?? false;
+            var isClassificationEndpoint = httpContext.Request.Path.Value?.Contains("Classification", StringComparison.OrdinalIgnoreCase) ?? false;
+
+            Console.WriteLine(Id);
+            Console.WriteLine(isClassificationEndpoint);
+
+            if (string.IsNullOrEmpty(Id))
             {
-                context.Result = new UnauthorizedObjectResult(new { Error = "User not authenticated" });
+                context.Result = new BadRequestObjectResult(new { Error = "Id is null or empty" });
                 return;
             }
 
-            var admin = await _adminRepository.GetAdminById(int.Parse(UserId));
-            if (admin == null)
+            if (isCategoryEndpoint)
             {
-                context.Result = new UnauthorizedObjectResult(new { Error = "User not authenticated" });
-                return;
+                var category = await _categoryRepository.GetCategoryById(int.Parse(Id));
+                if (category == null) 
+                {
+                    context.Result = new BadRequestObjectResult(new { Error = "Category not found" });
+                    return;
+                }
+
+                httpContext.Items["Category"] = category;
+            }
+            else if (isClassificationEndpoint)
+            {
+                var classification = await _classificationRepository.GetClassificationById(int.Parse(Id));
+                if (classification == null) 
+                {
+                    context.Result = new BadRequestObjectResult(new { Error = "Classification not found" });
+                    return;
+                }
+
+                httpContext.Items["Classification"] = classification;
             }
 
             await next(); 

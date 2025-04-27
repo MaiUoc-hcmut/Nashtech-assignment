@@ -3,6 +3,7 @@ using Ecommerce.SharedViewModel.DTOs;
 using Ecommerce.SharedViewModel.Models;
 using Ecommerce.BackendAPI.Services;
 using Microsoft.AspNetCore.Mvc;
+using Ecommerce.BackendAPI.FiltersAction;
 
 namespace Ecommerce.BackendAPI.Controllers
 {
@@ -31,6 +32,8 @@ namespace Ecommerce.BackendAPI.Controllers
         }
 
         [HttpPost]
+        [ServiceFilter(typeof(VerifyToken))]
+        [ServiceFilter(typeof(VerifyAdmin))]
         public async Task<IActionResult> CreateAdminAccount(AdminDTO request) 
         {
             var admin = new Admin

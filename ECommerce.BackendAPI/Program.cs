@@ -20,14 +20,17 @@ builder.Services.AddScoped<VerifyToken>();
 builder.Services.AddScoped<CheckUserExists>();
 builder.Services.AddScoped<CategoryAndParentAndClassificationFilter>();
 
-// Cart filter
+// Cart filters
 builder.Services.AddScoped<AddToCartFilter>();
 builder.Services.AddScoped<RemoveFromCartFilter>();
 
-// Order filter
+// Order filters
 builder.Services.AddScoped<GetOrderFilter>();
 builder.Services.AddScoped<GetAllOrdersFilter>();
 builder.Services.AddScoped<CreateOrderFilter>();
+
+// Admin filter
+builder.Services.AddScoped<VerifyAdmin>();
 
 // Add custom repositories
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();

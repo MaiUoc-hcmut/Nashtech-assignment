@@ -18,9 +18,10 @@ namespace Ecommerce.BackendAPI.FiltersAction
             _configuration = configuration;
         }
 
-        public override void OnActionExecuting(ActionExecutingContext context)
+        public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
             var httpContext = context.HttpContext;
+            var isValidateEndpoint = httpContext.Request.Path.Value?.Contains("validate", StringComparison.OrdinalIgnoreCase) ?? false;
             if (httpContext.Request.Cookies.TryGetValue("access_token", out var token))
             {
                 try
@@ -54,14 +55,22 @@ namespace Ecommerce.BackendAPI.FiltersAction
                     httpContext.Items["IsTokenValid"] = false;
                     httpContext.Items["TokenError"] = $"Invalid or expired token: {ex.Message}";
                     context.Result = new UnauthorizedObjectResult(new { Error = httpContext.Items["TokenError"] });
+                    return;
                 }
             }
             else
             {
+                if (isValidateEndpoint)
+                {
+                    await next();
+                }
                 httpContext.Items["IsTokenValid"] = false;
                 httpContext.Items["TokenError"] = "Authorization header not found";
                 context.Result = new UnauthorizedObjectResult(new { Error = httpContext.Items["TokenError"] });
+                return;
             }
+
+            await next();
         }
     }
 

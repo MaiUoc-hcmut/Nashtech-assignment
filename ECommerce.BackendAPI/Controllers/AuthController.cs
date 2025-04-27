@@ -5,6 +5,8 @@ using Ecommerce.BackendAPI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Ecommerce.SharedViewModel.DTOs;
 using Ecommerce.BackendAPI.Interfaces.Helper;
+using Ecommerce.BackendAPI.FiltersAction;
+using Ecommerce.SharedViewModel.Models;
 
 
 namespace ECommerce.BackendAPI.Controllers
@@ -14,18 +16,21 @@ namespace ECommerce.BackendAPI.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthRepository _authRepository;
+        private readonly ICustomerRepository _customerRepository;
         private readonly AuthService _authService;
         private readonly IDependMethod _dependMethod;
 
         public AuthController
         (
             IAuthRepository authRepository, 
+            ICustomerRepository customerRepository,
             AuthService authService, 
             IDependMethod dependMethod
         )
         
         {
             _authRepository = authRepository;
+            _customerRepository = customerRepository;
             _authService = authService;
             _dependMethod = dependMethod;
         }
@@ -38,6 +43,12 @@ namespace ECommerce.BackendAPI.Controllers
             {
                 var hashedPassword = _authService.HashPassword(request.Password);
                 request.Password = hashedPassword;
+
+                var customer = _customerRepository.GetCustomerByEmail(request.Email);
+                if (customer != null) 
+                {
+                    return BadRequest("This email already exist!");
+                }
 
                 var registeredUser = await _authRepository.Register(request);
 
@@ -99,7 +110,7 @@ namespace ECommerce.BackendAPI.Controllers
                 } : null
             };
 
-            Response.Cookies.Append("acces_token", token, new CookieOptions {
+            Response.Cookies.Append("access_token", token, new CookieOptions {
                 HttpOnly = true,
                 SameSite = SameSiteMode.Strict,
                 MaxAge = TimeSpan.FromHours(1)
@@ -109,7 +120,7 @@ namespace ECommerce.BackendAPI.Controllers
         }
 
 
-        [HttpPost("/admin/login")]
+        [HttpPost("admin/login")]
         public async Task<IActionResult> AdminLogin([FromBody] LoginParameter request)
         {
             var admin = await _authRepository.AdminLogin(request);
@@ -135,7 +146,7 @@ namespace ECommerce.BackendAPI.Controllers
                 } : null
             };
 
-            Response.Cookies.Append("acces_token", token, new CookieOptions {
+            Response.Cookies.Append("access_token", token, new CookieOptions {
                 HttpOnly = true,
                 SameSite = SameSiteMode.Strict,
                 MaxAge = TimeSpan.FromHours(1)
@@ -161,5 +172,27 @@ namespace ECommerce.BackendAPI.Controllers
         //     return Ok(response);
         // }
     
+
+        [HttpGet("validate")]
+        [ServiceFilter(typeof(VerifyToken))]
+        [ServiceFilter(typeof(VerifyAdmin))]
+        public IActionResult CheckAuthState()
+        {
+            var isAuthenticated = HttpContext.Items["IsAuthenticated"] == null ? 
+                false : (HttpContext.Items["IsAuthenticated"] as bool?) ?? false;
+
+            if (!isAuthenticated)
+            {
+                return Unauthorized("User is not authenticated");
+            }
+
+            var admin = HttpContext.Items["admin"] as Admin;
+            if (admin == null)
+            {
+                return Unauthorized("Include token but admin is invalid");
+            }
+            
+            return Ok(admin);
+        }
     }
 }
