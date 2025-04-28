@@ -18,7 +18,16 @@ namespace Ecommerce.BackendAPI.Repositories
 
         public async Task<IList<Category>> GetAllCategories()
         {
-            return await _context.Categories.ToListAsync();
+            return await _context.Categories
+                .Include(c => c.ParentCategory)
+                .Select(c => new Category
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    Description = c.Description,
+                    ParentCategory = c.ParentCategory
+                })
+                .ToListAsync();
         }
 
         public async Task<Category?> GetCategoryById(int id)

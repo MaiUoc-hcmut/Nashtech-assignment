@@ -3,6 +3,7 @@ using Ecommerce.BackendAPI.Interfaces;
 using Ecommerce.SharedViewModel.Models;
 using Ecommerce.SharedViewModel.DTOs;
 using Ecommerce.SharedViewModel.ParametersType;
+using Ecommerce.BackendAPI.FiltersAction;
 using System.Text.Json;
 
 
@@ -100,6 +101,8 @@ namespace Ecommerce.BackendAPI.Controllers
         }
         
         [HttpPost]
+        [ServiceFilter(typeof(VerifyToken))]
+        [ServiceFilter(typeof(VerifyAdmin))]
         public async Task<IActionResult> CreateProduct
         (
             [FromForm] ProductDTO productDto, 
@@ -124,9 +127,8 @@ namespace Ecommerce.BackendAPI.Controllers
                 {
                     productDto.ImageUrl = "";
                 }
-
-                var classificationIdList = JsonSerializer.Deserialize<List<int>>(classifications);
-                if (classificationIdList == null || classificationIdList.Count == 0) return BadRequest(new { Error = "Classification is required" });
+                var classificationIdList = classifications.Split(',');
+                if (classificationIdList == null || classificationIdList.Length == 0) return BadRequest(new { Error = "Classification is required" });
 
                 IList<CreateVariantsOfProductParameter> variantList = new List<CreateVariantsOfProductParameter>();
                 if (!string.IsNullOrEmpty(variants))
@@ -141,8 +143,8 @@ namespace Ecommerce.BackendAPI.Controllers
                     }  
                 }           
                 var classificationList = new List<Classification>();
-                foreach (int Id in classificationIdList) {
-                    var classification = await _classificationRepository.GetClassificationById(Id);
+                foreach (var Id in classificationIdList) {
+                    var classification = await _classificationRepository.GetClassificationById(int.Parse(Id));
                     if (classification == null) return BadRequest(new { Error = $"Classification with Id = {Id} not found"});
                     classificationList.Add(classification);
                 }
@@ -150,7 +152,8 @@ namespace Ecommerce.BackendAPI.Controllers
                 var product = new Product {
                     Name = productDto.Name,
                     Price = productDto.Price,
-                    Description = productDto.Description
+                    Description = productDto.Description,
+                    ImageUrl = productDto.ImageUrl
                 };
                 var productCreated = await _productRepository.CreateProduct(product, classificationList);
 
@@ -192,6 +195,9 @@ namespace Ecommerce.BackendAPI.Controllers
         }
 
         [HttpPut("{id}")]
+        [ServiceFilter(typeof(VerifyToken))]
+        [ServiceFilter(typeof(VerifyAdmin))]
+        [ServiceFilter(typeof(UpdateAndDeleteProductFilter))]
         public async Task<IActionResult> UpdateProduct(int id, [FromForm] ProductDTO productDto)
         {
             if (productDto == null)
@@ -215,6 +221,9 @@ namespace Ecommerce.BackendAPI.Controllers
         }
 
         [HttpDelete("{id}")]
+        [ServiceFilter(typeof(VerifyToken))]
+        [ServiceFilter(typeof(VerifyAdmin))]
+        [ServiceFilter(typeof(UpdateAndDeleteProductFilter))]
         public async Task<IActionResult> DeleteProduct(int id)
         {
             if (!await _productRepository.DeleteProduct(id))

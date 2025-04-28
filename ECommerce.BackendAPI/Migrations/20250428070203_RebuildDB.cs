@@ -1,15 +1,48 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace ECommerce.BackendAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class RebuildDB : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "Admins",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RefreshToken = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Admins", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Classifications",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Classifications", x => x.Id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Customers",
                 columns: table => new
@@ -22,7 +55,9 @@ namespace ECommerce.BackendAPI.Migrations
                     Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    RefreshToken = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    RefreshToken = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -35,7 +70,8 @@ namespace ECommerce.BackendAPI.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -49,9 +85,11 @@ namespace ECommerce.BackendAPI.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -81,7 +119,9 @@ namespace ECommerce.BackendAPI.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CustomerId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -102,6 +142,7 @@ namespace ECommerce.BackendAPI.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ParentCategoryId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -116,6 +157,30 @@ namespace ECommerce.BackendAPI.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ProductClassifications",
+                columns: table => new
+                {
+                    ProductId = table.Column<int>(type: "int", nullable: false),
+                    ClassificationId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProductClassifications", x => new { x.ProductId, x.ClassificationId });
+                    table.ForeignKey(
+                        name: "FK_ProductClassifications_Classifications_ClassificationId",
+                        column: x => x.ClassificationId,
+                        principalTable: "Classifications",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ProductClassifications_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Reviews",
                 columns: table => new
                 {
@@ -124,7 +189,9 @@ namespace ECommerce.BackendAPI.Migrations
                     Rating = table.Column<int>(type: "int", nullable: false),
                     Text = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ProductId = table.Column<int>(type: "int", nullable: false),
-                    CustomerId = table.Column<int>(type: "int", nullable: false)
+                    CustomerId = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -150,9 +217,12 @@ namespace ECommerce.BackendAPI.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     SKU = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     StockQuantity = table.Column<int>(type: "int", nullable: false),
-                    ProductId = table.Column<int>(type: "int", nullable: false)
+                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ProductId = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -166,23 +236,25 @@ namespace ECommerce.BackendAPI.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "VariantCart",
+                name: "VariantCarts",
                 columns: table => new
                 {
                     VariantId = table.Column<int>(type: "int", nullable: false),
-                    CartId = table.Column<int>(type: "int", nullable: false)
+                    CartId = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_VariantCart", x => new { x.VariantId, x.CartId });
+                    table.PrimaryKey("PK_VariantCarts", x => new { x.VariantId, x.CartId });
                     table.ForeignKey(
-                        name: "FK_VariantCart_Carts_CartId",
+                        name: "FK_VariantCarts_Carts_CartId",
                         column: x => x.CartId,
                         principalTable: "Carts",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_VariantCart_Variants_VariantId",
+                        name: "FK_VariantCarts_Variants_VariantId",
                         column: x => x.VariantId,
                         principalTable: "Variants",
                         principalColumn: "Id",
@@ -190,23 +262,25 @@ namespace ECommerce.BackendAPI.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "VariantCategory",
+                name: "VariantCategories",
                 columns: table => new
                 {
                     VariantId = table.Column<int>(type: "int", nullable: false),
-                    CategoryId = table.Column<int>(type: "int", nullable: false)
+                    CategoryId = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_VariantCategory", x => new { x.VariantId, x.CategoryId });
+                    table.PrimaryKey("PK_VariantCategories", x => new { x.VariantId, x.CategoryId });
                     table.ForeignKey(
-                        name: "FK_VariantCategory_Categories_CategoryId",
+                        name: "FK_VariantCategories_Categories_CategoryId",
                         column: x => x.CategoryId,
                         principalTable: "Categories",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_VariantCategory_Variants_VariantId",
+                        name: "FK_VariantCategories_Variants_VariantId",
                         column: x => x.VariantId,
                         principalTable: "Variants",
                         principalColumn: "Id",
@@ -214,23 +288,25 @@ namespace ECommerce.BackendAPI.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "VariantOrder",
+                name: "VariantOrders",
                 columns: table => new
                 {
                     VariantId = table.Column<int>(type: "int", nullable: false),
-                    OrderId = table.Column<int>(type: "int", nullable: false)
+                    OrderId = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_VariantOrder", x => new { x.VariantId, x.OrderId });
+                    table.PrimaryKey("PK_VariantOrders", x => new { x.VariantId, x.OrderId });
                     table.ForeignKey(
-                        name: "FK_VariantOrder_Orders_OrderId",
+                        name: "FK_VariantOrders_Orders_OrderId",
                         column: x => x.OrderId,
                         principalTable: "Orders",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_VariantOrder_Variants_VariantId",
+                        name: "FK_VariantOrders_Variants_VariantId",
                         column: x => x.VariantId,
                         principalTable: "Variants",
                         principalColumn: "Id",
@@ -248,6 +324,11 @@ namespace ECommerce.BackendAPI.Migrations
                 column: "CustomerId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ProductClassifications_ClassificationId",
+                table: "ProductClassifications",
+                column: "ClassificationId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Reviews_CustomerId",
                 table: "Reviews",
                 column: "CustomerId");
@@ -258,18 +339,18 @@ namespace ECommerce.BackendAPI.Migrations
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_VariantCart_CartId",
-                table: "VariantCart",
+                name: "IX_VariantCarts_CartId",
+                table: "VariantCarts",
                 column: "CartId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_VariantCategory_CategoryId",
-                table: "VariantCategory",
+                name: "IX_VariantCategories_CategoryId",
+                table: "VariantCategories",
                 column: "CategoryId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_VariantOrder_OrderId",
-                table: "VariantOrder",
+                name: "IX_VariantOrders_OrderId",
+                table: "VariantOrders",
                 column: "OrderId");
 
             migrationBuilder.CreateIndex(
@@ -282,16 +363,25 @@ namespace ECommerce.BackendAPI.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "Admins");
+
+            migrationBuilder.DropTable(
+                name: "ProductClassifications");
+
+            migrationBuilder.DropTable(
                 name: "Reviews");
 
             migrationBuilder.DropTable(
-                name: "VariantCart");
+                name: "VariantCarts");
 
             migrationBuilder.DropTable(
-                name: "VariantCategory");
+                name: "VariantCategories");
 
             migrationBuilder.DropTable(
-                name: "VariantOrder");
+                name: "VariantOrders");
+
+            migrationBuilder.DropTable(
+                name: "Classifications");
 
             migrationBuilder.DropTable(
                 name: "Carts");

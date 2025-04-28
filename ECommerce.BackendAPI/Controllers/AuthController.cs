@@ -178,8 +178,9 @@ namespace ECommerce.BackendAPI.Controllers
         [ServiceFilter(typeof(VerifyAdmin))]
         public IActionResult CheckAuthState()
         {
-            var isAuthenticated = HttpContext.Items["IsAuthenticated"] == null ? 
-                false : (HttpContext.Items["IsAuthenticated"] as bool?) ?? false;
+            Console.WriteLine(HttpContext.Items["isAuthenticated"]);
+            var isAuthenticated = HttpContext.Items["isAuthenticated"] == null ? 
+                false : (HttpContext.Items["isAuthenticated"] as bool?) ?? false;
 
             if (!isAuthenticated)
             {

@@ -3,6 +3,7 @@ using Ecommerce.SharedViewModel.Models;
 using Ecommerce.BackendAPI.Interfaces;
 using Ecommerce.BackendAPI.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 
 namespace Ecommerce.BackendAPI.Repositories
@@ -24,6 +25,17 @@ namespace Ecommerce.BackendAPI.Repositories
         public async Task<Classification?> GetClassificationById(int Id)
         {
             return await _context.Classifications.FindAsync(Id);
+        }
+
+        public async Task<IEnumerable<Classification>> SearchClassificationByPattern(string pattern)
+        {
+            var query = _context.Classifications.AsQueryable();
+            var term = pattern.ToLower();
+            query = query.Where(c => c.Name.Contains(term));
+
+            var response = await query.ToListAsync();
+
+            return response;
         }
 
         public async Task<Classification?> CreateClassification(Classification classification)

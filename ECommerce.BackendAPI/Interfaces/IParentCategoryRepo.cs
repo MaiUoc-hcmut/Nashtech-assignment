@@ -1,3 +1,4 @@
+using Ecommerce.SharedViewModel.DTOs;
 using Ecommerce.SharedViewModel.Models;
 
 namespace Ecommerce.BackendAPI.Interfaces
@@ -8,7 +9,7 @@ namespace Ecommerce.BackendAPI.Interfaces
         Task<ParentCategory?> GetParentCategoryById(int id);
         Task<ParentCategory?> GetParentCategoryByName(string name);
         Task<ParentCategory?> CreateParentCategory(string Name);
-        Task<ParentCategory?> UpdateParentCategory(ParentCategory parentCategory);
+        Task<ParentCategory?> UpdateParentCategory(ParentCategoryDTO parentCategory);
         Task<bool> DeleteParentCategory(int id);
         Task<bool> SaveAsync();
     }

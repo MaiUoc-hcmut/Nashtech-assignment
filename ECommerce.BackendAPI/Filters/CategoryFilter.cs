@@ -8,11 +8,18 @@ namespace Ecommerce.BackendAPI.FiltersAction
     public class CategoryAndParentAndClassificationFilter : ActionFilterAttribute
     {
         private readonly ICategoryRepository _categoryRepository;
+        private readonly IParentCategoryRepo _parentCategoryRepository;
         private readonly IClassificationRepository _classificationRepository;
 
-        public CategoryAndParentAndClassificationFilter(ICategoryRepository categoryRepository, IClassificationRepository classificationRepository)
+        public CategoryAndParentAndClassificationFilter
+        (
+            ICategoryRepository categoryRepository, 
+            IParentCategoryRepo parentCategoryRepository,
+            IClassificationRepository classificationRepository
+        )
         {
             _categoryRepository = categoryRepository;
+            _parentCategoryRepository = parentCategoryRepository;
             _classificationRepository = classificationRepository;
         }
 
@@ -21,10 +28,8 @@ namespace Ecommerce.BackendAPI.FiltersAction
             var httpContext = context.HttpContext;
             var Id = context.RouteData.Values["Id"]?.ToString();
             var isCategoryEndpoint = httpContext.Request.Path.Value?.Contains("Category", StringComparison.OrdinalIgnoreCase) ?? false;
+            var isParentCategoryEndpoint = httpContext.Request.Path.Value?.Contains("ParentCategory", StringComparison.OrdinalIgnoreCase) ?? false;
             var isClassificationEndpoint = httpContext.Request.Path.Value?.Contains("Classification", StringComparison.OrdinalIgnoreCase) ?? false;
-
-            Console.WriteLine(Id);
-            Console.WriteLine(isClassificationEndpoint);
 
             if (string.IsNullOrEmpty(Id))
             {
@@ -32,7 +37,18 @@ namespace Ecommerce.BackendAPI.FiltersAction
                 return;
             }
 
-            if (isCategoryEndpoint)
+            if (isParentCategoryEndpoint)
+            {
+                var parentCategory = await _parentCategoryRepository.GetParentCategoryById(int.Parse(Id));
+                if (parentCategory == null) 
+                {
+                    context.Result = new BadRequestObjectResult(new { Error = "ParentCategory not found" });
+                    return;
+                }
+
+                httpContext.Items["ParentClassification"] = parentCategory;
+            }
+            else if (isCategoryEndpoint)
             {
                 var category = await _categoryRepository.GetCategoryById(int.Parse(Id));
                 if (category == null) 

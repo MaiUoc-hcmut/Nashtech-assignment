@@ -42,7 +42,7 @@ namespace Ecommerce.BackendAPI.FiltersAction
             {
                 if (isValidateEndpoint)
                 {
-                    httpContext.Items["IsAuthenticated"] = false;
+                    httpContext.Items["isAuthenticated"] = false;
                     await next();
                     return;
                 }

@@ -20,6 +20,9 @@ builder.Services.AddScoped<VerifyToken>();
 builder.Services.AddScoped<CheckUserExists>();
 builder.Services.AddScoped<CategoryAndParentAndClassificationFilter>();
 
+// Product filters
+builder.Services.AddScoped<UpdateAndDeleteProductFilter>();
+
 // Cart filters
 builder.Services.AddScoped<AddToCartFilter>();
 builder.Services.AddScoped<RemoveFromCartFilter>();

@@ -65,11 +65,11 @@ namespace Ecommerce.BackendAPI.Data
             modelBuilder.Entity<ProductClassification>()
                 .HasOne(p => p.Product)
                 .WithMany(pc => pc.ProductClassifications)
-                .HasForeignKey(pc => pc.ClassificationId);
+                .HasForeignKey(pc => pc.ProductId);
             modelBuilder.Entity<ProductClassification>()
                 .HasOne(c => c.Classification)
                 .WithMany(pc => pc.ProductClassifications)
-                .HasForeignKey(pc => pc.ProductId);
+                .HasForeignKey(pc => pc.ClassificationId);
 
             modelBuilder.Entity<Cart>()
                 .HasOne(c => c.Customer)

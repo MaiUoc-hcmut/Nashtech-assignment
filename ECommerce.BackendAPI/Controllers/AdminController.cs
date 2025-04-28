@@ -46,7 +46,7 @@ namespace Ecommerce.BackendAPI.Controllers
             };
 
             var response = await _adminRepository.CreateAdminAccount(admin);
-            return Ok();
+            return Ok(response);
         }
     }
 }

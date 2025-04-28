@@ -26,7 +26,7 @@ namespace Ecommerce.BackendAPI.Controllers
             return Ok(parentCategories);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{Id}")]
         public async Task<IActionResult> GetParentCategoryById(int id)
         {
             var parentCategory = await _parentCategoryRepo.GetParentCategoryById(id);
@@ -38,7 +38,8 @@ namespace Ecommerce.BackendAPI.Controllers
         }
 
         [HttpPost]
-        [ServiceFilter(typeof(CategoryAndParentAndClassificationFilter))]
+        [ServiceFilter(typeof(VerifyToken))]
+        [ServiceFilter(typeof(VerifyAdmin))]
         public async Task<IActionResult> CreateParentCategory([FromBody] ParentCategoryDTO request)
         {
             if (request == null)
@@ -61,24 +62,27 @@ namespace Ecommerce.BackendAPI.Controllers
         }
     
 
-        [HttpPut("{id}")]
+        [HttpPut("{Id}")]
+        [ServiceFilter(typeof(VerifyToken))]
+        [ServiceFilter(typeof(VerifyAdmin))]
         [ServiceFilter(typeof(CategoryAndParentAndClassificationFilter))]
-        public async Task<IActionResult> UpdateParentCategory(int id, [FromBody] ParentCategoryDTO request)
+        public async Task<IActionResult> UpdateParentCategory(int Id, [FromBody] ParentCategoryDTO request)
         {
-            var parentCategory = new ParentCategory {
-                Name = request.Name,
-                Id = id
-            };
+            if (request == null) return BadRequest("Invalid category data");
+            request.Id = Id;
+            
 
-            var response = await _parentCategoryRepo.UpdateParentCategory(parentCategory);
+            var response = await _parentCategoryRepo.UpdateParentCategory(request);
             if (response == null) {
-                return NotFound($"Parent category with ID {id} not found.");
+                return NotFound($"Parent category with ID {Id} not found.");
             }
 
             return Ok(response);
         }
 
         [HttpDelete("{id}")]
+        [ServiceFilter(typeof(VerifyToken))]
+        [ServiceFilter(typeof(VerifyAdmin))]
         [ServiceFilter(typeof(CategoryAndParentAndClassificationFilter))]
         public async Task<IActionResult> DeleteParentCategory(int id)
         {

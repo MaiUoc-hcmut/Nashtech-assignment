@@ -35,6 +35,13 @@ namespace Ecommerce.BackendAPI.Controllers
             return Ok(classification);
         }
 
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchClassificationByPattern ([FromQuery] string pattern)
+        {
+            var response = await _classificationRepository.SearchClassificationByPattern(pattern);
+            return Ok(response);
+        }
+
         [HttpPost]
         [ServiceFilter(typeof(VerifyToken))]
         [ServiceFilter(typeof(VerifyAdmin))]

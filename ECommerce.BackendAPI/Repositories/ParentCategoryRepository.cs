@@ -3,6 +3,7 @@ using Ecommerce.SharedViewModel.Models;
 using Ecommerce.BackendAPI.Data;
 using Ecommerce.SharedViewModel.ParametersType;
 using Microsoft.EntityFrameworkCore;
+using Ecommerce.SharedViewModel.DTOs;
 
 
 namespace Ecommerce.BackendAPI.Repositories
@@ -37,10 +38,15 @@ namespace Ecommerce.BackendAPI.Repositories
             return (await SaveAsync() == true) ? parentCategory.Entity : null;
         }
 
-        public async Task<ParentCategory?> UpdateParentCategory(ParentCategory parentCategory)
+        public async Task<ParentCategory?> UpdateParentCategory(ParentCategoryDTO request)
         {
-            var response = _context.ParentCategories.Update(parentCategory);
-            return (await SaveAsync() == true) ? response.Entity : null;
+            var parentCategory = await _context.ParentCategories.FindAsync(request.Id);
+            if (parentCategory == null) return null;
+
+            parentCategory.Name = request.Name;
+            parentCategory.Description = request.Description;
+            _context.ParentCategories.Update(parentCategory);
+            return (await SaveAsync() == true) ? parentCategory : null;
         }
 
         public async Task<bool> DeleteParentCategory(int id)

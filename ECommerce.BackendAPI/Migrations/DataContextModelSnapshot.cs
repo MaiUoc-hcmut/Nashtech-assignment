@@ -436,13 +436,13 @@ namespace ECommerce.BackendAPI.Migrations
 
             modelBuilder.Entity("Ecommerce.SharedViewModel.Models.ProductClassification", b =>
                 {
-                    b.HasOne("Ecommerce.SharedViewModel.Models.Product", "Product")
+                    b.HasOne("Ecommerce.SharedViewModel.Models.Classification", "Classification")
                         .WithMany("ProductClassifications")
                         .HasForeignKey("ClassificationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Ecommerce.SharedViewModel.Models.Classification", "Classification")
+                    b.HasOne("Ecommerce.SharedViewModel.Models.Product", "Product")
                         .WithMany("ProductClassifications")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
