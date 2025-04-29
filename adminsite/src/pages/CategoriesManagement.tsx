@@ -4,11 +4,15 @@ import { fetchCategories, updateCategory, deleteCategory, addCategory } from '..
 import { ClassificationNCateGoryNParent } from '../types/dashboardTypes';
 import { Trash2, Edit, Plus } from 'lucide-react';
 import { useForm } from 'react-hook-form';
+import PageHeader from '../components/commons/PageHeader';
+import PageFooter from '../components/commons/PageFooter';
 
 const CategoriesManagement: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<ClassificationNCateGoryNParent | null>(null);
   const [isPending, setIsPending] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
 
   const dispatch = useAppDispatch();
   const { categories, status, error } = useAppSelector((state) => state.categories);
@@ -79,61 +83,86 @@ const CategoriesManagement: React.FC = () => {
     setIsModalOpen(true);
   };
 
+  const handleSearch = (value: string) => {
+    setSearchTerm(value);
+    setCurrentPage(1); // Reset to first page when searching
+  };
+
+  const itemsPerPage = 10;
+  const totalPages = Math.ceil(categories.length / itemsPerPage);
+  const currentItems = categories.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
   return (
     <div className="bg-white rounded-lg shadow p-6">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold">Categories Management</h2>
-        <button
-          onClick={() => openModal()}
-          className="flex items-center bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-        >
-          <Plus size={20} className="mr-2" />
-          Add Category
-        </button>
-      </div>
+      <PageHeader
+        title="Categories Management"
+        searchPlaceholder="Search categories..."
+        searchValue={searchTerm}
+        onSearch={handleSearch}
+        buttonText="Add Category"
+        onButtonClick={() => openModal()}
+        buttonIcon={<Plus size={20} />}
+      />
 
       {error && <p className="text-red-500 mb-4">{error}</p>}
       {isPending && <p className="text-blue-500 mb-4">Loading Categories...</p>}
 
-      <table className="w-full table-auto">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="px-4 py-2 text-left">ID</th>
-            <th className="px-4 py-2 text-left">Name</th>
-            <th className="px-4 py-2 text-left">Description</th>
-            <th className="px-4 py-2 text-left">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {categories.length === 0 ? (
-            <tr>
-              <td colSpan={4} className="text-center py-4">No Categories found</td>
+      <div className="flex-1 overflow-auto px-6 pb-6 w-full">
+        <table className="w-full table-auto">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="px-4 py-2 text-left">ID</th>
+              <th className="px-4 py-2 text-left">Name</th>
+              <th className="px-4 py-2 text-left">Description</th>
+              <th className="px-4 py-2 text-left">Parent</th>
+              <th className="px-4 py-2 text-left">Actions</th>
             </tr>
-          ) : (
-            categories.map((category) => (
-              <tr key={category.id} className="border-b">
-                <td className="px-4 py-2">{category.id}</td>
-                <td className="px-4 py-2">{category.name}</td>
-                <td className="px-4 py-2">{category.description}</td>
-                <td className="px-4 py-2 flex space-x-2">
-                  <button
-                    onClick={() => openModal(category)}
-                    className="text-blue-600 hover:text-blue-800"
-                  >
-                    <Edit size={20} />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(category.id)}
-                    className="text-red-600 hover:text-red-800"
-                  >
-                    <Trash2 size={20} />
-                  </button>
-                </td>
+          </thead>
+          <tbody>
+            {categories.length === 0 ? (
+              <tr>
+                <td colSpan={4} className="text-center py-4">No Categories found</td>
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+            ) : (
+              categories.map((category) => (
+                <tr key={category.id} className="border-b">
+                  <td className="px-4 py-2">{category.id}</td>
+                  <td className="px-4 py-2">{category.name}</td>
+                  <td className="px-4 py-2">{category.description}</td>
+                  <td className="px-4 py-2">{category.parentCategory?.name || 'No Parent'}</td>
+                  <td className="px-4 py-2 flex space-x-2">
+                    <button
+                      onClick={() => openModal(category)}
+                      className="text-blue-600 hover:text-blue-800"
+                    >
+                      <Edit size={20} />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(category.id)}
+                      className="text-red-600 hover:text-red-800"
+                    >
+                      <Trash2 size={20} />
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      <PageFooter
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalItems={categories.length}
+        itemsPerPage={itemsPerPage}
+        currentItemCount={currentItems.length}
+        onPageChange={setCurrentPage}
+        itemLabel="products"
+      />
 
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">

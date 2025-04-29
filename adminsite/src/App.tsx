@@ -1,17 +1,15 @@
-// App.tsx
-import { JSX, lazy, Suspense, useEffect, useState } from 'react';
+import React, { lazy, Suspense, useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from './redux/hooks/redux';
 import { checkAuthState } from './redux/features/auths/authsSlice';
 import LoadingSpinner from './components/LoadingSpiner';
-import AdminLayout from './layout';
 
 // Import your page components
-const Login = lazy(() => import('./pages/Login')); // Import trang Login
+const Login = lazy(() => import('./pages/Login')); 
+const AdminLayout = lazy(() => import('./layout'));
 
-
-// Component để bảo vệ route yêu cầu xác thực
-const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
+// Component to protect routes requiring authentication
+const ProtectedRoute = ({ children }: { children: React.ReactElement }) => {
   const { isAuthenticated, status } = useAppSelector((state) => state.auth);
   const location = useLocation();
 
@@ -21,7 +19,7 @@ const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
   }
 
   if (!isAuthenticated) {
-    // Chuyển hướng đến trang đăng nhập và lưu lại đường dẫn hiện tại để redirect sau khi đăng nhập
+    // Redirect to login page and save current path for redirect after login
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
@@ -49,24 +47,20 @@ const App: React.FC = () => {
 
   return (
     <BrowserRouter>
-      <Routes>
-        <Route 
-          path="/login" 
-          element={
-            <Suspense fallback={<LoadingSpinner />}>
-              <Login />
-            </Suspense>
-          } 
-        />
-        <Route 
-          path="/*" 
-          element={
+      <Suspense fallback={<LoadingSpinner />}>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/admin/*" element={
             <ProtectedRoute>
               <AdminLayout />
             </ProtectedRoute>
-          } 
-        />
-      </Routes>
+          } />
+          {/* Redirect root to admin dashboard */}
+          <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
+          {/* Catch all route - redirect to dashboard */}
+          <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
+        </Routes>
+      </Suspense>
     </BrowserRouter>
   );
 };

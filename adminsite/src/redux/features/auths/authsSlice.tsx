@@ -33,9 +33,7 @@ export const checkAuthState = createAsyncThunk(
   'auth/checkState',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axiosConfig.get('http://localhost:5113/api/Auth/validate', {
-        withCredentials: true 
-      });
+      const response = await axiosConfig.get('http://localhost:5113/api/Auth/validate');
       return response.data;
     } catch (error) {
       return rejectWithValue('Authentication failed');

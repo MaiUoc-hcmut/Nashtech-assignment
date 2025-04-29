@@ -36,6 +36,15 @@ export const fetchClassifications = createAsyncThunk(
   }
 );
 
+export const searchClassification = createAsyncThunk(
+  'classifications/searchClassification',
+  async (pattern: string) => {
+    const response = await axiosConfig.get(`http://localhost:5113/api/Classification/search?pattern=${pattern}`);
+    if (response.status !== 200) throw new Error('Failed to fetch classifications');
+    return response.data;
+  }
+)
+
 export const addClassification = createAsyncThunk(
   'classifications/addClassification',
   async (payload: AddClassification) => {

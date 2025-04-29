@@ -1,22 +1,21 @@
 import { useState, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../redux/hooks/redux';
-import { fetchClassifications, updateClassification, deleteClassification, addClassification } from '../redux/features/classifications/classificationsSlice';
+import { fetchParentCategories, updateParentCategory, deleteParentCategory, addParentCategory } from '../redux/features/parentCategories/parentCategoriesSlice';
 import { ClassificationNCateGoryNParent } from '../types/dashboardTypes';
 import { Trash2, Edit, Plus } from 'lucide-react';
 import { useForm } from 'react-hook-form';
-import PageHeader from '../components/commons/PageHeader';
 import PageFooter from '../components/commons/PageFooter';
+import PageHeader from '../components/commons/PageHeader';
 
-const ClassificationsManagement: React.FC = () => {
+const ParentCategoryManagement: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingClassification, setEditingClassification] = useState<ClassificationNCateGoryNParent | null>(null);
+  const [editingParentCategory, setEditingParentCategory] = useState<ClassificationNCateGoryNParent | null>(null);
   const [isPending, setIsPending] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
 
-  
   const dispatch = useAppDispatch();
-  const { classifications, status, error } = useAppSelector((state) => state.classifications);
+  const { parentCategories, status, error } = useAppSelector((state) => state.parentCategories);
 
   const {
     register,
@@ -30,10 +29,10 @@ const ClassificationsManagement: React.FC = () => {
     }
   });
 
-  // Fetch classifications on mount
+  // Fetch parent categories on mount
   useEffect(() => {
     if (status == "idle") {
-      dispatch(fetchClassifications());
+      dispatch(fetchParentCategories());
     }
 
     if (status == "loading") {
@@ -43,19 +42,19 @@ const ClassificationsManagement: React.FC = () => {
     if (status != "loading") {
       setIsPending(false);
     }
-  }, [dispatch, status, classifications]);
+  }, [dispatch, status, parentCategories]);
 
   const onSubmit = handleSubmit(async (data) => {
-    if (editingClassification) {
-      // Update existing classification
-      await dispatch(updateClassification({
-        id: editingClassification.id,
+    if (editingParentCategory) {
+      // Update existing parent category
+      await dispatch(updateParentCategory({
+        id: editingParentCategory.id,
         ...data
       })).unwrap();
     } 
     else {
-      // Add new classification
-      await dispatch(addClassification({
+      // Add new parent category
+      await dispatch(addParentCategory({
         ...data
       })).unwrap();
     }
@@ -65,16 +64,15 @@ const ClassificationsManagement: React.FC = () => {
   });
 
   const handleDelete = async (id: number) => {
-    await dispatch(deleteClassification(id)).unwrap();
+    await dispatch(deleteParentCategory(id)).unwrap();
   }
 
-
-  const openModal = (classification?: ClassificationNCateGoryNParent) => {
-    setEditingClassification(classification || null);
-    if (classification) {
+  const openModal = (parentCategory?: ClassificationNCateGoryNParent) => {
+    setEditingParentCategory(parentCategory || null);
+    if (parentCategory) {
       reset({
-        name: classification.name,
-        description: classification.description
+        name: parentCategory.name,
+        description: parentCategory.description
       });
     } else {
       reset({
@@ -91,8 +89,8 @@ const ClassificationsManagement: React.FC = () => {
   };
 
   const itemsPerPage = 10;
-  const totalPages = Math.ceil(classifications.length / itemsPerPage);
-  const currentItems = classifications.slice(
+  const totalPages = Math.ceil(parentCategories.length / itemsPerPage);
+  const currentItems = parentCategories.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
@@ -100,17 +98,17 @@ const ClassificationsManagement: React.FC = () => {
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <PageHeader
-        title="Classifications Management"
-        searchPlaceholder="Search clssifications..."
+        title="Parent Categories Management"
+        searchPlaceholder="Search parent categories..."
         searchValue={searchTerm}
         onSearch={handleSearch}
-        buttonText="Add Classification"
+        buttonText="Add parent category"
         onButtonClick={() => openModal()}
         buttonIcon={<Plus size={20} />}
       />
 
       {error && <p className="text-red-500 mb-4">{error}</p>}
-      {isPending && <p className="text-blue-500 mb-4">Loading Classifications...</p>}
+      {isPending && <p className="text-blue-500 mb-4">Loading Parent Categories...</p>}
 
       <div className="flex-1 overflow-auto px-6 pb-6 w-full">
         <table className="w-full table-auto">
@@ -123,25 +121,25 @@ const ClassificationsManagement: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {classifications.length === 0 ? (
+            {parentCategories.length === 0 ? (
               <tr>
-                <td colSpan={4} className="text-center py-4">No classifications found</td>
+                <td colSpan={4} className="text-center py-4">No Parent Categories found</td>
               </tr>
             ) : (
-              classifications.map((classification) => (
-                <tr key={classification.id} className="border-b">
-                  <td className="px-4 py-2">{classification.id}</td>
-                  <td className="px-4 py-2">{classification.name}</td>
-                  <td className="px-4 py-2">{classification.description}</td>
+              parentCategories.map((parentCategory) => (
+                <tr key={parentCategory.id} className="border-b">
+                  <td className="px-4 py-2">{parentCategory.id}</td>
+                  <td className="px-4 py-2">{parentCategory.name}</td>
+                  <td className="px-4 py-2">{parentCategory.description}</td>
                   <td className="px-4 py-2 flex space-x-2">
                     <button
-                      onClick={() => openModal(classification)}
+                      onClick={() => openModal(parentCategory)}
                       className="text-blue-600 hover:text-blue-800"
                     >
                       <Edit size={20} />
                     </button>
                     <button
-                    onClick={() => handleDelete(classification.id)}
+                      onClick={() => handleDelete(parentCategory.id)}
                       className="text-red-600 hover:text-red-800"
                     >
                       <Trash2 size={20} />
@@ -154,21 +152,11 @@ const ClassificationsManagement: React.FC = () => {
         </table>
       </div>
 
-      <PageFooter
-        currentPage={currentPage}
-        totalPages={totalPages}
-        totalItems={classifications.length}
-        itemsPerPage={itemsPerPage}
-        currentItemCount={currentItems.length}
-        onPageChange={setCurrentPage}
-        itemLabel="products"
-      />
-
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
             <h3 className="text-lg font-semibold mb-4">
-              {editingClassification ? 'Edit Classification' : 'Add Classification'}
+              {editingParentCategory ? 'Edit Parent Category' : 'Add Parent Category'}
             </h3>
             <form onSubmit={onSubmit} className="space-y-4">
               <div>
@@ -206,15 +194,25 @@ const ClassificationsManagement: React.FC = () => {
                   type="submit"
                   className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
                 >
-                  {editingClassification ? 'Update' : 'Add'}
+                  {editingParentCategory ? 'Update' : 'Add'}
                 </button>
               </div>
             </form>
           </div>
         </div>
       )}
+
+      <PageFooter
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalItems={parentCategories.length}
+        itemsPerPage={itemsPerPage}
+        currentItemCount={currentItems.length}
+        onPageChange={setCurrentPage}
+        itemLabel="products"
+      />
     </div>
   );
 };
 
-export default ClassificationsManagement;
+export default ParentCategoryManagement;

@@ -1,11 +1,13 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axiosConfig from '../../config/axios.config';
+import { parentCategory } from '../../../types/globalTypes';
 
 // Define types for your state
 interface Category {
   id: number;
   name: string;
   description: string;
+  parentCategory?: parentCategory
 }
 
 interface AddCategory {
