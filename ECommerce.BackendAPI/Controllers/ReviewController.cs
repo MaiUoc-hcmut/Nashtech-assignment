@@ -18,6 +18,37 @@ namespace Ecommerce.BackendAPI.Controllers
             _reviewRepository = reviewRepository;
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetAllReviews
+        (
+            [FromQuery] List<int> productIds,
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] double minRating = 0,
+            [FromQuery] double maxRating = 5,
+            [FromQuery] DateTime? startDate = null,
+            [FromQuery] DateTime? endDate = null,
+            [FromQuery] string sortBy = "CreatedAt",
+            [FromQuery] bool isAsc = true
+        )
+        {
+            startDate ??= new DateTime(2025, 1, 1, 0, 0, 0);
+            endDate ??= new DateTime(2030, 12, 31, 23, 59, 59);
+            var reviews = await _reviewRepository
+                .GetReviews
+                (
+                    productIds, 
+                    pageNumber,
+                    minRating,
+                    maxRating,
+                    startDate,
+                    endDate,
+                    sortBy,
+                    isAsc
+                );
+            return Ok(reviews);
+            
+        }
+
         [HttpGet("/product/{productId}")]
         public async Task<IActionResult> GetReviewsByProductId(int productId)
         {

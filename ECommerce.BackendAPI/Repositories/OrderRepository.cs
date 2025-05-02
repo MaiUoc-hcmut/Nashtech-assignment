@@ -17,7 +17,9 @@ namespace Ecommerce.BackendAPI.Repositories
 
         public async Task<IEnumerable<Order>> GetAllOrders()
         {
-            return await _context.Orders.ToListAsync();
+            return await _context.Orders
+                .Include(o => o.Customer)
+                .ToListAsync();
         }
 
         public async Task<Order?> GetOrderById(int orderId)

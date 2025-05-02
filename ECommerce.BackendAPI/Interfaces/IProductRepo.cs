@@ -12,13 +12,14 @@ namespace Ecommerce.BackendAPI.Interfaces
         public void AttachProductClassification(ProductClassification productClassification);
         Task<IDbContextTransaction> BeginTransactionAsync();
         Task<IEnumerable<GetAllProductsResponse>> GetAllProducts(
-            int pageNumber = 1,
-            int pageSize = 10,
-            string sortBy = "Price",
-            bool isAsc = true,
-            int? classificationId = null,
-            decimal minPrice = 0,
-            decimal maxPrice = 999999999
+            int pageNumber,
+            int pageSize,
+            string sortBy,
+            bool isAsc,
+            int? classificationId,
+            decimal minPrice,
+            decimal maxPrice,
+            string? search
         );
         Task<Product?> GetProductById(int id);
         Task<Product> CreateProduct(Product product, IList<Classification> classificationList);

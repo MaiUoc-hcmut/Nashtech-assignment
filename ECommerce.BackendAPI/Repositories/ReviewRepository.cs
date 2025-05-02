@@ -15,6 +15,37 @@ namespace Ecommerce.BackendAPI.Repositories
             _context = context;
         }
 
+        public async Task<IEnumerable<Review>> GetReviews
+        (
+            List<int> productIds, 
+            int pageNumber,
+            double minRating,
+            double maxRating,
+            DateTime? startDate,
+            DateTime? endDate,
+            string sortBy,
+            bool isAsc
+        )
+        {
+            var pageSize = 10;
+
+            var query = _context.Reviews
+                .Where(r => productIds.Contains(r.Product.Id))
+                .Where(r => r.Rating >= minRating && r.Rating <= maxRating)
+                .Where(r => r.CreatedAt >= startDate && r.CreatedAt <= endDate); 
+
+            // Apply sorting
+            query = isAsc
+                ? query.OrderBy(r => EF.Property<object>(r, sortBy)) 
+                : query.OrderByDescending(r => EF.Property<object>(r, sortBy)); 
+
+            // Apply pagination
+            return await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
         public async Task<IEnumerable<Review>> GetReviewsByProductId(int productId)
         {
             return await _context.Reviews.Where(r => r.Product.Id == productId).ToListAsync();

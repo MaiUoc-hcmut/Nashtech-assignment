@@ -41,7 +41,9 @@ namespace Ecommerce.BackendAPI.Controllers
             [FromQuery] bool isAsc = true,
             [FromQuery] int? classificationId = null,
             [FromQuery] decimal minPrice = 0,
-            [FromQuery] decimal maxPrice = 999999999
+            [FromQuery] decimal maxPrice = 999999999,
+            [FromQuery] string? search = null,
+            [FromQuery] bool? simplest = false
         )
         {
             var products = await _productRepository.GetAllProducts
@@ -52,8 +54,18 @@ namespace Ecommerce.BackendAPI.Controllers
                     isAsc,
                     classificationId,
                     minPrice,
-                    maxPrice
+                    maxPrice,
+                    search
                 );
+            if (simplest == true)
+            {
+                var simpleProducts = products.Select(p => new
+                {
+                    p.Id,
+                    p.Name
+                }).ToList();
+                return Ok(simpleProducts);
+            }
             return Ok(products);
         }
 

@@ -50,13 +50,14 @@ namespace Ecommerce.BackendAPI.Repositories
 
         public async Task<IEnumerable<GetAllProductsResponse>> GetAllProducts
         (
-            int pageNumber = 1,
-            int pageSize = 10,
-            string sortBy = "UpdatedAt",
-            bool isAsc = true,
-            int? classificationId = null,
-            decimal minPrice = 0,
-            decimal maxPrice = 999999999
+            int pageNumber,
+            int pageSize,
+            string sortBy,
+            bool isAsc,
+            int? classificationId,
+            decimal minPrice,
+            decimal maxPrice,
+            string? search
         )
         {
             var query = _context.Products
@@ -72,6 +73,11 @@ namespace Ecommerce.BackendAPI.Repositories
             }
 
             query = query.Where(p => p.Price >= minPrice && p.Price <= maxPrice);
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                query = query.Where(p => p.Name.Contains(search) || p.Description.Contains(search));
+            }
 
             query = isAsc
                 ? query.OrderBy(p => EF.Property<object>(p, sortBy))
