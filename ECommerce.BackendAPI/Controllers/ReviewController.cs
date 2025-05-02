@@ -49,7 +49,7 @@ namespace Ecommerce.BackendAPI.Controllers
             
         }
 
-        [HttpGet("/product/{productId}")]
+        [HttpGet("product/{productId}")]
         public async Task<IActionResult> GetReviewsByProductId(int productId)
         {
             var reviews = await _reviewRepository.GetReviewsByProductId(productId);
@@ -73,7 +73,7 @@ namespace Ecommerce.BackendAPI.Controllers
             return Ok(review);
         }
 
-        [HttpPost("/product/{productId}")]
+        [HttpPost("product/{productId}")]
         [ServiceFilter(typeof(VerifyToken))]
         [ServiceFilter(typeof(VerifyWhenCreateReview))]
         public async Task<IActionResult> AddReview([FromBody] ReviewDTO reviewDto)

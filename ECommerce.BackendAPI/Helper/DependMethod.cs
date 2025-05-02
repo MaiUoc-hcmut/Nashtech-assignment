@@ -1,6 +1,7 @@
 using Ecommerce.SharedViewModel.Models;
 using Ecommerce.BackendAPI.Data;
 using Ecommerce.BackendAPI.Interfaces.Helper;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace Ecommerce.BackendAPI.Helper
@@ -20,7 +21,6 @@ namespace Ecommerce.BackendAPI.Helper
             {
                 Customer = customer
             };
-
             await _context.Carts.AddAsync(cart);
             await _context.SaveChangesAsync();
             return cart;

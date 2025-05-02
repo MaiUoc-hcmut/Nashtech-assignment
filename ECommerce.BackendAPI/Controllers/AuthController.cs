@@ -44,37 +44,24 @@ namespace ECommerce.BackendAPI.Controllers
                 var hashedPassword = _authService.HashPassword(request.Password);
                 request.Password = hashedPassword;
 
-                var customer = _customerRepository.GetCustomerByEmail(request.Email);
+                var customer = await _customerRepository.GetCustomerByEmail(request.Email);
                 if (customer != null) 
                 {
                     return BadRequest("This email already exist!");
                 }
-
+                
+                Console.WriteLine(53);
                 var registeredUser = await _authRepository.Register(request);
 
                 if (registeredUser == null)
                 {
                     return BadRequest("Registration failed.");
                 }
-
-                var response = new RegisterResponse
-                {
-                    Success = true,
-                    Message = "Registration successful.",
-                    Customer = {
-                        Id = registeredUser.Id,
-                        Name = registeredUser.Name,
-                        Email = registeredUser.Email,
-                        Username = registeredUser.Username,
-                        PhoneNumber = registeredUser.PhoneNumber,
-                        Address = registeredUser.Address
-                    }
-                };
-
+                
                 await _dependMethod.CreateCartWhenRegister(registeredUser);
                 await transaction.CommitAsync();
 
-                return Ok(response);
+                return Ok(new { message = "Registration successful." });
             }
             catch (Exception e)
             {

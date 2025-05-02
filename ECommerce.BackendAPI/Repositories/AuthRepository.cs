@@ -35,7 +35,6 @@ namespace Ecommerce.BackendAPI.Repositories
                 Address = request.Address,
                 PhoneNumber = request.PhoneNumber
             };
-
             // Add the customer to the database
             await _context.Customers.AddAsync(customer);
             await _context.SaveChangesAsync();

@@ -28,8 +28,13 @@ namespace Ecommerce.BackendAPI.Repositories
             return await _context.Database.BeginTransactionAsync();
         }
 
-        public async Task<Product?> GetProductById(int id)
+        public async Task<Product?> GetProductById(int id, bool includeRelated = true)
         {
+            if (!includeRelated)
+            {
+                return await _context.Products.FindAsync(id);
+            }
+
             return await _context.Products
                 .Include(p => p.Reviews)
                 .Include(p => p.Variants)

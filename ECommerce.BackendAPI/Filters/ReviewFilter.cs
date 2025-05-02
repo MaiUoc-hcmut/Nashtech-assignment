@@ -37,7 +37,7 @@ namespace Ecommerce.BackendAPI.FiltersAction
                 return;
             }
 
-            var product = await _productRepository.GetProductById(productId);
+            var product = await _productRepository.GetProductById(productId, false);
             if (product == null)
             {
                 context.Result = new NotFoundObjectResult(new { Error = "Product not found" });

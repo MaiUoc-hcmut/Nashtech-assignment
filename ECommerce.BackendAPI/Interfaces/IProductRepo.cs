@@ -21,7 +21,7 @@ namespace Ecommerce.BackendAPI.Interfaces
             decimal maxPrice,
             string? search
         );
-        Task<Product?> GetProductById(int id);
+        Task<Product?> GetProductById(int id, bool includeRelated = true);
         Task<Product> CreateProduct(Product product, IList<Classification> classificationList);
         Task<bool> UpdateProduct(Product product);
         Task<bool> DeleteProduct(int id);

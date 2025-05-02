@@ -58,9 +58,9 @@ namespace Ecommerce.BackendAPI.Repositories
 
         public async Task<Review> AddReview(Review review)
         {
-            await _context.Reviews.AddAsync(review);
+            var response = await _context.Reviews.AddAsync(review);
             await _context.SaveChangesAsync();
-            return review;
+            return response.Entity;
         }
 
         public async Task<bool> UpdateReview(Review review)

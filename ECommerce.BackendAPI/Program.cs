@@ -7,6 +7,7 @@ using Ecommerce.BackendAPI.Services;
 using Ecommerce.BackendAPI.Interfaces.Helper;
 using Ecommerce.BackendAPI.Helper;
 using Ecommerce.BackendAPI.FiltersAction;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,6 +36,10 @@ builder.Services.AddScoped<CreateOrderFilter>();
 // Admin filter
 builder.Services.AddScoped<VerifyAdmin>();
 
+// Review filters
+builder.Services.AddScoped<VerifyWhenCreateReview>();
+builder.Services.AddScoped<VerifyWhenUpdateAndDeleteReview>();
+
 // Add custom repositories
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IAdminRepository, AdminRepository>();
@@ -47,6 +52,7 @@ builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IClassificationRepository, ClassificationRepository>();
 builder.Services.AddScoped<ICartRepository, CartRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -55,7 +61,31 @@ builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 //     c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
 //     c.OperationFilter<FileUploadOperationFilter>();
 // });
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.AddSecurityDefinition("cookieAuth", new OpenApiSecurityScheme
+    {
+        Type = SecuritySchemeType.ApiKey,
+        In = ParameterLocation.Cookie,
+        Name = "access_token", // Name of the cookie
+        Description = "JWT Authorization cookie"
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "cookieAuth"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
 builder.Services.AddDbContext<DataContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")
 ));
