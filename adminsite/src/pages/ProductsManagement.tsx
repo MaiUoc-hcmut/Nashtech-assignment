@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../redux/hooks/redux';
 import { fetchProducts, addProduct, deleteProduct } from '../redux/features/products/productsSlice';
-import { Plus, ArrowUpDown, Star } from "lucide-react";
+import { Plus, ArrowUpDown, Star, RefreshCw } from "lucide-react";
 // import { Link } from 'react-router-dom';
 import ProductModal from "../components/products/AddProductModal";
 import ConfirmDelete from "../components/products/ConfirmDeleteModal";
@@ -100,6 +100,14 @@ const ProductPage: React.FC = () => {
     setCurrentPage(1);
   };
 
+  const handleRefreshReviews = () => {
+    // UI only - actual logic to be implemented by the user
+    setIsPending(true);
+    setTimeout(() => {
+      setIsPending(false);
+    }, 500); // Simulate loading for UI feedback
+  };
+
   // Sort filtered products
   const sortedProducts = [...products].sort((a, b) => {
     if (sortBy === 'price') {
@@ -196,7 +204,14 @@ const ProductPage: React.FC = () => {
                     <SortIcon column="rating" />
                   </div>
                 </th>
-                <th className="px-4 py-2 text-left"></th>
+                <th className="px-4 py-2 text-left">
+                  {/* Refresh Button */}
+                  <RefreshCw 
+                    size={18} 
+                    className={`mr-2 ${isPending ? 'animate-spin' : ''} hover:cursor-pointer`}
+                    onClick={handleRefreshReviews}
+                  />
+                </th>
               </tr>
             </thead>
             <tbody>

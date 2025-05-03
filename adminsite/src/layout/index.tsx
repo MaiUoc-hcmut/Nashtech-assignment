@@ -10,8 +10,8 @@ const Classifications = lazy(() => import('../pages/ClassificationsManagement'))
 const Categories = lazy(() => import('../pages/CategoriesManagement'));
 const ParentCategory = lazy(() => import('../pages/ParentCategoriesManagement'));
 const Products = lazy(() => import('../pages/ProductsManagement'));
-// const Orders = lazy(() => import('../pages/OrdersManagement'));
-// const Reviews = lazy(() => import('../pages/ReviewsManagement'));
+const Orders = lazy(() => import('../pages/OrdersManagement'));
+const Reviews = lazy(() => import('../pages/ReviewsManagement'));
 // const Customers = lazy(() => import('../pages/CustomersManagement'));
 // const Analytics = lazy(() => import('../pages/AnalyticsManagement'));
 // const Settings = lazy(() => import('../pages/SettingsManagement'));
@@ -42,9 +42,9 @@ const AdminLayout: React.FC = () => {
               <Route path="products" element={<Products />} >
                 <Route path="detail/:id" element={<ProductDetail />} />
               </Route>
-              {/* <Route path="orders" element={<Orders />} />
+              <Route path="orders" element={<Orders />} />
               <Route path="reviews" element={<Reviews />} />
-              <Route path="customers" element={<Customers />} />
+              {/* <Route path="customers" element={<Customers />} />
               <Route path="analytics" element={<Analytics />} />
               <Route path="settings" element={<Settings />} /> */}
               {/* Redirect to dashboard if no route matches */}

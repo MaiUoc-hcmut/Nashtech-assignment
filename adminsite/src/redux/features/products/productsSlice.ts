@@ -12,12 +12,23 @@ interface Product {
   updatedAt: Date
 }
 
+interface Variant {
+  id: number;
+  price: number;
+  colorId: number;
+  sizeId: number;
+  sku: string;
+  stock: number;
+  imagePreview: string;
+}
+
 interface AddProduct {
   name: string;
   description: string;
   price: string;
   classifications: string;
   image: File[] | null;
+  variants: Variant[] | null;
 }
 
 interface ProductsState {
@@ -51,11 +62,22 @@ export const addProduct = createAsyncThunk(
     formData.append('description', data.description);
     formData.append('price', data.price);
     formData.append('classifications', data.classifications);
+
+    if (data.variants !== null) {
+      const transformedVariants = data.variants.map(({ id, colorId, sizeId, sku, imagePreview, ...rest }) => ({
+        ...rest,
+        SKU: sku,
+        Categories: [colorId, sizeId],
+      }));
+
+      formData.append('variants', JSON.stringify(transformedVariants));
+    }
+
     if (data.image && data.image[0]) {
       formData.append('image', data.image[0]);
     }
 
-    const response = await axiosConfig.post('http://localhost:5113/api/Product', data);
+    const response = await axiosConfig.post('http://localhost:5113/api/Product', formData);
     if (response.status !== 200) throw new Error('Failed to add product');
     return response.data;
   }
@@ -64,8 +86,7 @@ export const addProduct = createAsyncThunk(
 export const deleteProduct = createAsyncThunk(
   'products/deleteProduct',
   async (data: {id: number, password: string}) => {
-    document.cookie = `password=${data.password}`;
-    const response = await axiosConfig.delete(`http://localhost:5113/api/Product/${data.id}`);
+    const response = await axiosConfig.delete(`http://localhost:5113/api/Product/${data.id}`, {data: data.password });
     if (response.status !== 200) throw new Error('Failed to delete product');
     return data.id;
   }

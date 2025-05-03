@@ -15,8 +15,8 @@ instance.interceptors.request.use(
     (config) => {
         if (config && config.url) {
             if (
-                config.url.includes("/Product") ||
-                config.url.includes("/Variant")
+                (config.url.includes("/Product") || config.url.includes("/Variant")) &&
+                config.method !== 'delete'
             ) {
                 config.headers['Content-Type'] = 'multipart/form-data';
                 config.headers['Accept'] = 'multipart/form-data';

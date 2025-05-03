@@ -1,17 +1,18 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axiosConfig from '../../config/axios.config';
-import { parentCategory } from '../../../types/globalTypes';
+import { ParentCategory } from '../../../types/globalTypes';
 
 // Define types for your state
 interface Category {
   id: number;
   name: string;
   description: string;
-  parentCategory?: parentCategory
+  parentCategory?: ParentCategory
 }
 
 interface AddCategory {
   name: string;
+  parent: number
   description: string;
 }
 
@@ -41,7 +42,8 @@ export const fetchCategories = createAsyncThunk(
 export const addCategory = createAsyncThunk(
   'categories/addCategory',
   async(payload: AddCategory) => {
-    const response = await axiosConfig.post('http://localhost:5113/api/Category', payload);
+    const { parent, ...data } = payload;
+    const response = await axiosConfig.post(`http://localhost:5113/api/Category?parentId=${parent}`, data);
     if (response.status !== 200) throw new Error('Failed to add categories');
     return response.data;
   }

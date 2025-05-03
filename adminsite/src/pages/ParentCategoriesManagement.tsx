@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../redux/hooks/redux';
 import { fetchParentCategories, updateParentCategory, deleteParentCategory, addParentCategory } from '../redux/features/parentCategories/parentCategoriesSlice';
 import { ClassificationNCateGoryNParent } from '../types/dashboardTypes';
-import { Trash2, Edit, Plus } from 'lucide-react';
+import { Trash2, Edit, Plus, RefreshCw } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import PageFooter from '../components/commons/PageFooter';
 import PageHeader from '../components/commons/PageHeader';
@@ -67,6 +67,14 @@ const ParentCategoryManagement: React.FC = () => {
     await dispatch(deleteParentCategory(id)).unwrap();
   }
 
+  const handleRefreshReviews = () => {
+    // UI only - actual logic to be implemented by the user
+    setIsPending(true);
+    setTimeout(() => {
+      setIsPending(false);
+    }, 500); // Simulate loading for UI feedback
+  };
+
   const openModal = (parentCategory?: ClassificationNCateGoryNParent) => {
     setEditingParentCategory(parentCategory || null);
     if (parentCategory) {
@@ -117,7 +125,14 @@ const ParentCategoryManagement: React.FC = () => {
               <th className="px-4 py-2 text-left">ID</th>
               <th className="px-4 py-2 text-left">Name</th>
               <th className="px-4 py-2 text-left">Description</th>
-              <th className="px-4 py-2 text-left">Actions</th>
+              <th className="px-4 py-2 text-left">
+                {/* Refresh Button */}
+                <RefreshCw 
+                  size={18} 
+                  className={`mr-2 ${isPending ? 'animate-spin' : ''} hover:cursor-pointer`}
+                  onClick={handleRefreshReviews}
+                />
+              </th>
             </tr>
           </thead>
           <tbody>

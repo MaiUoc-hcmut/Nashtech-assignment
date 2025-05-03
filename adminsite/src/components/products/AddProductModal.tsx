@@ -1,13 +1,18 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useForm } from 'react-hook-form';
+
+// Import the VariantTab component
+import VariantTab from './VariantTab';
+import { useAppSelector } from '../../redux/hooks/redux';
 import axiosConfig from '../../redux/config/axios.config';
 
 interface AddProduct {
   name: string;
   description: string;
   price: string;
-  classifications: string; 
+  classifications: string;
   image: File[] | null;
+  variants?: any[]; // Add variants to the product data
 }
 
 interface FormValues {
@@ -16,6 +21,7 @@ interface FormValues {
   price: string;
   classifications: string;
   image: FileList | null;
+  variants?: any[]; // Add variants to the form values
 }
 
 interface Classification {
@@ -46,7 +52,7 @@ const debounce = (func: (value: string) => void, wait: number): ((value: string)
 
 const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSubmit, error: serverError }) => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [classifications, setClassifications] = useState<Classification[]>([]);
+  const [clsft, setClsft] = useState<Classification[]>([]);
   const [selectedClassifications, setSelectedClassifications] = useState<Classification[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [searchStatus, setSearchStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
@@ -56,6 +62,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSubmit, 
   
   // Reference to the classification container div for handling outside clicks
   const classificationContainerRef = useRef<HTMLDivElement>(null);
+  const { classifications } = useAppSelector((state) => state.classifications);
 
   const {
     register,
@@ -70,13 +77,18 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSubmit, 
       description: '',
       price: '',
       classifications: '',
-      image: null
+      image: null,
+      variants: [] // Initialize variants as empty array
     },
     mode: 'onChange' // Enable real-time validation
   });
 
   const imageFile: FileList | null = watch('image');
   const allFieldsWatched = watch(['name', 'description', 'price', 'classifications', 'image']);
+  
+  // Get name and price for passing to VariantTab
+  const productName = watch('name');
+  const productPrice = watch('price');
   
   // Check if all product fields are valid
   const isProductFormValid = 
@@ -97,27 +109,27 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSubmit, 
   // Function to search classifications directly
   const searchClassification = async (query: string) => {
     if (!query.trim()) {
-      setClassifications([]);
+      setClsft([]);
       return;
     }
     
     try {
       setSearchStatus('loading');
-      // Replace with your actual API endpoint
-      const response = await axiosConfig.get(`http://localhost:5113/api/Classification/search?pattern=${encodeURIComponent(query)}`);
-      
-      if (response.status !== 200) {
-        throw new Error('Failed to fetch classifications');
+      if (classifications.length !== 0) {
+        const result = classifications.filter((classification: Classification) =>
+          classification.name.toLowerCase().includes(query.toLowerCase())
+        );
+        setClsft(result);
+      } else {
+        const result = await axiosConfig.get(`http://localhost:5113/api/Classification/search?pattern=${encodeURIComponent(query)}`);
+        setClsft(result.data);
       }
-      
-      const data = await response.data;
-      setClassifications(data);
       setSearchStatus('success');
       setSearchError(null);
     } catch (error) {
       setSearchStatus('error');
       setSearchError(error instanceof Error ? error.message : 'Unknown error occurred');
-      setClassifications([]);
+      setClsft([]);
     }
   };
 
@@ -126,7 +138,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSubmit, 
     const handleClickOutside = (event: MouseEvent) => {
       if (classificationContainerRef.current && 
           !classificationContainerRef.current.contains(event.target as Node)) {
-        setClassifications([]);
+        setClsft([]);
       }
     };
 
@@ -152,7 +164,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSubmit, 
     if (!isOpen) {
       reset();
       setImagePreview(null);
-      setClassifications([]);
+      setClsft([]);
       setSelectedClassifications([]);
       setSearchTerm('');
       setActiveTab(ModalTab.PRODUCT);
@@ -164,7 +176,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSubmit, 
   const debouncedSearch = useCallback(
     debounce((value: string) => {
       searchClassification(value);
-    }, 1000),
+    }, 400),
     []
   );
 
@@ -191,7 +203,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSubmit, 
     
     // Clear search input and results
     setSearchTerm('');
-    setClassifications([]);
+    setClsft([]);
   };
 
   // Handle removing a classification
@@ -209,7 +221,8 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSubmit, 
   const handleFormSubmit = handleSubmit(async (data: FormValues): Promise<void> => {
     const formData: AddProduct = {
       ...data,
-      image: data.image ? Array.from(data.image) : null
+      image: data.image ? Array.from(data.image) : null,
+      variants: data.variants
     };
     
     await onSubmit(formData);
@@ -232,6 +245,12 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSubmit, 
         fileInput.dispatchEvent(event);
       }
     }
+  };
+
+  // Validate variants when in variant tab
+  const validateVariants = () => {
+    const variants = watch('variants');
+    return variants && variants.length > 0;
   };
 
   if (!isOpen) return null;
@@ -315,10 +334,10 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSubmit, 
                   <label className="block text-sm font-medium text-gray-700">Classifications</label>
                   
                   {/* Classification suggestions dropdown positioned above the input */}
-                  {classifications.length > 0 && (
+                  {clsft.length > 0 && (
                     <div className="absolute z-10 bottom-full left-0 right-0 mb-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
                       <ul className="py-1">
-                        {classifications.map((classification: Classification) => (
+                        {clsft.map((classification: Classification) => (
                           <li 
                             key={classification.id} 
                             className="px-3 py-2 hover:bg-blue-100 cursor-pointer text-gray-700"
@@ -435,16 +454,23 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSubmit, 
             </div>
           )}
           
-          {/* Variant Form */}
+          {/* Variant Form - Integrated VariantTab Component */}
           {activeTab === ModalTab.VARIANT && (
             <div className="p-6 flex-1 overflow-auto">
-              <h3 className="text-lg font-medium text-gray-900">Variant Details</h3>
-              <p className="text-sm text-gray-500 mt-1">Add variant details for your product here.</p>
+              <VariantTab
+                productName={productName}
+                productPrice={productPrice}
+                productImagePreview={imagePreview}
+                register={register}
+                setValue={setValue}
+                watch={watch}
+                errors={errors}
+              />
               
-              {/* Placeholder for variant form fields */}
-              <div className="mt-4 bg-gray-50 p-6 rounded-md">
-                <p className="text-center text-gray-600">Variant form fields will be added here.</p>
-              </div>
+              {/* Display error for variants */}
+              {errors.variants && (
+                <p className="text-red-500 text-sm mt-2">{errors.variants.message}</p>
+              )}
             </div>
           )}
           
@@ -466,9 +492,9 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSubmit, 
             
             {activeTab === ModalTab.PRODUCT ? (
               <button
-                type="button" // Ensure this is explicitly set to "button"
+                type="button"
                 onClick={(e) => {
-                  e.preventDefault(); // Prevent any default form submission behavior
+                  e.preventDefault();
                   handleNextClick();
                 }}
                 disabled={!(formValidated || isProductFormValid)}
@@ -483,9 +509,9 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSubmit, 
             ) : (
               <button
                 type="submit"
-                disabled={!(formValidated || isProductFormValid)}
+                disabled={!validateVariants()}
                 className={`px-6 py-2 rounded-md ${
-                  (formValidated || isProductFormValid)
+                  validateVariants()
                     ? 'bg-blue-600 hover:bg-blue-700 text-white' 
                     : 'bg-blue-300 cursor-not-allowed text-white'
                 }`}

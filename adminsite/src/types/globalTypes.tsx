@@ -1,4 +1,4 @@
-export interface parentCategory {
+export interface ParentCategory {
     id: number,
     name: string,
     description: string
@@ -19,4 +19,24 @@ export interface ProductCardProps {
   
 export interface StarRatingProps {
     rating: number;
+}
+
+export interface Order {
+    id: number;
+    amount: number;
+    status: string;
+    createdAt: string;
+    customer: string;
+}
+
+export interface Review {
+    id: number;
+    rating: number;
+    text: string;
+    createdAt: string;
+    customer: {
+        id: number;
+        name: string;
+    };
+    product: Product;
 }

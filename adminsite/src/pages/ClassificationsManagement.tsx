@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../redux/hooks/redux';
 import { fetchClassifications, updateClassification, deleteClassification, addClassification } from '../redux/features/classifications/classificationsSlice';
 import { ClassificationNCateGoryNParent } from '../types/dashboardTypes';
-import { Trash2, Edit, Plus } from 'lucide-react';
+import { Trash2, Edit, Plus, RefreshCw } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import PageHeader from '../components/commons/PageHeader';
 import PageFooter from '../components/commons/PageFooter';
@@ -68,6 +68,13 @@ const ClassificationsManagement: React.FC = () => {
     await dispatch(deleteClassification(id)).unwrap();
   }
 
+  const handleRefreshReviews = () => {
+    // UI only - actual logic to be implemented by the user
+    setIsPending(true);
+    setTimeout(() => {
+      setIsPending(false);
+    }, 500); // Simulate loading for UI feedback
+  };
 
   const openModal = (classification?: ClassificationNCateGoryNParent) => {
     setEditingClassification(classification || null);
@@ -119,7 +126,14 @@ const ClassificationsManagement: React.FC = () => {
               <th className="px-4 py-2 text-left">ID</th>
               <th className="px-4 py-2 text-left">Name</th>
               <th className="px-4 py-2 text-left">Description</th>
-              <th className="px-4 py-2 text-left">Actions</th>
+              <th className="px-4 py-2 text-left">
+                {/* Refresh Button */}
+                <RefreshCw 
+                  size={18} 
+                  className={`mr-2 ${isPending ? 'animate-spin' : ''} hover:cursor-pointer`}
+                  onClick={handleRefreshReviews}
+                />
+              </th>
             </tr>
           </thead>
           <tbody>

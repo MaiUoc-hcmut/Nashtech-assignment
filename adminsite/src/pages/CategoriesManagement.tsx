@@ -1,11 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAppDispatch, useAppSelector } from '../redux/hooks/redux';
 import { fetchCategories, updateCategory, deleteCategory, addCategory } from '../redux/features/categories/categoriesSlice';
 import { ClassificationNCateGoryNParent } from '../types/dashboardTypes';
-import { Trash2, Edit, Plus } from 'lucide-react';
+import { Trash2, Edit, Plus, RefreshCw } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import PageHeader from '../components/commons/PageHeader';
 import PageFooter from '../components/commons/PageFooter';
+import axiosConfig from '../redux/config/axios.config';
 
 const CategoriesManagement: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -13,18 +14,25 @@ const CategoriesManagement: React.FC = () => {
   const [isPending, setIsPending] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [parentSearchTerm, setParentSearchTerm] = useState('');
+  const [pCategories, setPCategories] = useState<ClassificationNCateGoryNParent[]>([]);
+  const [selectedParent, setSelectedParent] = useState<ClassificationNCateGoryNParent | null>(null);
 
   const dispatch = useAppDispatch();
   const { categories, status, error } = useAppSelector((state) => state.categories);
+  const { parentCategories } = useAppSelector((state) => state.parentCategories);
+  const parentCategoryContainerRef = useRef<HTMLDivElement>(null);
 
   const {
     register,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors }
-  } = useForm<{ name: string; description: string }>({
+  } = useForm<{ name: string; parent: number, description: string }>({
     defaultValues: {
       name: '',
+      parent: 0,
       description: '',
     }
   });
@@ -44,6 +52,67 @@ const CategoriesManagement: React.FC = () => {
     }
   }, [dispatch, status, categories]);
 
+  // Handle searching for parent categories
+  const searchParentCategories = async (query: string) => {
+    if (!query.trim()) {
+      setPCategories([]);
+      return;
+    }
+    if (parentCategories.length > 0) {
+      const filteredParentCategories = parentCategories.filter((category) => {
+        return category.name.toLowerCase().includes(query.toLowerCase());
+      });
+      setPCategories(filteredParentCategories);
+    } else {
+      const filteredParentCategories = await axiosConfig.get(`http://localhost:5113/api/ParentCategory/search?pattern=${query}`);
+      if (filteredParentCategories.status !== 200) throw new Error('Failed to fetch categories');
+      setPCategories(filteredParentCategories.data);
+    }
+    
+  };
+
+  // Handle clicking outside the parent category container
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (parentCategoryContainerRef.current && 
+          !parentCategoryContainerRef.current.contains(event.target as Node)) {
+        setPCategories([]);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  // Handle parent category selection
+  const handleSelectParent = (parentCategory: ClassificationNCateGoryNParent) => {
+    setSelectedParent(parentCategory);
+    setValue('parent', parentCategory.id, { shouldValidate: true });
+    setParentSearchTerm('');
+    setPCategories([]);
+  };
+
+  // Debounce utility function
+  const debounce = (func: (value: string) => void, wait: number): ((value: string) => void) => {
+    let timeout: NodeJS.Timeout;
+    return (value: string) => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func(value), wait);
+    };
+  };
+
+  // Debounced search for parent categories
+  const debouncedSearch = debounce((value: string) => {
+    searchParentCategories(value);
+  }, 300);
+
+  // Handle parent search input change
+  useEffect(() => {
+    debouncedSearch(parentSearchTerm);
+  }, [parentSearchTerm]);
+
   const onSubmit = handleSubmit(async (data) => {
     if (editingCategory) {
       // Update existing category
@@ -61,25 +130,38 @@ const CategoriesManagement: React.FC = () => {
     
     setIsModalOpen(false);
     reset();
+    setSelectedParent(null);
   });
 
   const handleDelete = async (id: number) => {
     await dispatch(deleteCategory(id)).unwrap();
   }
 
+  const handleRefreshReviews = () => {
+    // UI only - actual logic to be implemented by the user
+    setIsPending(true);
+    setTimeout(() => {
+      setIsPending(false);
+    }, 500); // Simulate loading for UI feedback
+  };
+
   const openModal = (category?: ClassificationNCateGoryNParent) => {
     setEditingCategory(category || null);
-    if (category) {
-      reset({
-        name: category.name,
-        description: category.description
-      });
-    } else {
+    // if (category) {
+    //   reset({
+    //     name: category.name,
+    //     parent: category.parentCategory?.id || 0,
+    //     description: category.description
+    //   });
+    //   setSelectedParent(category.parentCategory || null);
+    // } else {
       reset({
         name: '',
+        parent: 0,
         description: ''
       });
-    }
+      setSelectedParent(null);
+    // }
     setIsModalOpen(true);
   };
 
@@ -118,7 +200,14 @@ const CategoriesManagement: React.FC = () => {
               <th className="px-4 py-2 text-left">Name</th>
               <th className="px-4 py-2 text-left">Description</th>
               <th className="px-4 py-2 text-left">Parent</th>
-              <th className="px-4 py-2 text-left">Actions</th>
+              <th className="px-4 py-2 text-left">
+                {/* Refresh Button */}
+                <RefreshCw 
+                  size={18} 
+                  className={`mr-2 ${isPending ? 'animate-spin' : ''} hover:cursor-pointer`}
+                  onClick={handleRefreshReviews}
+                />
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -171,6 +260,7 @@ const CategoriesManagement: React.FC = () => {
               {editingCategory ? 'Edit Category' : 'Add Category'}
             </h3>
             <form onSubmit={onSubmit} className="space-y-4">
+              {/* Name field */}
               <div>
                 <label className="block text-sm font-medium text-gray-700">Name</label>
                 <input
@@ -183,6 +273,63 @@ const CategoriesManagement: React.FC = () => {
                 />
                 {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
               </div>
+
+              {/* Parent category field with search */}
+              <div className="relative" ref={parentCategoryContainerRef}>
+                <label className="block text-sm font-medium text-gray-700">Parent Category</label>
+                
+                {/* Hidden input to store the selected parent ID */}
+                <input
+                  type="hidden"
+                  {...register("parent")}
+                />
+                
+                {/* Parent category suggestions dropdown */}
+                {pCategories.length > 0 && (
+                  <div className="absolute z-10 top-full left-0 right-0 mb-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
+                    <ul className="py-1">
+                      {pCategories.map((pCategory) => (
+                        <li 
+                          key={pCategory.id} 
+                          className="px-3 py-2 hover:bg-blue-100 cursor-pointer text-gray-700"
+                          onClick={() => handleSelectParent(pCategory)}
+                        >
+                          {pCategory.name}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                
+                {/* Input field with selected parent display */}
+                <div className={`mt-1 flex items-center border ${errors.parent ? 'border-red-500' : 'border-gray-300'} rounded-md px-3 py-2 focus-within:ring-2 focus-within:ring-blue-500`}>
+                  {selectedParent ? (
+                    <div className="flex items-center bg-blue-100 text-blue-800 rounded-md px-2 py-1 mr-2 text-sm">
+                      {selectedParent.name}
+                      <button
+                        type="button"
+                        className="ml-1 text-blue-500 hover:text-blue-700 focus:outline-none"
+                        onClick={() => {
+                          setSelectedParent(null);
+                          setValue('parent', 0);
+                        }}
+                      >
+                        &times;
+                      </button>
+                    </div>
+                  ) : null}
+                  
+                  <input
+                    type="text"
+                    value={parentSearchTerm}
+                    onChange={(e) => setParentSearchTerm(e.target.value)}
+                    className="flex-grow border-none focus:outline-none focus:ring-0"
+                    placeholder={selectedParent ? "" : "Search parent category..."}
+                  />
+                </div>
+              </div>
+                
+              {/* Description field */}
               <div>
                 <label className="block text-sm font-medium text-gray-700">Description</label>
                 <textarea
@@ -197,7 +344,10 @@ const CategoriesManagement: React.FC = () => {
               <div className="flex justify-end space-x-2">
                 <button
                   type="button"
-                  onClick={() => setIsModalOpen(false)}
+                  onClick={() => {
+                    setIsModalOpen(false);
+                    setSelectedParent(null);
+                  }}
                   className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100"
                 >
                   Cancel
