@@ -45,8 +45,26 @@ namespace Ecommerce.BackendAPI.Controllers
                     sortBy,
                     isAsc
                 );
-            return Ok(reviews);
-            
+
+            var formattedReviews = reviews.Select(r => new
+            {
+                r.Id,
+                r.Rating,
+                r.Text,
+                CreatedAt = r.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss"),
+                Customer = new
+                {
+                    r.Customer.Id,
+                    r.Customer.Name,
+                },
+                Product = new
+                {
+                    r.Product.Id,
+                    r.Product.Name,
+                }
+            });
+
+            return Ok(formattedReviews);
         }
 
         [HttpGet("product/{productId}")]
@@ -70,7 +88,22 @@ namespace Ecommerce.BackendAPI.Controllers
         {
             var review = await _reviewRepository.GetReview(id);
             if (review == null) return NotFound();
-            return Ok(review);
+            return Ok(new {
+                review.Id,
+                review.Rating,
+                review.Text,
+                CreatedAt = review.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss"),
+                CustomerName = new
+                {
+                    review.Customer.Id,
+                    review.Customer.Name,
+                },
+                Product = new
+                {
+                    review.Product.Id,
+                    review.Product.Name,
+                }
+            });
         }
 
         [HttpPost("product/{productId}")]
@@ -79,12 +112,14 @@ namespace Ecommerce.BackendAPI.Controllers
         public async Task<IActionResult> AddReview([FromBody] ReviewDTO reviewDto)
         {
             if (reviewDto == null) return BadRequest("Review cannot be null");
+            var Customer = HttpContext.Items["Customer"] as Customer ?? throw new InvalidOperationException("Customer is not available in HttpContext.");
+            var Product = HttpContext.Items["Product"] as Product ?? throw new InvalidOperationException("Product is not available in HttpContext.");
             var review = new Review {
                 Rating = reviewDto.Rating,
-                Text = reviewDto.Text
+                Text = reviewDto.Text,
+                Customer = Customer,
+                Product = Product,
             };
-            review.Customer = HttpContext.Items["Customer"] as Customer ?? throw new InvalidOperationException("Customer is not available in HttpContext.");
-            review.Product = HttpContext.Items["Product"] as Product ?? throw new InvalidOperationException("Product is not available in HttpContext.");
 
             var createdReview = await _reviewRepository.AddReview(review);
             return Ok(createdReview);

@@ -5,6 +5,7 @@ using Ecommerce.SharedViewModel.DTOs;
 using Ecommerce.SharedViewModel.ParametersType;
 using Ecommerce.BackendAPI.FiltersAction;
 using System.Text.Json;
+using Ecommerce.BackendAPI.Services;
 
 
 namespace Ecommerce.BackendAPI.Controllers
@@ -15,20 +16,20 @@ namespace Ecommerce.BackendAPI.Controllers
     {
         private readonly IProductRepository _productRepository;
         private readonly IVariantRepository _variantRepository;
-        private readonly ICategoryRepository _categoryRepository;
+        private readonly AuthService _authService;
         private readonly IClassificationRepository _classificationRepository;
 
         public ProductController
         (
             IProductRepository productRepository, 
             IVariantRepository variantRepository,
-            ICategoryRepository categoryRepository,
+            AuthService authService,
             IClassificationRepository classificationRepository
         )
         {
             _productRepository = productRepository;
             _variantRepository = variantRepository;
-            _categoryRepository = categoryRepository;
+            _authService = authService;
             _classificationRepository = classificationRepository;
         }
 
@@ -119,7 +120,7 @@ namespace Ecommerce.BackendAPI.Controllers
         (
             [FromForm] ProductDTO productDto, 
             [FromForm] string classifications,
-            [FromForm] string? variants = null
+            [FromForm] string variants
         )
         {
             var transaction = await _productRepository.BeginTransactionAsync();
@@ -181,6 +182,7 @@ namespace Ecommerce.BackendAPI.Controllers
                         var variantCategories = new List<VariantCategory>();
                         foreach (var categoryId in variantDto.Categories)
                         {
+                            Console.WriteLine($"Category ID: {categoryId}");
                             variantCategories.Add(new VariantCategory { CategoryId = categoryId });
                         }
                         var variantEntity = new Variant {
@@ -236,8 +238,13 @@ namespace Ecommerce.BackendAPI.Controllers
         [ServiceFilter(typeof(VerifyToken))]
         [ServiceFilter(typeof(VerifyAdmin))]
         [ServiceFilter(typeof(UpdateAndDeleteProductFilter))]
-        public async Task<IActionResult> DeleteProduct(int id)
+        public async Task<IActionResult> DeleteProduct(int id, [FromBody] string password)
         {
+            var admin = HttpContext.Items["admin"] as Admin;
+            if (admin == null || !_authService.VerifyPassword(password, admin.Password))
+            {
+                return BadRequest("You do not have permission to perform this action.");
+            }
             if (!await _productRepository.DeleteProduct(id))
             {
                 return NotFound($"Product with ID {id} not found.");

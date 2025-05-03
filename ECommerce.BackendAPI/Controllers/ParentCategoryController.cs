@@ -37,6 +37,13 @@ namespace Ecommerce.BackendAPI.Controllers
             return Ok(parentCategory);
         }
 
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchParentCategoryByPattern([FromQuery] string pattern)
+        {
+            var parentCategories = await _parentCategoryRepo.SearchParentCategoryByPattern(pattern);
+            return Ok(parentCategories);
+        }
+
         [HttpPost]
         [ServiceFilter(typeof(VerifyToken))]
         [ServiceFilter(typeof(VerifyAdmin))]

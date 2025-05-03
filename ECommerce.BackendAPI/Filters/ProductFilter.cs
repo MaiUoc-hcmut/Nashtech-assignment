@@ -17,17 +17,10 @@ namespace Ecommerce.BackendAPI.FiltersAction
         {
             var httpContext = context.HttpContext;
             var admin = httpContext.Items["admin"] as Admin;
-            var password = httpContext.Request.Cookies["password"]?.ToString();
 
-            if (admin == null || string.IsNullOrEmpty(password))
+            if (admin == null)
             {
                 context.Result = new BadRequestObjectResult(new { Error = "You do not have authorize to do this action" });
-                return;
-            }
-
-            if (!_authService.VerifyPassword(password, admin.Password))
-            {
-                context.Result = new BadRequestObjectResult(new { Error = "Password does not match with your account" });
                 return;
             }
 

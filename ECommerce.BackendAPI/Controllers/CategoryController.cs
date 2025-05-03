@@ -42,6 +42,13 @@ namespace Ecommerce.BackendAPI.Controllers
             return Ok(categories);
         }
 
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchCategoryByPattern([FromQuery] string pattern)
+        {
+            var categories = await _categoryRepository.SearchCategoryByPattern(pattern);
+            return Ok(categories);
+        }
+
         [HttpPost]
         [ServiceFilter(typeof(VerifyToken))]
         [ServiceFilter(typeof(VerifyAdmin))]

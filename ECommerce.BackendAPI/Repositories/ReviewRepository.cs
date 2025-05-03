@@ -29,8 +29,11 @@ namespace Ecommerce.BackendAPI.Repositories
         {
             var pageSize = 10;
 
-            var query = _context.Reviews
-                .Where(r => productIds.Contains(r.Product.Id))
+            var query = _context.Reviews.AsQueryable();
+
+            query = _context.Reviews
+                .Include(r => r.Product)
+                .Include(r => r.Customer)
                 .Where(r => r.Rating >= minRating && r.Rating <= maxRating)
                 .Where(r => r.CreatedAt >= startDate && r.CreatedAt <= endDate); 
 
@@ -48,12 +51,18 @@ namespace Ecommerce.BackendAPI.Repositories
 
         public async Task<IEnumerable<Review>> GetReviewsByProductId(int productId)
         {
-            return await _context.Reviews.Where(r => r.Product.Id == productId).ToListAsync();
+            return await _context.Reviews
+                .Include(r => r.Customer)
+                .Where(r => r.Product.Id == productId)
+                .ToListAsync();
         }
 
         public async Task<Review?> GetReview(int id)
         {
-            return await _context.Reviews.FindAsync(id);
+            return await _context.Reviews
+                .Include(r => r.Customer)
+                .Include(r => r.Product) 
+                .FirstOrDefaultAsync(r => r.Id == id);
         }
 
         public async Task<Review> AddReview(Review review)

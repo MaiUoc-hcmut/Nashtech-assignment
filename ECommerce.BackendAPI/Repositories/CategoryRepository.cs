@@ -40,6 +40,17 @@ namespace Ecommerce.BackendAPI.Repositories
             return await _context.Categories.Where(c => c.ParentCategory.Id == parentId).ToListAsync();
         }
 
+        public async Task<IEnumerable<Category>> SearchCategoryByPattern(string pattern)
+        {
+            var query = _context.Categories.AsQueryable();
+            var term = pattern.ToLower();
+            query = query.Where(c => c.Name.Contains(term));
+
+            var response = await query.ToListAsync();
+
+            return response;
+        }
+
         public async Task<Category?> CreateCategory(CategoryDTO request, ParentCategory parentCategory)
         {
             var category = new Category

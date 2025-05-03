@@ -32,6 +32,17 @@ namespace Ecommerce.BackendAPI.Repositories
             return await _context.ParentCategories.FirstOrDefaultAsync(pc => pc.Name == name);
         }
 
+        public async Task<List<ParentCategory>> SearchParentCategoryByPattern(string pattern)
+        {
+            var query = _context.ParentCategories.AsQueryable();
+            var term = pattern.ToLower();
+            query = query.Where(c => c.Name.Contains(term));
+
+            var response = await query.ToListAsync();
+
+            return response;
+        }
+
         public async Task<ParentCategory?> CreateParentCategory(string Name)
         {
             var parentCategory = await _context.ParentCategories.AddAsync(new ParentCategory { Name = Name });
