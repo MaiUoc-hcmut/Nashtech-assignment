@@ -1,8 +1,146 @@
-﻿@{
+﻿@* @using Ecommerce.SharedViewModel.Models *@
+@using Ecommerce.SharedViewModel.Responses
+
+@model IEnumerable<GetAllProductsResponse>
+@{
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<link rel="stylesheet" href="~/css/home.css" />
+
+<!-- Classifications Section -->
+<div class="classifications-section">
+    <div class="section-header">
+        <h2 class="section-title">Product Types</h2>
+    </div>
+    
+    <div class="classifications">
+        <div class="classification-item">
+            <a asp-controller="Product" asp-action="Index" asp-route-id="5">
+                <img src="~/assets/images/sport_type.webp" alt="Sport" class="classification-image">
+            </a>
+            <div class="classification-name" style="color: inherit; text-decoration: none;">SPORT</div>
+        </div>
+        <div class="classification-item">
+            <a asp-controller="Product" asp-action="Index" asp-route-classificationId="1002">
+                <img src="~/assets/images/casual_type.webp" alt="Casual" class="classification-image">
+            </a>
+            <div class="classification-name" style="color: inherit; text-decoration: none;">CASUAL</div>
+        </div>
+        <div class="classification-item">
+            <a asp-controller="Product" asp-action="Index" asp-route-classificationId="2">
+                <img src="~/assets/images/summer_type.webp" alt="Summer" class="classification-image">
+            </a>
+            <div class="classification-name" style="color: inherit; text-decoration: none;">SUMMER</div>
+        </div>
+        <div class="classification-item">
+            <a asp-controller="Product" asp-action="Index" asp-route-classificationId="1">
+                <img src="~/assets/images/winter_type.webp" alt="Winter" class="classification-image">
+            </a>
+            <div class="classification-name" style="color: inherit; text-decoration: none;">WINTER</div>
+        </div>
+        <div class="classification-item">
+            <a asp-controller="Product" asp-action="Index" asp-route-classificationId="1003">
+                <img src="~/assets/images/daily_type.webp" alt="Daily" class="classification-image">
+            </a>
+            <div class="classification-name" style="color: inherit; text-decoration: none;">DAILY</div>
+        </div>
+        <div class="classification-item">
+            <a asp-controller="Product" asp-action="Index" asp-route-classifictionId="1004">
+                <img src="~/assets/images/office_type.webp" alt="Office" class="classification-image">
+            </a>
+            <div class="classification-name" style="color: inherit; text-decoration: none;">OFFICE</div>
+        </div>
+    </div>
 </div>
+
+<!-- Casual Wear Section -->
+<div class="product-section">
+    <div class="section-header">
+        <h2 class="section-title">SẢN PHẨM MẶC HẰNG NGÀY</h2>
+        <a href="#" class="see-more">Xem Thêm</a>
+    </div>
+    
+    <div class="products-container">
+        <div class="navigation-arrow arrow-prev">
+            <i class="fas fa-chevron-left"></i>
+        </div>
+        
+        @if (Model.Any())
+        {
+            @foreach (var product in Model)
+            {
+                <partial name="_ProductCardPartial" model='new {
+                    IsNew = (DateTime.UtcNow - product.CreatedAt).TotalDays <= 7,
+                    Id = product.Id,
+                    Rating = product.AverageRating,
+                    Reviews = product.TotalReviews,
+                    IsBestSeller = true,
+                    Image = product.ImageUrl,
+                    Name = product.Name,
+                    Price = product.Price,
+                }'/>
+            }
+        }
+        
+        <div class="navigation-arrow arrow-next">
+            <i class="fas fa-chevron-right"></i>
+        </div>
+    </div>
+</div>
+
+<!-- Sports Wear Section -->
+<div class="product-section">
+    <div class="section-header">
+        <h2 class="section-title">SẢN PHẨM THỂ THAO</h2>
+        <a href="#" class="see-more">Xem Thêm</a>
+    </div>
+    
+    <div class="products-container">
+        <div class="navigation-arrow arrow-prev">
+            <i class="fas fa-chevron-left"></i>
+        </div>
+        
+        <!-- Sport Product Card 1 -->
+        @if (Model.Any())
+        {
+            @foreach (var product in Model)
+            {
+                <partial name="_ProductCardPartial" model='new {
+                    IsNew = (DateTime.UtcNow - product.CreatedAt).TotalDays <= 7,
+                    Id = product.Id,
+                    Rating = product.AverageRating,
+                    Reviews = product.TotalReviews,
+                    IsBestSeller = true,
+                    Image = product.ImageUrl,
+                    Name = product.Name,
+                    Price = product.Price,
+                }'/>
+            }
+        }
+        
+        <div class="navigation-arrow arrow-next">
+            <i class="fas fa-chevron-right"></i>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Add carousel functionality for product sections
+    document.addEventListener('DOMContentLoaded', function() {
+        const productContainers = document.querySelectorAll('.products-container');
+        
+        productContainers.forEach(container => {
+            const prevButton = container.querySelector('.arrow-prev');
+            const nextButton = container.querySelector('.arrow-next');
+            
+            prevButton.addEventListener('click', () => {
+                container.scrollBy({ left: -300, behavior: 'smooth' });
+            });
+            
+            nextButton.addEventListener('click', () => {
+                container.scrollBy({ left: 300, behavior: 'smooth' });
+            });
+        });
+    });
+</script>

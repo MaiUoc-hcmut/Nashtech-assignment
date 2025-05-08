@@ -1,0 +1,130 @@
+@using Ecommerce.SharedViewModel.Responses
+@model CreateOrderResponse
+
+<link rel="stylesheet" href="~/css/congratulation.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+<div class="container">
+    <div class="success-card">
+        <div class="success-icon">
+            <i class="fas fa-check"></i>
+        </div>
+        
+        <h1>Thank You for Your Order!</h1>
+        <p>Your purchase was completed successfully. We've sent a confirmation email with all the details.</p>
+        
+        <div class="order-number">
+            Order #: <span id="orderNumber">@Model.Id</span>
+        </div>
+        
+        <div class="order-details">
+            <div class="detail-row">
+                <span class="label">Order Date:</span>
+                <span id="orderDate">@Model.CreatedAt.ToString("MMMM dd, yyyy")</span>
+            </div>
+            <div class="detail-row">
+                <span class="label">Order Status:</span>
+                <span id="orderStatus">Success</span>
+            </div>
+            <div class="detail-row">
+                <span class="label">Shipping Method:</span>
+                <span id="shippingMethod">Standard Shipping (3-5 business days)</span>
+            </div>
+            <div class="detail-row">
+                <span class="label">Total:</span>
+                <span id="totalAmount">$@Model.TotalAmount</span>
+            </div>
+        </div>
+        
+        <div>
+            <a class="btn">Track My Order</a>
+            <a asp-controller="Product" asp-action="Index" class="btn btn-outline">Continue Shopping</a>
+        </div>
+        
+        <div class="next-steps">
+            <h3>What's Next?</h3>
+            
+            <div class="step">
+                <div class="step-icon">1</div>
+                <div>
+                    <strong>Order Processing</strong>
+                    <p>We're preparing your items for shipment. You'll receive an email when your order ships.</p>
+                </div>
+            </div>
+            
+            <div class="step">
+                <div class="step-icon">2</div>
+                <div>
+                    <strong>Track Your Package</strong>
+                    <p>Use the tracking number in your shipping confirmation email to follow your order's journey.</p>
+                </div>
+            </div>
+            
+            <div class="step">
+                <div class="step-icon">3</div>
+                <div>
+                    <strong>Enjoy Your Purchase</strong>
+                    <p>We hope you love your new items! Don't forget to leave a review.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="social-share">
+            <p>Share your purchase with friends!</p>
+            <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+            <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+            <a href="#" class="social-icon"><i class="fab fa-pinterest"></i></a>
+        </div>
+        
+        <footer>
+            <p>Questions about your order? Contact our <a href="@Url.Action("Contact", "Home")">customer support</a>.</p>
+            <p>© @DateTime.Now.Year Your Store Name. All rights reserved.</p>
+        </footer>
+    </div>
+</div>
+@* 
+@section scripts { *@
+    <script>
+        $(document).ready(function() {
+            // Add confetti effect for extra celebration
+            createConfetti();
+        });
+        
+        // Simple confetti effect
+        function createConfetti() {
+            const confettiCount = 100;
+            
+            for (let i = 0; i < confettiCount; i++) {
+                const confetti = document.createElement('div');
+                confetti.style.position = 'absolute';
+                confetti.style.width = Math.random() * 10 + 5 + 'px';
+                confetti.style.height = Math.random() * 10 + 5 + 'px';
+                confetti.style.backgroundColor = getRandomColor();
+                confetti.style.borderRadius = '50%';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.top = '-5vh';
+                confetti.style.opacity = Math.random() + 0.5;
+                confetti.style.pointerEvents = 'none';
+                
+                document.body.appendChild(confetti);
+                
+                // Animation
+                const animation = confetti.animate([
+                    { transform: 'translateY(0) rotate(0deg)', opacity: 1 },
+                    { transform: `translateY(100vh) rotate(${Math.random() * 360}deg)`, opacity: 0 }
+                ], {
+                    duration: Math.random() * 3000 + 2000,
+                    easing: 'cubic-bezier(.215,.61,.355,1)'
+                });
+                
+                animation.onfinish = () => confetti.remove();
+            }
+        }
+        
+        function getRandomColor() {
+            const colors = ['#4CAF50', '#FFC107', '#2196F3', '#F44336', '#9C27B0', '#FF9800'];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+    </script>
+}

@@ -33,3 +33,4 @@ C:\Users\Admin\OneDrive\Documents\NashTech_Training\Assignment\ECommerce.ClientM
 C:\Users\Admin\OneDrive\Documents\NashTech_Training\Assignment\ECommerce.ClientMVC\obj\Debug\net8.0\ECommerce.ClientMVC.genruntimeconfig.cache
 C:\Users\Admin\OneDrive\Documents\NashTech_Training\Assignment\ECommerce.ClientMVC\obj\Debug\net8.0\ref\ECommerce.ClientMVC.dll
 C:\Users\Admin\OneDrive\Documents\NashTech_Training\Assignment\ECommerce.ClientMVC\obj\Debug\net8.0\ECommerce.ClientMVC.sourcelink.json
+C:\Users\Admin\OneDrive\Documents\NashTech_Training\Assignment\ECommerce.ClientMVC\bin\Debug\net8.0\Newtonsoft.Json.dll

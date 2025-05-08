@@ -1,0 +1,388 @@
+@using Ecommerce.SharedViewModel.ViewModels
+@model ProfileViewModel
+@{
+    ViewData["Title"] = "Products";
+    
+    string activeTab = ViewBag.ActiveTab ?? "AccountInfo";
+}
+
+<div class="container-fluid" style="margin-top: 20px;">
+    <div class="row">
+        <!-- Left Navigation Sidebar -->
+        <div class="col-md-3 bg-light p-0">
+            <div class="list-group list-group-flush">
+                <div 
+                    class="list-group-item list-group-item-action py-3 @(activeTab == "AccountInfo" ? "bg-dark text-white" : "")"
+                    style="cursor: pointer;"
+                    data-tab="AccountInfo"
+                    onclick="changeTab('AccountInfo')"
+                >
+                    <i class="fas fa-user-circle me-2"></i> Account Information
+                    <i class="fas fa-chevron-right float-end mt-1"></i>
+                </div>
+                <div 
+                    class="list-group-item list-group-item-action py-3 @(activeTab == "Orders" ? "bg-dark text-white" : "")"
+                    style="cursor: pointer;"
+                    data-tab="Orders"
+                    onclick="changeTab('Orders')"
+                >
+                    <i class="fas fa-shopping-bag me-2"></i> Your Orders
+                    <i class="fas fa-chevron-right float-end mt-1"></i>
+                </div>
+                <div 
+                    class="list-group-item list-group-item-action py-3 @(activeTab == "Reviews" ? "bg-dark text-white" : "")"
+                    style="cursor: pointer;"
+                    data-tab="Reviews"
+                    onclick="changeTab('Reviews')"
+                >
+                    <i class="fas fa-star me-2"></i> Reviews and Responses
+                    <i class="fas fa-chevron-right float-end mt-1"></i>
+                </div>
+                <div 
+                    class="list-group-item list-group-item-action py-3"
+                    style="cursor: pointer;"
+                    onclick="logout()"
+                >
+                    <i class="fas fa-sign-out-alt me-2"></i> Logout
+                    <i class="fas fa-chevron-right float-end mt-1"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Content Area -->
+        <div class="col-md-9 bg-white" id="content-area">
+            @if (activeTab == "AccountInfo")
+            {
+                <partial name="_AccountInfoPartial" model="@Model.Customer" />
+            }
+            else if (activeTab == "Orders")
+            {
+                @* <partial name="_OrdersPartial" model="Model.Orders" /> *@
+            }
+            else if (activeTab == "Reviews")
+            {
+                @* <partial name="_ReviewsPartial" model="Model.Reviews" /> *@
+            }
+        </div>
+    </div>
+</div>
+
+
+<script>
+    // Client-side state for activeTab
+    let activeTab = '@activeTab';
+    const customerId = @Model.Customer.Id;
+
+    // Function to update the UI for the active tab
+    function updateActiveTabUI(tab) {
+        // Remove active class from all sidebar items
+        document.querySelectorAll('.list-group-item').forEach(item => {
+            item.classList.remove('bg-dark', 'text-white');
+        });
+
+        // Add active class to the clicked item
+        const activeItem = document.querySelector(`[data-tab="${tab}"]`);
+        if (activeItem) {
+            activeItem.classList.add('bg-dark', 'text-white');
+        }
+    }
+
+    // Function to change tab and load partial view
+    function changeTab(tab) {
+        // Update the client-side state
+        activeTab = tab;
+
+        // Update the sidebar UI
+        updateActiveTabUI(tab);
+
+        // Load the partial view via AJAX
+        fetchPartialView(tab);
+    }
+
+    // Function to fetch partial view content via AJAX
+    function fetchPartialView(tab) {
+        const contentArea = document.getElementById('content-area');
+        let url;
+
+        // Map tab to the appropriate controller action
+        switch (tab) {
+            case 'AccountInfo':
+                url = '/Profile/GetAccountInfoPartial';
+                break;
+            case 'Orders':
+                url = `/Profile/GetOrdersPartial?customerId=${customerId}`;
+                break;
+            case 'Reviews':
+                url = `/Profile/GetReviewsPartial?customerId=${customerId}`;
+                break;
+            default:
+                return;
+        }
+
+        // Show a loading state (optional)
+        contentArea.innerHTML = '<p>Loading...</p>';
+
+        // Make AJAX request to fetch partial view
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'Accept': 'text/html'
+            }
+        })
+        .then(response => response.text())
+        .then(html => {
+            // Update the content area with the new partial view
+            contentArea.innerHTML = html;
+        })
+        .catch(error => {
+            console.error('Error loading partial view:', error);
+            contentArea.innerHTML = '<p>Error loading content.</p>';
+        });
+    }
+
+    // Logout function (example)
+    function logout() {
+        fetch('/Account/Logout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Logout failed');
+            }
+            return response.json(); // Parse the JSON response body
+        })
+        .then(data => {
+            if (data.success) {
+                window.location.href = '/Home/Index';
+            } else {
+                throw new Error(data.error || 'Logout failed');
+            }
+        })
+        .catch(error => {
+            console.error('Error during logout:', error);
+            alert('Failed to log out. Please try again.');
+        });
+    }
+</script>
+
+<script>
+    // Global variables
+    let reviewOrderId = null;
+    let selectedRating = 0;
+    let selectedProductId = null;
+    let currentModalStep = 1;
+    
+    // Function to open the review modal
+    function openReviewModal(orderId) {
+        reviewOrderId = orderId;
+        currentModalStep = 1;
+        
+        // Fetch order details and populate the first modal step
+        fetchOrderDetails(orderId);
+        
+        // Show the modal
+        const reviewModal = new bootstrap.Modal(document.getElementById('reviewModal'));
+        reviewModal.show();
+    }
+
+    
+    // Function to fetch order details by order ID
+    function fetchOrderDetails(orderId) {
+        // In a real application, you would fetch this data from the backend
+        // For now, we'll simulate the data fetch by getting it from the DOM
+        
+        const modalContent = document.getElementById('reviewModalContent');
+        modalContent.innerHTML = document.getElementById('productSelectionTemplate').innerHTML;
+        
+        // Find the order in the DOM
+        const orderCards = document.querySelectorAll('.card');
+        const orderCard = Array.from(orderCards).find(card => {
+            const header = card.querySelector('h5');
+            return header && header.textContent.trim() === `#${orderId}`;
+        });
+        if (!orderCard) return;
+        
+        const productContainer = document.getElementById('productsToReview');
+        productContainer.innerHTML = '';
+        
+        // Get all product information from the order
+        const productRows = orderCard.querySelectorAll('.card-body .row');
+        productRows.forEach((row, index) => {
+            const imageEl = row.querySelector('img');
+            const nameEl = row.querySelector('h5');
+            const detailsEl = row.querySelector('.text-muted');
+            const inputEl = row.querySelector('input');
+            
+            if (imageEl && nameEl) {
+                const imageUrl = imageEl.src;
+                const productName = nameEl.textContent;
+                const productId = inputEl.value;
+                const productDetails = detailsEl ? detailsEl.textContent : '';
+                
+                // Create product element
+                const productItem = document.createElement('div');
+                productItem.className = 'product-item d-flex align-items-center mb-3 p-2 border rounded';
+                productItem.dataset.productId = productId; // Use index+1 as mock product ID
+                productItem.innerHTML = `
+                    <div class="me-3" style="width: 80px; height: 80px;">
+                        <img src="${imageUrl}" class="img-fluid" alt="${productName}">
+                    </div>
+                    <div>
+                        <h5>${productName}</h5>
+                        <p class="text-muted">${productDetails}</p>
+                    </div>
+                `;
+                
+                // Add click event
+                productItem.addEventListener('click', function() {
+                    document.querySelectorAll('.product-item').forEach(item => {
+                        item.classList.remove('selected', 'border-primary');
+                    });
+                    
+                    const productIdInputData = document.getElementById("productIdData");
+                    this.classList.add('selected', 'border-primary');
+                    selectedProductId = this.dataset.productId;
+                    productIdInputData.value = selectedProductId;
+                    console.log(productIdInputData.value);
+                });
+                
+                productContainer.appendChild(productItem);
+            }
+        });
+        
+        // Initialize rating stars
+        initRatingStars();
+    }
+    
+    // Function to initialize star rating functionality
+    function initRatingStars() {
+        const stars = document.querySelectorAll('.star-icon');
+        
+        stars.forEach(star => {
+            // Mouseover event
+            star.addEventListener('mouseover', function() {
+                const rating = parseInt(this.dataset.rating);
+                highlightStars(rating);
+            });
+            
+            // Mouseout event
+            star.addEventListener('mouseout', function() {
+                // If no rating is selected, reset stars
+                if (selectedRating === 0) {
+                    resetStars();
+                } else {
+                    // Otherwise, highlight up to the selected rating
+                    highlightStars(selectedRating);
+                }
+            });
+            
+            // Click event
+            star.addEventListener('click', function() {
+                selectedRating = parseInt(this.dataset.rating);
+                const RatingInputData = document.getElementById("ratingData");
+                RatingInputData.value = selectedRating;
+                console.log(RatingInputData.value)
+                highlightStars(selectedRating);
+                
+                // If a product is selected and rating is done, proceed to the next step
+                if (selectedProductId && selectedRating > 0) {
+                    setTimeout(() => {
+                        showReviewForm();
+                    }, 300);
+                }
+            });
+        });
+    }
+    
+    // Function to highlight stars up to a specific rating
+    function highlightStars(rating) {
+        const stars = document.querySelectorAll('.star-icon');
+        
+        stars.forEach((star, index) => {
+            if (index < rating) {
+                star.classList.remove('far');
+                star.classList.add('fas', 'text-warning');
+            } else {
+                star.classList.remove('fas', 'text-warning');
+                star.classList.add('far');
+            }
+        });
+    }
+    
+    // Function to reset all stars
+    function resetStars() {
+        const stars = document.querySelectorAll('.star-icon');
+        
+        stars.forEach(star => {
+            star.classList.remove('fas', 'text-warning');
+            star.classList.add('far');
+        });
+    }
+    
+    // Function to show the review form (second step)
+    function showReviewForm() {
+        currentModalStep = 2;
+        
+        const modalContent = document.getElementById('reviewModalContent');
+        modalContent.innerHTML = document.getElementById('reviewFormTemplate').innerHTML;
+        
+        // Set the stars according to the selected rating
+        const stars = document.querySelectorAll('.star-icon');
+        stars.forEach((star, index) => {
+            const starRating = index + 1;
+            if (starRating <= selectedRating) {
+                star.classList.remove('far');
+                star.classList.add('fas', 'text-warning');
+            } else {
+                star.classList.remove('fas', 'text-warning');
+                star.classList.add('far');
+            }
+        });
+    }
+
+    async function handleSubmit() {
+        const reviewProductId = document.getElementById("productIdData").value;
+        const reviewRating = document.getElementById("ratingData").value;
+        const reviewText = document.getElementById("reviewText").value;
+        console.log(reviewText);
+
+        try {
+            const response = await fetch('/Review/CreateReview', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    productId: reviewProductId,
+                    rating: reviewRating,
+                    text: reviewText
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const result = await response.json();
+            if (result.success) {
+                console.log('Review submitted successfully:', result);
+                // Close the modal
+                const reviewModal = bootstrap.Modal.getInstance(document.getElementById('reviewModal'));
+                reviewModal.hide();
+                // Redirect to Profile/Index
+                if (result.redirectUrl) {
+                    window.location.href = result.redirectUrl;
+                }
+            } else {
+                console.error('Error submitting review:', result.error);
+                alert('Failed to submit review: ' + result.error);
+            }
+        } catch (error) {
+            console.error('Error submitting review:', error);
+            alert('Failed to submit review. Please try again later.');
+        }
+    }
+</script>

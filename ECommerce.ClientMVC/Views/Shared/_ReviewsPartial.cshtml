@@ -1,0 +1,48 @@
+@using Ecommerce.SharedViewModel.Models
+@model IEnumerable<Review>
+
+<div class="p-4">
+    <h2 class="mb-4">Reviews and Responses</h2>
+
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead class="bg-primary text-white">
+                <tr>
+                    <th class="py-3">Product</th>
+                    <th class="py-3">Review</th>
+                    <th class="py-3">Rating</th>
+                    <th class="py-3">Date</th>
+                    <th class="py-3"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var review in Model)
+                {
+                    <tr>
+                        <td class="py-3">
+                            <div class="d-flex align-items-center">
+                                <img src="@review.Product.ImageUrl" alt="@review.Product.Name" class="img-fluid me-3" style="max-width: 80px;">
+                                <div>
+                                    <h6 class="mb-1">@review.Product.Name</h6>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="py-3">@review.Text</td>
+                        <td class="py-3">
+                            <div class="rating">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    <i class="fas fa-star @(i <= review.Rating ? "text-warning" : "text-muted")"></i>
+                                }
+                            </div>
+                        </td>
+                        <td>@review.CreatedAt</td>
+                        <td class="py-3">
+                            <button class="btn btn-sm btn-outline-dark rounded-pill">Cập nhật</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

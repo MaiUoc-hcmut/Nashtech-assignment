@@ -1,46 +1,194 @@
-﻿<!DOCTYPE html>
+﻿@using Ecommerce.ClientMVC.Interface
+@inject IAuthService AuthService
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - ECommerce.ClientMVC</title>
+    <title>@ViewData["Title"] - NASHCLOTHES</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/ECommerce.ClientMVC.styles.css" asp-append-version="true" />
+    <!-- Add Font Awesome for social media icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        /* Custom styles for consistent 5% margins */
+        .page-container {
+            width: 90%; /* 100% - (5% left + 5% right) */
+            margin-left: 5%;
+            margin-right: 5%;
+        }
+        
+        /* Menu hover effects */
+        .nav-item .nav-link:hover {
+            background-color: #000;
+            color: #fff !important;
+            transition: all 0.3s ease;
+        }
+        
+        /* Active item styling */
+        .nav-item .nav-link.active {
+            background-color: #000;
+            color: #fff !important;
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">ECommerce.ClientMVC</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
+    <!-- Header Menu -->
+    <header class="py-3 border-bottom bg-white shadow-sm">
+        <div class="page-container">
+            <div class="row align-items-center">
+                <!-- Part 1: Logo -->
+                <div class="col-md-3 col-lg-2 mb-2 mb-md-0">
+                    <a class="d-flex align-items-center text-dark text-decoration-none" asp-area="" asp-controller="Home" asp-action="Index">
+                        <span class="fs-4 fw-bold ms-2">NASHCLOTHES</span>
+                    </a>
+                </div>
+                
+                <!-- Part 2: Menu icon and Search bar -->
+                <div class="col-md-6 col-lg-7 d-flex align-items-center">
+                    <button class="btn btn-outline-secondary me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#mainMenu" aria-controls="mainMenu">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <form class="w-100" asp-action="SearchProduct" method="get">
+                        <div class="input-group">
+                            <input type="search" class="form-control" placeholder="Search products..." aria-label="Search" name="q">
+                            <button class="btn btn-dark" type="submit">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Part 3: Authentication and Cart -->
+                <div class="col-md-3 col-lg-3 d-flex justify-content-end align-items-center">
+                    @if (await AuthService.IsAuthenticated())
+                    {
+                        var customer = AuthService.GetCurrentUser();
+                        <div class="dropdown me-3">
+                            <a href="#" class="d-block text-decoration-none dropdown-toggle" id="userMenu" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user-circle me-1" style="color: black;"></i>
+                                <span style="color: black;">@customer?.Name</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
+                                <li><a class="dropdown-item" asp-controller="Profile" asp-action="Index">My Profile</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form asp-controller="Account" asp-action="Logout" method="post">
+                                        <button type="submit" class="dropdown-item">Logout</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="me-3">
+                            <a asp-controller="Account" asp-action="Login" class="btn btn-outline-dark btn-sm me-2">Login</a>
+                            <a asp-controller="Account" asp-action="Register" class="btn btn-dark btn-sm">Register</a>
+                        </div>
+                    }
+                    @{
+                        var user = AuthService.GetCurrentUser();
+                        <a asp-controller="Cart" asp-action="Index" asp-route-customerId="@user?.Id" class="position-relative d-inline-flex text-decoration-none">
+                            <i class="fas fa-shopping-cart fa-lg" style="color: black;"></i>
+                            @* <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                0
+                                <span class="visually-hidden">items in cart</span>
+                            </span> *@
+                        </a>
+                    }
                 </div>
             </div>
-        </nav>
+        </div>
     </header>
-    <div class="container">
+    
+    <!-- Menu Sidebar -->
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="mainMenu" aria-labelledby="mainMenuLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title ps-3" id="mainMenuLabel">Menu</h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body p-0">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link active py-2 ps-3" aria-current="page" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link py-2 ps-3" asp-area="" asp-controller="Product" asp-action="Index">Products</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link py-2 ps-3" asp-area="" asp-controller="Category" asp-action="Index">Categories</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link py-2 ps-3" asp-area="" asp-controller="Home" asp-action="About">About Us</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link py-2 ps-3" asp-area="" asp-controller="Home" asp-action="Contact">Contact</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link py-2 ps-3" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Main section -->
+    <div class="page-container">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - ECommerce.ClientMVC - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <!-- Footer -->
+    <footer class="bg-black text-white py-4">
+        <div class="page-container">
+            <div class="row">
+                <!-- Company Info Column -->
+                <div class="col-lg-4 mb-4 mb-lg-0">
+                    <h3 class="fw-bold mb-3">NASHCLOTHES lắng nghe bạn!</h3>
+                    <p class="mb-4">Chúng tôi luôn trân trọng và mong đợi nhận được mọi ý kiến đóng góp từ khách hàng để có thể nâng cấp trải nghiệm dịch vụ và sản phẩm tốt hơn nữa.</p>
+                    <a href="#" class="btn btn-primary px-4 py-2 rounded-pill">ĐÓNG GÓP Ý KIẾN <i class="fas fa-arrow-right ms-2"></i></a>
+                </div>
+                
+                <!-- Contact Info Column -->
+                <div class="col-lg-4 mb-4 mb-lg-0">
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="me-3">
+                            <i class="fas fa-phone-alt fa-2x"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-1">Hotline</h6>
+                            <p class="mb-0 fw-bold">1900.272737 - 028.7777.2737</p>
+                            <p class="mb-0">(8:30 - 22:00)</p>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <i class="fas fa-envelope fa-2x"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-1">Email</h6>
+                            <p class="mb-0 fw-bold">Contact@nashclothes.me</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Social Media Column -->
+                <div class="col-lg-4 d-flex align-items-center justify-content-lg-end">
+                    <div class="social-icons d-flex">
+                        <a href="#" class="mx-2"><i class="fab fa-facebook-f fa-2x"></i></a>
+                        <a href="#" class="mx-2"><i class="fab fa-discord fa-2x"></i></a>
+                        <a href="#" class="mx-2"><i class="fab fa-tiktok fa-2x"></i></a>
+                        <a href="#" class="mx-2"><i class="fab fa-instagram fa-2x"></i></a>
+                        <a href="#" class="mx-2"><i class="fab fa-youtube fa-2x"></i></a>
+                    </div>
+                </div>
+            </div>
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

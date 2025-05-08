@@ -1,0 +1,233 @@
+@using Ecommerce.SharedViewModel.Responses
+@model IEnumerable<GetAllProductsResponse>
+
+@{
+    ViewData["Title"] = "Products";
+}
+
+<div class="container mt-4">
+    <h1 class="mb-4">Products</h1>
+
+    <div class="row">
+        <!-- Filters Sidebar -->
+        <div class="col-lg-3 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h4 class="mb-0">Filters</h4>
+                </div>
+                <div class="card-body">
+                    <form id="filter-form" method="get">
+                        <!-- Categories -->
+                        <div class="filter-group mb-4">
+                            <h5 class="filter-title mb-3">Categories</h5>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input category-filter" type="checkbox" value="men" id="men" name="categories" @(ViewBag.SelectedCategories != null && ViewBag.SelectedCategories.Contains("men") ? "checked" : "")>
+                                <label class="form-check-label" for="men">Men</label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input category-filter" type="checkbox" value="women" id="women" name="categories" @(ViewBag.SelectedCategories != null && ViewBag.SelectedCategories.Contains("women") ? "checked" : "")>
+                                <label class="form-check-label" for="women">Women</label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input category-filter" type="checkbox" value="kids" id="kids" name="categories" @(ViewBag.SelectedCategories != null && ViewBag.SelectedCategories.Contains("kids") ? "checked" : "")>
+                                <label class="form-check-label" for="kids">Kids</label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input category-filter" type="checkbox" value="accessories" id="accessories" name="categories" @(ViewBag.SelectedCategories != null && ViewBag.SelectedCategories.Contains("accessories") ? "checked" : "")>
+                                <label class="form-check-label" for="accessories">Accessories</label>
+                            </div>
+                        </div>
+
+                        <!-- Types -->
+                        <div class="filter-group mb-4">
+                            <h5 class="filter-title mb-3">Product Type</h5>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input type-filter" type="checkbox" value="shirts" id="shirts" name="types" @(ViewBag.SelectedTypes != null && ViewBag.SelectedTypes.Contains("shirts") ? "checked" : "")>
+                                <label class="form-check-label" for="shirts">Shirts</label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input type-filter" type="checkbox" value="shorts" id="shorts" name="types" @(ViewBag.SelectedTypes != null && ViewBag.SelectedTypes.Contains("shorts") ? "checked" : "")>
+                                <label class="form-check-label" for="shorts">Shorts</label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input type-filter" type="checkbox" value="pants" id="pants" name="types" @(ViewBag.SelectedTypes != null && ViewBag.SelectedTypes.Contains("pants") ? "checked" : "")>
+                                <label class="form-check-label" for="pants">Pants</label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input type-filter" type="checkbox" value="dresses" id="dresses" name="types" @(ViewBag.SelectedTypes != null && ViewBag.SelectedTypes.Contains("dresses") ? "checked" : "")>
+                                <label class="form-check-label" for="dresses">Dresses</label>
+                            </div>
+                        </div>
+
+                        <!-- Price Range -->
+                        <div class="filter-group mb-4">
+                            <h5 class="filter-title mb-3">Price Range</h5>
+                            <div class="row">
+                                <div class="col-6">
+                                    <label for="minPrice" class="form-label">Min</label>
+                                    <input type="number" class="form-control price-filter" id="minPrice" name="minPrice" value="@ViewBag.MinPrice" min="0">
+                                </div>
+                                <div class="col-6">
+                                    <label for="maxPrice" class="form-label">Max</label>
+                                    <input type="number" class="form-control price-filter" id="maxPrice" name="maxPrice" value="@ViewBag.MaxPrice" min="0">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Special Filters -->
+                        <div class="filter-group mb-4">
+                            <h5 class="filter-title mb-3">Special</h5>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input special-filter" type="checkbox" value="true" id="isNew" name="isNew" @(ViewBag.IsNew == true ? "checked" : "")>
+                                <label class="form-check-label" for="isNew">New Arrivals</label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input special-filter" type="checkbox" value="true" id="isBestSeller" name="isBestSeller" @(ViewBag.IsBestSeller == true ? "checked" : "")>
+                                <label class="form-check-label" for="isBestSeller">Best Sellers</label>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Apply Filters</button>
+                            <a href="@Url.Action("Products", "Shop")" class="btn btn-outline-secondary">Clear All</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Products Grid -->
+        <div class="col-lg-9">
+            <!-- Sort Options -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <span class="me-2">Showing @Model.Count() product(s)</span>
+                </div>
+                <div class="d-flex align-items-center">
+                    <label for="sortOrder" class="me-2">Sort by:</label>
+                    <select id="sortOrder" name="sortOrder" class="form-select form-select-sm" style="width: auto;">
+                    </select>
+                </div>
+            </div>
+
+            <!-- Products Grid -->
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="products-container">
+                @if (Model.Any())
+                {
+                    @foreach (var product in Model)
+                    {
+                        <div class="col">
+                            <partial name="_ProductCardPartial" model='new {
+                                Id = product.Id,
+                                Rating = product.AverageRating,
+                                Reviews = product.TotalReviews,
+                                IsNew = (DateTime.UtcNow - product.CreatedAt).TotalDays <= 7,
+                                IsBestSeller = true,
+                                Image = product.ImageUrl,
+                                Name = product.Name,
+                                Price = product.Price,
+                            }'/>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="col-12">
+                        <div class="alert alert-info text-center p-5">
+                            <i class="bi bi-exclamation-circle fs-1 mb-3"></i>
+                            <h4>No products found</h4>
+                            <p>Try adjusting your filter criteria or browse our categories.</p>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <!-- Pagination -->
+            @if (ViewBag.TotalPages > 1)
+            {
+                <nav aria-label="Page navigation" class="mt-5">
+                    <ul class="pagination justify-content-center">
+                        @if (ViewBag.CurrentPage > 1)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" href="@Url.Action("Products", new { page = ViewBag.CurrentPage - 1, categories = ViewBag.SelectedCategories, types = ViewBag.SelectedTypes, minPrice = ViewBag.MinPrice, maxPrice = ViewBag.MaxPrice, isNew = ViewBag.IsNew, isBestSeller = ViewBag.IsBestSeller, hasDiscount = ViewBag.HasDiscount, minRating = ViewBag.MinRating, sortOrder = ViewBag.SortOrder })" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                        }
+
+                        @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                        {
+                            <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                <a class="page-link" href="@Url.Action("Products", new { page = i, categories = ViewBag.SelectedCategories, types = ViewBag.SelectedTypes, minPrice = ViewBag.MinPrice, maxPrice = ViewBag.MaxPrice, isNew = ViewBag.IsNew, isBestSeller = ViewBag.IsBestSeller, hasDiscount = ViewBag.HasDiscount, minRating = ViewBag.MinRating, sortOrder = ViewBag.SortOrder })">@i</a>
+                            </li>
+                        }
+
+                        @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" href="@Url.Action("Products", new { page = ViewBag.CurrentPage + 1, categories = ViewBag.SelectedCategories, types = ViewBag.SelectedTypes, minPrice = ViewBag.MinPrice, maxPrice = ViewBag.MaxPrice, isNew = ViewBag.IsNew, isBestSeller = ViewBag.IsBestSeller, hasDiscount = ViewBag.HasDiscount, minRating = ViewBag.MinRating, sortOrder = ViewBag.SortOrder })" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Handle sort order change
+            $('#sortOrder').change(function() {
+                $('#filter-form').append('<input type="hidden" name="sortOrder" value="' + $(this).val() + '">');
+                $('#filter-form').submit();
+            });
+
+            // Optional: AJAX filtering without full page reload
+            // Uncomment and implement if you want client-side filtering
+            /*
+            $('.category-filter, .type-filter, .special-filter, .rating-filter').change(function() {
+                applyFilters();
+            });
+
+            $('.price-filter').on('change', function() {
+                applyFilters();
+            });
+
+            function applyFilters() {
+                var formData = $('#filter-form').serialize();
+                
+                $.ajax({
+                    url: '@Url.Action("ProductsPartial", "Shop")',
+                    type: 'GET',
+                    data: formData,
+                    success: function(result) {
+                        $('#products-container').html(result);
+                    }
+                });
+            }
+            */
+        });
+    </script>
+}
+

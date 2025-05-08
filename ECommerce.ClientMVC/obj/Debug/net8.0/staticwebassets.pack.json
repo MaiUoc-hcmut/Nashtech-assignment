@@ -5,6 +5,74 @@
       "PackagePath": "staticwebassets\\ECommerce.ClientMVC.bundle.scp.css"
     },
     {
+      "Id": "C:\\Users\\Admin\\OneDrive\\Documents\\NashTech_Training\\Assignment\\ECommerce.ClientMVC\\wwwroot\\assets\\images\\aothun.webp",
+      "PackagePath": "staticwebassets\\assets\\images\\aothun.webp"
+    },
+    {
+      "Id": "C:\\Users\\Admin\\OneDrive\\Documents\\NashTech_Training\\Assignment\\ECommerce.ClientMVC\\wwwroot\\assets\\images\\casual_type.webp",
+      "PackagePath": "staticwebassets\\assets\\images\\casual_type.webp"
+    },
+    {
+      "Id": "C:\\Users\\Admin\\OneDrive\\Documents\\NashTech_Training\\Assignment\\ECommerce.ClientMVC\\wwwroot\\assets\\images\\daily_type.webp",
+      "PackagePath": "staticwebassets\\assets\\images\\daily_type.webp"
+    },
+    {
+      "Id": "C:\\Users\\Admin\\OneDrive\\Documents\\NashTech_Training\\Assignment\\ECommerce.ClientMVC\\wwwroot\\assets\\images\\office_type.webp",
+      "PackagePath": "staticwebassets\\assets\\images\\office_type.webp"
+    },
+    {
+      "Id": "C:\\Users\\Admin\\OneDrive\\Documents\\NashTech_Training\\Assignment\\ECommerce.ClientMVC\\wwwroot\\assets\\images\\polo.png",
+      "PackagePath": "staticwebassets\\assets\\images\\polo.png"
+    },
+    {
+      "Id": "C:\\Users\\Admin\\OneDrive\\Documents\\NashTech_Training\\Assignment\\ECommerce.ClientMVC\\wwwroot\\assets\\images\\product!nothing!aokhoac.png",
+      "PackagePath": "staticwebassets\\assets\\images\\product!nothing!aokhoac.png"
+    },
+    {
+      "Id": "C:\\Users\\Admin\\OneDrive\\Documents\\NashTech_Training\\Assignment\\ECommerce.ClientMVC\\wwwroot\\assets\\images\\quandai.webp",
+      "PackagePath": "staticwebassets\\assets\\images\\quandai.webp"
+    },
+    {
+      "Id": "C:\\Users\\Admin\\OneDrive\\Documents\\NashTech_Training\\Assignment\\ECommerce.ClientMVC\\wwwroot\\assets\\images\\quanshort.webp",
+      "PackagePath": "staticwebassets\\assets\\images\\quanshort.webp"
+    },
+    {
+      "Id": "C:\\Users\\Admin\\OneDrive\\Documents\\NashTech_Training\\Assignment\\ECommerce.ClientMVC\\wwwroot\\assets\\images\\somi.webp",
+      "PackagePath": "staticwebassets\\assets\\images\\somi.webp"
+    },
+    {
+      "Id": "C:\\Users\\Admin\\OneDrive\\Documents\\NashTech_Training\\Assignment\\ECommerce.ClientMVC\\wwwroot\\assets\\images\\sport_type.webp",
+      "PackagePath": "staticwebassets\\assets\\images\\sport_type.webp"
+    },
+    {
+      "Id": "C:\\Users\\Admin\\OneDrive\\Documents\\NashTech_Training\\Assignment\\ECommerce.ClientMVC\\wwwroot\\assets\\images\\summer_type.webp",
+      "PackagePath": "staticwebassets\\assets\\images\\summer_type.webp"
+    },
+    {
+      "Id": "C:\\Users\\Admin\\OneDrive\\Documents\\NashTech_Training\\Assignment\\ECommerce.ClientMVC\\wwwroot\\assets\\images\\winter_type.webp",
+      "PackagePath": "staticwebassets\\assets\\images\\winter_type.webp"
+    },
+    {
+      "Id": "C:\\Users\\Admin\\OneDrive\\Documents\\NashTech_Training\\Assignment\\ECommerce.ClientMVC\\wwwroot\\css\\_orderPartial.css",
+      "PackagePath": "staticwebassets\\css\\_orderPartial.css"
+    },
+    {
+      "Id": "C:\\Users\\Admin\\OneDrive\\Documents\\NashTech_Training\\Assignment\\ECommerce.ClientMVC\\wwwroot\\css\\cart.css",
+      "PackagePath": "staticwebassets\\css\\cart.css"
+    },
+    {
+      "Id": "C:\\Users\\Admin\\OneDrive\\Documents\\NashTech_Training\\Assignment\\ECommerce.ClientMVC\\wwwroot\\css\\congratulation.css",
+      "PackagePath": "staticwebassets\\css\\congratulation.css"
+    },
+    {
+      "Id": "C:\\Users\\Admin\\OneDrive\\Documents\\NashTech_Training\\Assignment\\ECommerce.ClientMVC\\wwwroot\\css\\home.css",
+      "PackagePath": "staticwebassets\\css\\home.css"
+    },
+    {
+      "Id": "C:\\Users\\Admin\\OneDrive\\Documents\\NashTech_Training\\Assignment\\ECommerce.ClientMVC\\wwwroot\\css\\product-detail.css",
+      "PackagePath": "staticwebassets\\css\\product-detail.css"
+    },
+    {
       "Id": "C:\\Users\\Admin\\OneDrive\\Documents\\NashTech_Training\\Assignment\\ECommerce.ClientMVC\\wwwroot\\css\\site.css",
       "PackagePath": "staticwebassets\\css\\site.css"
     },

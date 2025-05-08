@@ -1,0 +1,40 @@
+@using Ecommerce.SharedViewModel.Responses
+@model CustomerResponse
+
+<div class="p-4">
+    <h2 class="mb-4">Thông tin tài khoản</h2>
+
+    <div class="row mb-5">
+        <div class="col-md-6">
+            <div class="mb-4">
+                <h5 class="text-muted">Full Name</h5>
+                <p class="fs-5">@Model.Name</p>
+            </div>
+            <div class="mb-4">
+                <h5 class="text-muted">Phone Number</h5>
+                <p class="fs-5">@Model.PhoneNumber</p>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn btn-outline-dark px-5 py-2 rounded-pill">CẬP NHẬT</button>
+
+    <hr class="my-5">
+
+    <h2 class="mb-4">Thông tin đăng nhập</h2>
+
+    <div class="row mb-5">
+        <div class="col-md-6">
+            <div class="mb-4">
+                <h5 class="text-muted">Email</h5>
+                <p class="fs-5">@Model.Email</p>
+            </div>
+            <div class="mb-4">
+                <h5 class="text-muted">Mật khẩu</h5>
+                <p class="fs-5">•••••••••••••••••••</p>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn btn-outline-dark px-5 py-2 rounded-pill">CẬP NHẬT</button>
+</div>

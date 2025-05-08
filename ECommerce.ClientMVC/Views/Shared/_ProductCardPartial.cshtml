@@ -1,0 +1,33 @@
+@model dynamic
+
+<div class="product-card" style="hover: transform(translateY(-3px)); cursor: pointer;">
+    <!-- Badges -->
+    @if (Model.IsNew != null && Model.IsNew == true)
+    {
+        <span class="badge badge-new">NEW</span>
+    }
+    @if (Model.IsBestSeller != null && Model.IsBestSeller == true)
+    {
+        <span class="badge badge-hot">ĐÁNG MUA</span>
+    }
+    
+    <!-- Product Image -->
+    <a asp-controller="Product" asp-action="Detail" asp-route-id="@Model.Id" style="text-decoration: none; color: inherit;">
+        <img src="@Model.Image" alt="@Model.Name" style="width: 100%; border-radius: 5px;">
+    </a>
+    
+    <!-- Rating -->
+    <div class="rating">
+        <span class="star">★</span>
+        <span>@Model.Rating</span>
+        <span class="count">(@Model.Reviews)</span>
+    </div>
+    
+    <!-- Product Name -->
+    <h3 style="font-size: 14px; margin-top: 8px; margin-bottom: 5px; font-weight: normal;">@Model.Name</h3>
+    
+    <!-- Price -->
+    <div style="display: flex; align-items: center; gap: 8px;">
+        <span style="font-weight: bold;">@string.Format("{0:N0}đ", Model.Price)</span>
+    </div>
+</div>

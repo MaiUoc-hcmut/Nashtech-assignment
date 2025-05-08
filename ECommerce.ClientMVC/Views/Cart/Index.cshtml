@@ -1,0 +1,273 @@
+@using Ecommerce.SharedViewModel.Responses
+@model CartItemResponse
+
+@using Ecommerce.ClientMVC.Interface
+@inject IAuthService AuthService
+
+@{
+    ViewData["Title"] = "Chi tiết sản phẩm";
+}
+
+<link rel="stylesheet" href="~/css/cart.css" />
+
+<div class="container">
+    <header>
+        <h1>@ViewData["Title"]</h1>
+    </header>
+    
+    <div class="cart-page">
+        <!-- Left Section - Customer Information -->
+        <section class="customer-info">
+            @{
+                var customer = AuthService.GetCurrentUser();
+                <!-- Anti-forgery token -->
+                <input type="hidden" name="__RequestVerificationToken" value="@Html.AntiForgeryToken().ToString()" />
+                <div class="validation-summary-errors"></div>
+                
+                <div class="form-group">
+                    <label for="Customer_Name">Full Name</label>
+                    <input 
+                        id="Customer_Name" 
+                        name="Customer.Name" 
+    using Ecommerce.ClientMVC.Services;
+                        class="form-control" 
+                        required="required" 
+                        type="text" 
+                        value="@customer?.Name" 
+                    />
+                    <span class="field-validation-error" data-valmsg-for="Customer.Name" data-valmsg-replace="true"></span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="Customer_Email">Email Address</label>
+                    <input 
+                        id="Customer_Email" 
+                        name="Customer.Email" 
+                        class="form-control" 
+                        type="email" 
+                        required="required" 
+                        value="@customer?.Email"
+                    />
+                    <span class="field-validation-error" data-valmsg-for="Customer.Email" data-valmsg-replace="true"></span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="Customer_PhoneNumber">Phone Number</label>
+                    <input 
+                        id="Customer_PhoneNumber" 
+                        name="Customer.PhoneNumber" 
+                        class="form-control" 
+                        type="tel" 
+                        required="required" 
+                        value="@customer?.PhoneNumber"
+                    />
+                    <span class="field-validation-error" data-valmsg-for="Customer.PhoneNumber" data-valmsg-replace="true"></span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="Customer_Address">Shipping Address</label>
+                    <input 
+                        id="Customer_Address" 
+                        name="Customer.Address" 
+                        class="form-control" 
+                        required="required"
+                        value="@customer?.Address"
+                        type="text"
+                    />
+                    <span class="field-validation-error" data-valmsg-for="Customer.Address" data-valmsg-replace="true"></span>
+                </div>
+            }
+        </section>
+        
+        <!-- Right Section - Cart Items -->
+        <section class="cart-items">
+            <h2 class="section-title">Cart Items</h2>
+            
+            @if (Model.Variants != null && Model.Variants.Any())
+            {
+                foreach (var item in Model.Variants)
+                {
+                    var imageUrl = !string.IsNullOrEmpty(item.ImageUrl) ? item.ImageUrl : item.Product?.ImageUrl;
+                    <div class="product-card" id="product-@item.Id">
+                        <img src="@imageUrl" alt="@item.Product?.Name" class="product-image" />
+                        
+                        <div class="product-details">
+                            <div class="product-name">@item.Product?.Name</div>
+                            <div class="product-variants">
+                                @{
+                                    var variantInfo = new List<string>();
+                                    variantInfo.Add($"Size: {item.Size.Name}");
+                                    variantInfo.Add($"Color: {item.Color.Name}");
+                                }
+                                @string.Join(" | ", variantInfo)
+                            </div>
+                        </div>
+                        
+                        <div class="product-actions">
+                            <div class="quantity-control">
+                                <button 
+                                    type="button" 
+                                    class="quantity-btn decrease-btn" 
+                                    data-id="@item.Id"
+                                >
+                                    -
+                                </button>
+                                <input 
+                                    type="number" 
+                                    class="quantity-input" 
+                                    value="@item.Quantity" 
+                                    min="1" 
+                                    id="quantity-@item.Id" 
+                                    data-id="@item.Id" 
+                                    data-price="@item.Price.ToString("F2")"
+                                    value="@item.Quantity"
+                                />
+                                <button 
+                                    type="button" 
+                                    class="quantity-btn increase-btn" 
+                                    data-id="@item.Id"
+                                >
+                                    +
+                                </button>
+                            </div>
+                            <div class="product-price" id="price-@item.Id">@((item.Price * item.Quantity).ToString("C"))</div>
+                            @{
+                                var customerForRemove = AuthService.GetCurrentUser();
+                                <form asp-controller="Cart" asp-action="DeleteFromCart" method="POST">
+                                    <input type="hidden" name="cartId" value="@customerForRemove?.CartId">
+                                    <input type="hidden" name="customerId" value="@customerForRemove?.Id">
+                                    <input type="hidden" name="variantId" value="@item.Id">
+                                    <button type="submit" class="delete-btn" data-id="@item.Id">Remove</button>
+                                </form>
+                            }
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="empty-cart-message">
+                    <p>Your cart is empty.</p>
+                    <a href="@Url.Action("Index", "Product")" class="btn btn-primary">Continue Shopping</a>
+                </div>
+            }
+            
+            <!-- Cart Summary -->
+            <div class="cart-summary">
+                <div class="cart-total">
+                    <span>Total Amount:</span>
+                    <span id="total-amount">@Model?.Variants?.Sum(i => i.Price * i.Quantity).ToString("C")</span>
+                </div>
+                @{
+                    var user = AuthService.GetCurrentUser();
+                    string variantIdList = string.Join(",", Model.Variants.Select(v => v.Id));
+                    <form asp-controller="Order" asp-action="CreateOrder">
+                        <input type="hidden" name="customerName" id="customerName" value="@user?.Name" />
+                        <input type="hidden" name="customerEmail" id="customerEmail" value="@user?.Email" />
+                        <input type="hidden" name="customerPhoneNumber" id="customerPhoneNumber" value="@user?.PhoneNumber" />
+                        <input type="hidden" name="customerAddress" id="customerAddress" value="@user?.Address" />
+                        <input type="hidden" name="customerId" id="customerId" value="@user?.Id" />
+                        <input type="hidden" name="variantIdList" id="variantIdList" value="@variantIdList" />
+                        <input type="hidden" name="totalAmount" id="totalAmountData" value="" />
+                        <button type="submit" class="checkout-btn" id="btn-checkout">Checkout</button>
+                    </form>
+                }
+            </div>
+        </section>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+        function updatePrice(itemId, quantity, price) {
+            const totalPriceElement = document.getElementById(`price-${itemId}`);
+            const totalAmountElement = document.getElementById('total-amount');
+            const totalAmountData = document.getElementById('totalAmountData');
+            
+            // Calculate the new total price
+            const newTotalPrice = Math.floor(quantity * price); // Remove decimals
+            totalPriceElement.innerText = newTotalPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+            
+            // Update the total amount
+            let totalAmount = 0;
+            const allPrices = document.querySelectorAll('.product-price');
+            allPrices.forEach(priceElement => {
+                const priceValue = priceElement.value;
+                totalAmount += priceValue;
+            });
+            totalAmountElement.innerText = totalAmount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+            totalAmountData.value = totalAmount;
+        }
+        
+        // User change information
+        const Customer_Name = document.getElementById('Customer_Name');
+        const Customer_Email = document.getElementById('Customer_Email');
+        const Customer_PhoneNumber = document.getElementById('Customer_PhoneNumber');
+        const Customer_Address = document.getElementById('Customer_Address');
+
+        const Customer_Name_Data = document.getElementById("customerName");
+        const Customer_Email_Data = document.getElementById("customerEmail");
+        const Customer_PhoneNumber_Data = document.getElementById("customerPhoneNumber");
+        const Customer_Address_Data = document.getElementById("customerAddress");
+
+        Customer_Name.addEventListener('input', function() {
+            Customer_Name_Data.value = this.value;
+        });
+        Customer_Email.addEventListener('input', function() {
+            Customer_Email_Data.value = this.value;
+        });
+        Customer_PhoneNumber.addEventListener('input', function() {
+            Customer_PhoneNumber_Data.value = this.value;
+        });
+        Customer_Address.addEventListener('input', function() {
+            Customer_Address_Data.value = this.value;
+        });
+
+        // Update quantity and total price
+        const decreaseBtns = document.querySelectorAll('.decrease-btn');
+        const increaseBtns = document.querySelectorAll('.increase-btn');
+        const quantityInputs = document.querySelectorAll('.quantity-input');
+
+        decreaseBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const itemId = this.getAttribute('data-id');
+                const quantityInput = document.getElementById(`quantity-${itemId}`);
+                let quantity = parseInt(quantityInput.value);
+                const price = parseFloat(quantityInput.getAttribute('data-price'));
+                if (quantity > 1) {
+                    quantity--;
+                    quantityInput.value = quantity;
+                    updatePrice(itemId, quantity, price);
+                }
+            });
+        });
+
+        increaseBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const itemId = this.getAttribute('data-id');
+                const quantityInput = document.getElementById(`quantity-${itemId}`);
+                let quantity = parseInt(quantityInput.value);
+                const price = parseFloat(quantityInput.getAttribute('data-price'));
+                quantity++;
+                quantityInput.value = quantity;
+                updatePrice(itemId, quantity, price);
+            });
+        });
+
+        quantityInputs.forEach(input => {
+            input.addEventListener('input', function() {
+                const itemId = this.getAttribute('data-id');
+                const quantity = parseInt(this.value);
+                const price = parseFloat(this.getAttribute('data-price'));
+
+                if (quantity < 1 || isNaN(quantity)) {
+                    this.value = 1;
+                    updatePrice(itemId, 1, price);
+                } else {
+                    updatePrice(itemId, quantity, price);
+                }
+            });
+        });
+    });
+</script>
