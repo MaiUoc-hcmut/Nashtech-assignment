@@ -5,7 +5,7 @@ namespace Ecommerce.SharedViewModel.Models
         public int Id { get; set; }
         public required string Name { get; set; }
         public string Description { get; set; } = string.Empty;
-        public ICollection<VariantCategory> VariantCategories { get; set; }
-        public ParentCategory ParentCategory { get; set; }
+        public ICollection<VariantCategory> VariantCategories { get; set; } = new List<VariantCategory>();
+        public ParentCategory ParentCategory { get; set; } 
     }
 }
