@@ -31,12 +31,13 @@ namespace Ecommerce.BackendAPI.Controllers
             [FromQuery] bool isAsc = true
         )
         {
-            startDate ??= new DateTime(2025, 1, 1, 0, 0, 0);
-            endDate ??= new DateTime(2030, 12, 31, 23, 59, 59);
-            var reviews = await _reviewRepository
-                .GetReviews
-                (
-                    productIds, 
+            try
+            {
+                startDate ??= new DateTime(2025, 1, 1, 0, 0, 0);
+                endDate ??= new DateTime(2030, 12, 31, 23, 59, 59);
+
+                var (totalReviews, reviews) = await _reviewRepository.GetReviews(
+                    productIds,
                     pageNumber,
                     minRating,
                     maxRating,
@@ -46,25 +47,27 @@ namespace Ecommerce.BackendAPI.Controllers
                     isAsc
                 );
 
-            var formattedReviews = reviews.Select(r => new
-            {
-                r.Id,
-                r.Rating,
-                r.Text,
-                CreatedAt = r.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss"),
-                Customer = new
+                var response = new
                 {
-                    r.Customer.Id,
-                    r.Customer.Name,
-                },
-                Product = new
-                {
-                    r.Product.Id,
-                    r.Product.Name,
-                }
-            });
+                    TotalReviews = totalReviews,
+                    Reviews = reviews.Select(r => new
+                    {
+                        r.Id,
+                        r.Rating,
+                        r.Text,
+                        CreatedAt = r.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss"),
+                        Customer = r.Customer.Name,
+                        Product = r.Product.Name
+                    })
+                };
 
-            return Ok(formattedReviews);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                // Handle unexpected errors
+                return StatusCode(500, new { Message = "An error occurred while retrieving reviews.", Error = ex.Message });
+            }
         }
 
         [HttpGet("product/{productId}")]
@@ -81,6 +84,33 @@ namespace Ecommerce.BackendAPI.Controllers
                 TotalReviews = totalReviews,
                 RatingsCount = ratingsCount
             });
+        }
+
+        [HttpGet("customer/{customerId}")]
+        public async Task<IActionResult> GetReviewsOfCustomer(int customerId)
+        {
+            var reviews = await _reviewRepository.GetReviewsOfCustomer(customerId);
+            if (reviews == null)
+            {
+                return NotFound(new { message = "No reviews found for this customer." });
+            }
+
+            var response = reviews.Select(r => new
+            {
+                r.Id,
+                r.Rating,
+                r.Text,
+                r.CreatedAt,
+                Product = new
+                {
+                    r.Product.Id,
+                    r.Product.Name,
+                    r.Product.Description,
+                    r.Product.ImageUrl
+                }
+            });
+
+            return Ok(response);
         }
 
         [HttpGet("{id}")]
@@ -114,6 +144,7 @@ namespace Ecommerce.BackendAPI.Controllers
             if (reviewDto == null) return BadRequest("Review cannot be null");
             var Customer = HttpContext.Items["Customer"] as Customer ?? throw new InvalidOperationException("Customer is not available in HttpContext.");
             var Product = HttpContext.Items["Product"] as Product ?? throw new InvalidOperationException("Product is not available in HttpContext.");
+            
             var review = new Review {
                 Rating = reviewDto.Rating,
                 Text = reviewDto.Text,

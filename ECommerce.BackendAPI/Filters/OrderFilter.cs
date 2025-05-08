@@ -1,9 +1,6 @@
 using Ecommerce.BackendAPI.Interfaces;
-using Ecommerce.SharedViewModel.Models;
-using Ecommerce.SharedViewModel.ParametersType;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using System.Text.Json;
 
 namespace Ecommerce.BackendAPI.FiltersAction
 {
@@ -40,7 +37,7 @@ namespace Ecommerce.BackendAPI.FiltersAction
                 return;
             }
 
-            var admin = _adminRepository.GetAdminById(int.Parse(userId));
+            var admin = await _adminRepository.GetAdminById(int.Parse(userId));
 
             if (orderId != null) {
                 var order = await _orderRepository.GetOrderById(int.Parse(orderId));
@@ -141,31 +138,7 @@ namespace Ecommerce.BackendAPI.FiltersAction
                 return;
             }
 
-            httpContext.Request.EnableBuffering();
-
-            using var reader = new StreamReader(httpContext.Request.Body);
-            var bodyContent = await reader.ReadToEndAsync();
-            httpContext.Request.Body.Position = 0;
-
-            var bodyRequest = JsonSerializer.Deserialize<CreateOrderParameter>(bodyContent);
-            if (bodyRequest == null || bodyRequest.Variants == null || bodyRequest.Variants.Count == 0) {
-                context.Result = new BadRequestObjectResult(new { Error = "Invalid body of request" });
-                return;
-            }
-
-            var variantList = new List<Variant>();
-
-            foreach (var id in bodyRequest.Variants) {
-                var variant = await _variantRepository.GetVariantById(id);
-                if (variant == null) {
-                    context.Result = new BadRequestObjectResult(new { Error = $"Not found variant with ID = {id}" });
-                    return;
-                }
-                variantList.Add(variant);
-            }
-
             httpContext.Items["Customer"] = customer;
-            httpContext.Items["Variants"] = variantList;
             await next();
         }
     }

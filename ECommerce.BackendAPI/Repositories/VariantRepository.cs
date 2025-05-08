@@ -28,7 +28,29 @@ namespace Ecommerce.BackendAPI.Repositories
 
         public async Task<IEnumerable<Variant>> GetVariantsByProductId(int productId)
         {
-            return await _context.Variants.Where(v => v.Product.Id == productId).ToListAsync();
+            return await _context.Variants
+                .Include(v => v.VariantCategories)
+                .ThenInclude(vc => vc.Category)
+                .Where(v => v.Product.Id == productId)
+                .Select(v => new Variant
+                {
+                    Id = v.Id,
+                    Price = v.Price,
+                    StockQuantity = v.StockQuantity,
+                    SKU = v.SKU,
+                    CreatedAt = v.CreatedAt,
+                    UpdatedAt = v.UpdatedAt,
+                    VariantCategories = v.VariantCategories.Select(vc => new VariantCategory
+                    {
+                        Category = new Category
+                        {
+                            Id = vc.Category.Id,
+                            Name = vc.Category.Name,
+                            ParentCategory = vc.Category.ParentCategory,
+                        }
+                    }).ToList()
+                })
+                .ToListAsync();
         }
 
         public async Task<bool> CreateVariant(Variant variant)

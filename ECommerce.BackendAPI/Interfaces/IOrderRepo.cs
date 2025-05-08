@@ -5,7 +5,7 @@ namespace Ecommerce.BackendAPI.Interfaces
 {
     public interface IOrderRepository
     {
-        Task<IEnumerable<Order>> GetAllOrders(); // For admin
+        Task<(int TotalOrders, IEnumerable<Order> Orders)> GetAllOrders(int pageNumber = 1); // For admin
         Task<Order?> GetOrderById(int orderId);
         Task<IEnumerable<Order>> GetOrderByUserId(int customerId);
         Task<IEnumerable<Order>> GetOrdersOfProduct(int productId);

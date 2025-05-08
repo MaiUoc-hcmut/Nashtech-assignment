@@ -4,6 +4,7 @@ using Ecommerce.BackendAPI.Interfaces;
 using Ecommerce.BackendAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Ecommerce.BackendAPI.Services;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 
 namespace Ecommerce.BackendAPI.Repositories
@@ -17,6 +18,25 @@ namespace Ecommerce.BackendAPI.Repositories
         {
             _context = context;
             _authService = authService;
+        }
+
+        public async Task<(int TotalCustomers, IEnumerable<Customer> Customers)> GetCustomers(int pageNumber = 1)
+        {
+            int pageSize = 10;
+
+            // Get the total number of customers
+            int totalCustomers = await _context.Customers.CountAsync();
+
+            // Get the paginated list of customers
+            var customers = await _context.Customers
+                .AsNoTracking()
+                .OrderByDescending(c => c.CreatedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            // Return both total customers and the paginated list
+            return (totalCustomers, customers);
         }
 
         public async Task<Customer?> GetCustomerById(int Id)

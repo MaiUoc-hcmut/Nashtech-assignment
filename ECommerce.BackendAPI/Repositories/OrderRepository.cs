@@ -15,11 +15,21 @@ namespace Ecommerce.BackendAPI.Repositories
             _context = context;
         }
 
-        public async Task<IEnumerable<Order>> GetAllOrders()
+        public async Task<(int TotalOrders, IEnumerable<Order> Orders)> GetAllOrders(int pageNumber = 1)
         {
-            return await _context.Orders
+            int pageSize = 10;
+
+            int totalOrders = await _context.Orders.CountAsync();
+
+            var orders = await _context.Orders
                 .Include(o => o.Customer)
+                .OrderByDescending(o => o.CreatedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
+
+            // Return both total orders and the paginated list
+            return (totalOrders, orders);
         }
 
         public async Task<Order?> GetOrderById(int orderId)
@@ -35,7 +45,14 @@ namespace Ecommerce.BackendAPI.Repositories
             return await _context.Orders
                 .Include(o => o.VariantOrders)
                 .ThenInclude(vo => vo.Variant)
+                .ThenInclude(v => v.VariantCategories)
+                .ThenInclude(vc => vc.Category)
+                .ThenInclude(c => c.ParentCategory)
+                .Include(o => o.VariantOrders)
+                .ThenInclude(vo => vo.Variant)
+                .ThenInclude(v => v.Product)
                 .Where(o => o.Customer.Id == customerId)
+                .OrderByDescending(o => o.CreatedAt)
                 .ToListAsync();
         }
 

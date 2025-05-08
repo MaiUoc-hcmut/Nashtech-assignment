@@ -21,7 +21,7 @@ namespace Ecommerce.BackendAPI.FiltersAction
             var httpContext = context.HttpContext;
             var cartId = context.RouteData.Values["cartId"]?.ToString();
             var variantId = context.RouteData.Values["variantId"]?.ToString();
-            var customerId = httpContext.Items["customerId"]?.ToString();
+            var customerId = httpContext.Items["UserId"]?.ToString();
 
             if (cartId == null || variantId == null || customerId == null)
             {
@@ -29,6 +29,7 @@ namespace Ecommerce.BackendAPI.FiltersAction
                 return;
             }
 
+            Console.WriteLine("End");
             var cart = await _cartRepository.GetCartOfCustomer(int.Parse(cartId));
             if (cart == null)
             {
@@ -36,12 +37,14 @@ namespace Ecommerce.BackendAPI.FiltersAction
                 return;
             }
 
+            Console.WriteLine("End");
             if (cart.Customer.Id != int.Parse(customerId))
             {
                 context.Result = new UnauthorizedObjectResult(new { Error = "Unauthorized access to cart" });
                 return;
             }
 
+            Console.WriteLine("End");
             var variant = await _variantRepository.GetVariantById(int.Parse(variantId));
             if (variant == null)
             {
@@ -51,8 +54,8 @@ namespace Ecommerce.BackendAPI.FiltersAction
 
             httpContext.Items["Cart"] = cart;
             httpContext.Items["Variant"] = variant;
-
-            await next(); // Proceed to the action method
+            Console.WriteLine("End");
+            await next();
         }
     }
 
@@ -72,7 +75,7 @@ namespace Ecommerce.BackendAPI.FiltersAction
             var httpContext = context.HttpContext;
             var cartId = context.RouteData.Values["cartId"]?.ToString();
             var variantId = context.RouteData.Values["variantId"]?.ToString();
-            var customerId = httpContext.Items["customerId"]?.ToString();
+            var customerId = httpContext.Items["UserId"]?.ToString();
 
             if (cartId == null || variantId == null || customerId == null)
             {
@@ -92,7 +95,6 @@ namespace Ecommerce.BackendAPI.FiltersAction
                 context.Result = new UnauthorizedObjectResult(new { Error = "Unauthorized access to cart" });
                 return;
             }
-
             var variant = await _variantRepository.GetVariantById(int.Parse(variantId));
             if (variant == null)
             {

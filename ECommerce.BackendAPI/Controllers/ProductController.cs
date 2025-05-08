@@ -6,6 +6,7 @@ using Ecommerce.SharedViewModel.ParametersType;
 using Ecommerce.BackendAPI.FiltersAction;
 using System.Text.Json;
 using Ecommerce.BackendAPI.Services;
+using Ecommerce.SharedViewModel.Responses;
 
 
 namespace Ecommerce.BackendAPI.Controllers
@@ -41,33 +42,54 @@ namespace Ecommerce.BackendAPI.Controllers
             [FromQuery] string sortBy = "UpdatedAt",
             [FromQuery] bool isAsc = true,
             [FromQuery] int? classificationId = null,
-            [FromQuery] decimal minPrice = 0,
-            [FromQuery] decimal maxPrice = 999999999,
+            [FromQuery] int minPrice = 0,
+            [FromQuery] int maxPrice = 999999999,
             [FromQuery] string? search = null,
             [FromQuery] bool? simplest = false
         )
         {
-            var products = await _productRepository.GetAllProducts
-                (
-                    pageNumber, 
-                    pageSize, 
-                    sortBy, 
+            try
+            {
+                // Retrieve total products and paginated products
+                var (totalProducts, products) = await _productRepository.GetAllProducts(
+                    pageNumber,
+                    pageSize,
+                    sortBy,
                     isAsc,
                     classificationId,
                     minPrice,
                     maxPrice,
                     search
                 );
-            if (simplest == true)
-            {
-                var simpleProducts = products.Select(p => new
+
+                if (simplest == true)
                 {
-                    p.Id,
-                    p.Name
-                }).ToList();
-                return Ok(simpleProducts);
+                    // Return a simplified response if requested
+                    var simpleProducts = products.Select(p => new
+                    {
+                        p.Id,
+                        p.Name
+                    }).ToList();
+
+                    return Ok(new
+                    {
+                        TotalProducts = totalProducts,
+                        Products = simpleProducts
+                    });
+                }
+
+                // Return the full response
+                return Ok(new
+                {
+                    TotalProducts = totalProducts,
+                    Products = products
+                });
             }
-            return Ok(products);
+            catch (Exception ex)
+            {
+                // Handle unexpected errors
+                return StatusCode(500, new { Message = "An error occurred while retrieving products.", Error = ex.Message });
+            }
         }
 
         [HttpGet("{id}")]
@@ -78,7 +100,59 @@ namespace Ecommerce.BackendAPI.Controllers
             {
                 return NotFound();
             }
-            
+
+            // Calculate ReviewsDetail
+            var totalReviews = product.Reviews.Count;
+            var reviewsDetail = new
+            {
+                TotalReviews = totalReviews,
+                OneStar = product.Reviews.Count(r => r.Rating == 1),
+                OneStarPercent = totalReviews > 0 ? (double)product.Reviews.Count(r => r.Rating == 1) / totalReviews * 100 : 0,
+                TwoStar = product.Reviews.Count(r => r.Rating == 2),
+                TwoStarPercent = totalReviews > 0 ? (double)product.Reviews.Count(r => r.Rating == 2) / totalReviews * 100 : 0,
+                ThreeStar = product.Reviews.Count(r => r.Rating == 3),
+                ThreeStarPercent = totalReviews > 0 ? (double)product.Reviews.Count(r => r.Rating == 3) / totalReviews * 100 : 0,
+                FourStar = product.Reviews.Count(r => r.Rating == 4),
+                FourStarPercent = totalReviews > 0 ? (double)product.Reviews.Count(r => r.Rating == 4) / totalReviews * 100 : 0,
+                FiveStar = product.Reviews.Count(r => r.Rating == 5),
+                FiveStarPercent = totalReviews > 0 ? (double)product.Reviews.Count(r => r.Rating == 5) / totalReviews * 100 : 0,
+                Reviews = product.Reviews.Select(r => new
+                {
+                    r.Id,
+                    r.Rating,
+                    r.Text,
+                    r.CreatedAt,
+                    Customer = new
+                    {
+                        r.Customer.Id,
+                        r.Customer.Name,
+                        r.Customer.Email
+                    }
+                }).ToList()
+            };
+
+            // Calculate Colors and Sizes
+            var colors = product.Variants
+            .SelectMany(v => v.VariantCategories)
+            .Where(vc => vc.Category.ParentCategory != null && vc.Category.ParentCategory.Name.ToLower().Contains("color"))
+            .GroupBy(vc => new { vc.Category.Id, vc.Category.Name, vc.Category.Description })
+            .Select(g => new
+            {
+                g.Key.Id,
+                g.Key.Name,
+                g.Key.Description,
+                Sizes = product.Variants
+                    .SelectMany(v => v.VariantCategories)
+                    .Where(vc => vc.Category.ParentCategory != null && vc.Category.ParentCategory.Name.ToLower().Contains("size"))
+                    .GroupBy(vc => new { vc.Category.Id, vc.Category.Name })
+                    .Select(sg => new
+                    {
+                        sg.Key.Id,
+                        sg.Key.Name
+                    }).ToList()
+            }).ToList();
+
+            // Include Variants if requested
             List<object>? variants = null;
             if (includeVariant != null && includeVariant.ToLower() == "true")
             {
@@ -91,25 +165,55 @@ namespace Ecommerce.BackendAPI.Controllers
                     v.StockQuantity,
                     v.ImageUrl,
                     v.CreatedAt,
-                    v.UpdatedAt
+                    v.UpdatedAt,
+                    Color = v.VariantCategories?
+                        .Where(vc => vc.Category != null &&
+                                    vc.Category.ParentCategory != null &&
+                                    vc.Category.ParentCategory.Name?.ToLower() == "color")
+                        .Select(vc => new
+                        {
+                            Id = vc.Category?.Id ?? 0,
+                            Name = vc.Category?.Name ?? string.Empty
+                        })
+                        .FirstOrDefault(),
+                    Size = v.VariantCategories?
+                        .Where
+                        (
+                            vc => vc.Category != null &&
+                            vc.Category.ParentCategory != null &&
+                            (vc.Category.ParentCategory.Name?.ToLower() == "jean size" || vc.Category.ParentCategory.Name?.ToLower() == "shirt size")
+                        )
+                        .Select(vc => new
+                        {
+                            Id = vc.Category?.Id ?? 0,
+                            Name = vc.Category?.Name ?? string.Empty
+                        })
+                        .FirstOrDefault()
                 }).ToList<object>();
             }
-            
-            return Ok(new {
+            return Ok(new
+            {
                 product.Id,
                 product.Name,
                 product.Price,
                 product.Description,
                 product.ImageUrl,
+                Classifications = product.ProductClassifications.Select(pc => new
+                {
+                    pc.Classification.Id,
+                    pc.Classification.Name
+                }).ToList(),
                 product.CreatedAt,
                 product.UpdatedAt,
-                AverageRating = product.Reviews != null && product.Reviews.Any() 
-                    ? product.Reviews.Average(r => r.Rating) 
+                AverageRating = product.Reviews != null && product.Reviews.Any()
+                    ? product.Reviews.Average(r => r.Rating)
                     : 0,
-                TotalOrders = product.Variants
-                        .SelectMany(v => v.VariantOrders)
-                        .Count(),
-                Variants = variants
+                TotalOrders = product.Variants?
+                        .SelectMany(v => v.VariantOrders ?? Enumerable.Empty<object>())
+                        .Count() ?? 0,
+                Variants = variants,
+                ReviewDetails = reviewsDetail,
+                Colors = colors
             });
         }
         
@@ -144,6 +248,7 @@ namespace Ecommerce.BackendAPI.Controllers
                 if (classificationIdList == null || classificationIdList.Length == 0) return BadRequest(new { Error = "Classification is required" });
 
                 IList<CreateVariantsOfProductParameter> variantList = new List<CreateVariantsOfProductParameter>();
+                Console.WriteLine(variants);
                 if (!string.IsNullOrEmpty(variants))
                 {
                     try
@@ -174,6 +279,7 @@ namespace Ecommerce.BackendAPI.Controllers
                 {
                     foreach (var variantDto in variantList)
                     {
+                        Console.WriteLine(variantDto.StockQuantity);
                         if (urls != null && urls.TryGetValue(variantDto.Key, out var variantUrl))
                         {
                             variantDto.ImageUrl = variantUrl;
@@ -182,13 +288,12 @@ namespace Ecommerce.BackendAPI.Controllers
                         var variantCategories = new List<VariantCategory>();
                         foreach (var categoryId in variantDto.Categories)
                         {
-                            Console.WriteLine($"Category ID: {categoryId}");
                             variantCategories.Add(new VariantCategory { CategoryId = categoryId });
                         }
                         var variantEntity = new Variant {
                             SKU = variantDto.SKU,
-                            Price = variantDto.Price,
-                            StockQuantity = variantDto.StockQuantity,
+                            Price = int.Parse(variantDto.Price),
+                            StockQuantity = int.Parse(variantDto.StockQuantity),
                             ImageUrl = variantDto.ImageUrl
                         };
                         variantEntity.Product = productCreated;

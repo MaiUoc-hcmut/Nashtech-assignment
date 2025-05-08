@@ -6,7 +6,7 @@ namespace Ecommerce.BackendAPI.Interfaces
     public interface ICartRepository
     {
         Task<Cart?> GetCartOfCustomer(int cartId, bool? includeVariants = true);
-        Task<bool> AddToCart(Cart cart, Variant variant);
+        Task<bool> AddToCart(Cart cart, Variant variant, int quantity);
         Task<bool> RemoveFromCart(Cart cart, Variant variant);
         // Task<bool> UpdateCartItem(Cart cart);
         // Task<IEnumerable<Cart>> GetAllCarts();

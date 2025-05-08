@@ -4,7 +4,7 @@ namespace Ecommerce.BackendAPI.Interfaces
 {
     public interface IReviewRepository
     {
-        Task<IEnumerable<Review>> GetReviews
+        Task<(int TotalReviews, IEnumerable<Review> Reviews)> GetReviews
         (
             List<int> productIds, 
             int pageNumber,
@@ -16,6 +16,7 @@ namespace Ecommerce.BackendAPI.Interfaces
             bool isAsc
         );
         Task<IEnumerable<Review>> GetReviewsByProductId(int productId);
+        Task<IEnumerable<Review>> GetReviewsOfCustomer(int customerId);
         Task<Review?> GetReview(int id);
         Task<Review> AddReview(Review review);
         Task<bool> UpdateReview(Review review);

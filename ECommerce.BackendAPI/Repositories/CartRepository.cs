@@ -21,14 +21,23 @@ namespace Ecommerce.BackendAPI.Repositories
             if (includeVariants == true)
             {
                 return await _context.Carts
+                    .Include(c => c.Customer)
                     .Include(c => c.VariantCarts)
                     .ThenInclude(vc => vc.Variant)
+                    .ThenInclude(v => v.Product) // Include Product
+                    .Include(c => c.VariantCarts)
+                    .ThenInclude(vc => vc.Variant)
+                    .ThenInclude(v => v.VariantCategories)
+                    .ThenInclude(vc => vc.Category)
+                    .ThenInclude(c => c.ParentCategory) // Include ParentCategory for Color and Size
                     .FirstOrDefaultAsync(c => c.Customer.Id == customerId);
             }
-            return await _context.Carts.FirstOrDefaultAsync(c => c.Customer.Id == customerId);
+            return await _context.Carts
+                .Include(c => c.Customer)
+                .FirstOrDefaultAsync(c => c.Customer.Id == customerId);
         }
 
-        public async Task<bool> AddToCart(Cart cart, Variant variant)
+        public async Task<bool> AddToCart(Cart cart, Variant variant, int quantity)
         {
             var variantCartExist = await _context.VariantCarts
                 .AnyAsync(vc => vc.Cart.Id == cart.Id && vc.Variant.Id == variant.Id);
@@ -41,7 +50,8 @@ namespace Ecommerce.BackendAPI.Repositories
             var variantCart = new VariantCart
             {
                 Variant = variant,
-                Cart = cart
+                Cart = cart,
+                Quantity = quantity
             };
 
             await _context.VariantCarts.AddAsync(variantCart);

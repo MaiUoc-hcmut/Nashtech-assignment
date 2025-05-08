@@ -15,9 +15,9 @@ namespace Ecommerce.BackendAPI.Repositories
             _context = context;
         }
 
-        public async Task<IEnumerable<Review>> GetReviews
+        public async Task<(int TotalReviews, IEnumerable<Review> Reviews)> GetReviews
         (
-            List<int> productIds, 
+            List<int> productIds,
             int pageNumber,
             double minRating,
             double maxRating,
@@ -29,24 +29,44 @@ namespace Ecommerce.BackendAPI.Repositories
         {
             var pageSize = 10;
 
-            var query = _context.Reviews.AsQueryable();
-
-            query = _context.Reviews
+            // Build the query
+            var query = _context.Reviews
                 .Include(r => r.Product)
                 .Include(r => r.Customer)
-                .Where(r => r.Rating >= minRating && r.Rating <= maxRating)
-                .Where(r => r.CreatedAt >= startDate && r.CreatedAt <= endDate); 
+                .Where(r => r.Rating >= minRating && r.Rating <= maxRating);
+
+            // Filter by product IDs if provided
+            if (productIds != null && productIds.Any())
+            {
+                query = query.Where(r => productIds.Contains(r.Product.Id));
+            }
+
+            // Filter by date range if provided
+            if (startDate.HasValue)
+            {
+                query = query.Where(r => r.CreatedAt >= startDate.Value);
+            }
+            if (endDate.HasValue)
+            {
+                query = query.Where(r => r.CreatedAt <= endDate.Value);
+            }
+
+            // Get the total number of reviews
+            int totalReviews = await query.CountAsync();
 
             // Apply sorting
             query = isAsc
-                ? query.OrderBy(r => EF.Property<object>(r, sortBy)) 
-                : query.OrderByDescending(r => EF.Property<object>(r, sortBy)); 
+                ? query.OrderBy(r => EF.Property<object>(r, sortBy))
+                : query.OrderByDescending(r => EF.Property<object>(r, sortBy));
 
             // Apply pagination
-            return await query
+            var reviews = await query
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
+
+            // Return both total reviews and the paginated list
+            return (totalReviews, reviews);
         }
 
         public async Task<IEnumerable<Review>> GetReviewsByProductId(int productId)
@@ -54,6 +74,29 @@ namespace Ecommerce.BackendAPI.Repositories
             return await _context.Reviews
                 .Include(r => r.Customer)
                 .Where(r => r.Product.Id == productId)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Review>> GetReviewsOfCustomer(int customerId)
+        {
+            return await _context.Reviews
+                .Include(r => r.Product)
+                .Where(r => r.Customer.Id == customerId)
+                .Select(r => new Review
+                {
+                    Id = r.Id,
+                    Rating = r.Rating,
+                    Text = r.Text,
+                    CreatedAt = r.CreatedAt,
+                    Product = new Product
+                    {
+                        Id = r.Product.Id,
+                        Name = r.Product.Name,
+                        Description = r.Product.Description,
+                        ImageUrl = r.Product.ImageUrl
+                    }
+                })
+                .OrderByDescending(r => r.CreatedAt)
                 .ToListAsync();
         }
 

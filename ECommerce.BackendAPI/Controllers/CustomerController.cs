@@ -19,6 +19,37 @@ namespace Ecommerce.BackendAPI.Controllers
             _customerRepository = customerRepository;
         }
 
+        [HttpGet]
+        [ServiceFilter(typeof(VerifyToken))]
+        [ServiceFilter(typeof(VerifyAdmin))]
+        public async Task<IActionResult> GetCustomers([FromQuery] int pageNumber = 1)
+        {
+            try
+            {
+                var (totalCustomers, customers) = await _customerRepository.GetCustomers(pageNumber);
+
+                // Return the response
+                return Ok(new
+                {
+                    TotalCustomers = totalCustomers,
+                    Customers = customers.Select(c => new
+                    {
+                        c.Id,
+                        c.Name,
+                        c.Email,
+                        c.Username,
+                        c.PhoneNumber,
+                        c.Address,
+                        c.CreatedAt
+                    })
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "An error occurred while retrieving customers.", Error = ex.Message });
+            }
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetCustomerById(int id)
         {

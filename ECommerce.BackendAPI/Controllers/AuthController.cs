@@ -17,6 +17,7 @@ namespace ECommerce.BackendAPI.Controllers
     {
         private readonly IAuthRepository _authRepository;
         private readonly ICustomerRepository _customerRepository;
+        private readonly ICartRepository _cartRepository;
         private readonly AuthService _authService;
         private readonly IDependMethod _dependMethod;
 
@@ -24,6 +25,7 @@ namespace ECommerce.BackendAPI.Controllers
         (
             IAuthRepository authRepository, 
             ICustomerRepository customerRepository,
+            ICartRepository cartRepository,
             AuthService authService, 
             IDependMethod dependMethod
         )
@@ -31,6 +33,7 @@ namespace ECommerce.BackendAPI.Controllers
         {
             _authRepository = authRepository;
             _customerRepository = customerRepository;
+            _cartRepository = cartRepository;
             _authService = authService;
             _dependMethod = dependMethod;
         }
@@ -50,7 +53,6 @@ namespace ECommerce.BackendAPI.Controllers
                     return BadRequest("This email already exist!");
                 }
                 
-                Console.WriteLine(53);
                 var registeredUser = await _authRepository.Register(request);
 
                 if (registeredUser == null)
@@ -61,7 +63,7 @@ namespace ECommerce.BackendAPI.Controllers
                 await _dependMethod.CreateCartWhenRegister(registeredUser);
                 await transaction.CommitAsync();
 
-                return Ok(new { message = "Registration successful." });
+                return Ok(new RegisterResponse { Success = true, Message = "Registration successfully" });
             }
             catch (Exception e)
             {
@@ -79,6 +81,11 @@ namespace ECommerce.BackendAPI.Controllers
             {
                 return Unauthorized(new { message = "Invalid username or password." });
             }
+            var cart = await _cartRepository.GetCartOfCustomer(customer.Id, false);
+            if (cart == null)
+            {
+                return NotFound(new { message = "Cart not found." });
+            }
 
             var token = _authService.GenerateToken(customer);
 
@@ -86,14 +93,15 @@ namespace ECommerce.BackendAPI.Controllers
             {
                 Success = true,
                 Message = "Login successful.",
-                Customer = customer != null ? new CustomerDTO
+                Customer = customer != null ? new CustomerResponse
                 {
                     Id = customer.Id,
                     Name = customer.Name,
                     Email = customer.Email,
                     Username = customer.Username,
                     PhoneNumber = customer.PhoneNumber,
-                    Address = customer.Address
+                    Address = customer.Address,
+                    CartId = cart.Id,
                 } : null
             };
 
@@ -165,7 +173,6 @@ namespace ECommerce.BackendAPI.Controllers
         [ServiceFilter(typeof(VerifyAdmin))]
         public IActionResult CheckAuthState()
         {
-            Console.WriteLine(HttpContext.Items["isAuthenticated"]);
             var isAuthenticated = HttpContext.Items["isAuthenticated"] == null ? 
                 false : (HttpContext.Items["isAuthenticated"] as bool?) ?? false;
 
@@ -181,6 +188,28 @@ namespace ECommerce.BackendAPI.Controllers
             }
             
             return Ok(admin);
+        }
+    
+        [HttpGet("customer/validate")]
+        [ServiceFilter(typeof(VerifyToken))]
+        [ServiceFilter(typeof(VerifyCustomer))]
+        public bool IsCustomerAuthenticated()
+        {
+            var isAuthenticated = HttpContext.Items["isAuthenticated"] == null ? 
+                false : (HttpContext.Items["isAuthenticated"] as bool?) ?? false;
+            return isAuthenticated;
+        }
+    
+        [HttpPost("logout")]
+        public IActionResult Logout()
+        {
+            Response.Cookies.Append("access_token", "", new CookieOptions
+            {
+                HttpOnly = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTimeOffset.UtcNow.AddDays(-1) // Set expiration to the past
+            });
+            return Ok(new { Success= true, Message = "Logout successful." });
         }
     }
 }

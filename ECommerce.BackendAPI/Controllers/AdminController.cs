@@ -4,6 +4,8 @@ using Ecommerce.SharedViewModel.Models;
 using Ecommerce.BackendAPI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Ecommerce.BackendAPI.FiltersAction;
+using Ecommerce.SharedViewModel.ParametersType;
+using Ecommerce.BackendAPI.Data;
 
 namespace Ecommerce.BackendAPI.Controllers
 {
@@ -13,11 +15,27 @@ namespace Ecommerce.BackendAPI.Controllers
     {
         private readonly IAdminRepository _adminRepository;
         private readonly AuthService _authService;
+        private readonly DataContext _context;
 
-        public AdminController(IAdminRepository adminRepository, AuthService authService)
+        public AdminController(IAdminRepository adminRepository, AuthService authService,DataContext context)
         {
             _adminRepository = adminRepository;
             _authService = authService;
+            _context = context;
+        }
+
+        [HttpGet]
+        [ServiceFilter(typeof(VerifyToken))]
+        [ServiceFilter(typeof(VerifyAdmin))]
+        public IActionResult GetSelfInfo()
+        {
+            var admin = HttpContext.Items["admin"] as Admin;
+            if (admin == null)
+            {
+                return NotFound(new { Message = "Admin not found" });
+            }
+
+            return Ok(admin);
         }
 
         [HttpGet("{id}")]
@@ -47,6 +65,34 @@ namespace Ecommerce.BackendAPI.Controllers
 
             var response = await _adminRepository.CreateAdminAccount(admin);
             return Ok(response);
+        }
+    
+        [HttpPost("changePassword")]
+        [ServiceFilter(typeof(VerifyToken))]
+        [ServiceFilter(typeof(VerifyAdmin))]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordParameter request)
+        {
+            var admin = HttpContext.Items["admin"] as Admin;
+            if (admin == null) 
+            {
+                return NotFound("Admin not found");
+            }
+
+            if (request.NewPassword != request.ConfirmPassword)
+            {
+                return BadRequest("New password and password does not match");
+            }
+
+            if (!_authService.VerifyPassword(request.OldPassword, admin.Password))
+            {
+                return BadRequest("New password does not match with current password");
+            }
+
+            admin.Password = _authService.HashPassword(request.NewPassword);
+            _context.Admins.Update(admin);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { Message = "Password change successfully" });
         }
     }
 }

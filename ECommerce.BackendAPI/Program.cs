@@ -33,8 +33,9 @@ builder.Services.AddScoped<GetOrderFilter>();
 builder.Services.AddScoped<GetAllOrdersFilter>();
 builder.Services.AddScoped<CreateOrderFilter>();
 
-// Admin filter
+// User filter
 builder.Services.AddScoped<VerifyAdmin>();
+builder.Services.AddScoped<VerifyCustomer>();
 
 // Review filters
 builder.Services.AddScoped<VerifyWhenCreateReview>();

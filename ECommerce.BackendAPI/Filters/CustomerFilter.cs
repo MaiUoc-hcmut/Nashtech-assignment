@@ -21,6 +21,7 @@ namespace Ecommerce.BackendAPI.FiltersAction
         public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
             var httpContext = context.HttpContext;
+            Console.WriteLine(httpContext.Request.Path.Value);
             var isValidateEndpoint = httpContext.Request.Path.Value?.Contains("validate", StringComparison.OrdinalIgnoreCase) ?? false;
             if (httpContext.Request.Cookies.TryGetValue("access_token", out var token))
             {
@@ -69,7 +70,37 @@ namespace Ecommerce.BackendAPI.FiltersAction
                 context.Result = new UnauthorizedObjectResult(new { Error = httpContext.Items["TokenError"] });
                 return;
             }
+            Console.WriteLine(httpContext.Items["UserId"]);
+            await next();
+        }
+    }
 
+    public class VerifyCustomer : ActionFilterAttribute
+    {
+        private readonly ICustomerRepository _customerRepository;
+
+        public VerifyCustomer(ICustomerRepository customerRepository)
+        {
+            _customerRepository = customerRepository;
+        }
+
+        public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+        {
+            var customerId = context.HttpContext.Items["UserId"]?.ToString();
+            if (string.IsNullOrEmpty(customerId))
+            {
+                context.HttpContext.Items["isAuthenticated"] = false;
+                await next();
+                return;
+            }
+            var customer = await _customerRepository.GetCustomerById(int.Parse(customerId));
+            if (customer == null)
+            {
+                context.HttpContext.Items["isAuthenticated"] = false;
+                await next();
+                return;
+            }
+            context.HttpContext.Items["isAuthenticated"] = true;
             await next();
         }
     }
