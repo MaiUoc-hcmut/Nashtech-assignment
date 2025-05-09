@@ -1,10 +1,11 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Ecommerce.BackendAPI.Interfaces;
 using Microsoft.IdentityModel.Tokens;
 namespace Ecommerce.BackendAPI.Services
 {
-    public class AuthService
+    public class AuthService : IAuthService
     {
         private readonly IConfiguration _configuration;
         public AuthService(IConfiguration configuration)

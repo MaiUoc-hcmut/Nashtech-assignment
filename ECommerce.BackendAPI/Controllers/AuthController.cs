@@ -9,7 +9,7 @@ using Ecommerce.BackendAPI.FiltersAction;
 using Ecommerce.SharedViewModel.Models;
 
 
-namespace ECommerce.BackendAPI.Controllers
+namespace Ecommerce.BackendAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -18,7 +18,7 @@ namespace ECommerce.BackendAPI.Controllers
         private readonly IAuthRepository _authRepository;
         private readonly ICustomerRepository _customerRepository;
         private readonly ICartRepository _cartRepository;
-        private readonly AuthService _authService;
+        private readonly IAuthService _authService;
         private readonly IDependMethod _dependMethod;
 
         public AuthController
@@ -26,7 +26,7 @@ namespace ECommerce.BackendAPI.Controllers
             IAuthRepository authRepository, 
             ICustomerRepository customerRepository,
             ICartRepository cartRepository,
-            AuthService authService, 
+            IAuthService authService, 
             IDependMethod dependMethod
         )
         

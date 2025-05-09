@@ -14,10 +14,10 @@ namespace Ecommerce.BackendAPI.Controllers
     public class AdminController : ControllerBase
     {
         private readonly IAdminRepository _adminRepository;
-        private readonly AuthService _authService;
+        private readonly IAuthService _authService;
         private readonly DataContext _context;
 
-        public AdminController(IAdminRepository adminRepository, AuthService authService,DataContext context)
+        public AdminController(IAdminRepository adminRepository, IAuthService authService,DataContext context)
         {
             _adminRepository = adminRepository;
             _authService = authService;

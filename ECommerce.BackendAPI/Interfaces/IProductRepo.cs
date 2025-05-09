@@ -11,7 +11,7 @@ namespace Ecommerce.BackendAPI.Interfaces
     {
         public void AttachProductClassification(ProductClassification productClassification);
         Task<IDbContextTransaction> BeginTransactionAsync();
-        Task<(int TotalProducts, IEnumerable<GetAllProductsResponse> Products)> GetAllProducts(
+        Task<(int TotalProducts, IEnumerable<ProductsGetAllProductsResponse> Products)> GetAllProducts(
             int pageNumber,
             int pageSize,
             string sortBy,

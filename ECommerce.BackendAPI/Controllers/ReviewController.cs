@@ -2,6 +2,7 @@ using Ecommerce.SharedViewModel.Models;
 using Ecommerce.SharedViewModel.DTOs;
 using Ecommerce.BackendAPI.Interfaces;
 using Ecommerce.BackendAPI.FiltersAction;
+using Ecommerce.SharedViewModel.Responses;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -47,7 +48,7 @@ namespace Ecommerce.BackendAPI.Controllers
                     isAsc
                 );
 
-                var response = new
+                var response = new GetReviewsResponse
                 {
                     TotalReviews = totalReviews,
                     Reviews = reviews.Select(r => new
@@ -74,11 +75,25 @@ namespace Ecommerce.BackendAPI.Controllers
         public async Task<IActionResult> GetReviewsByProductId(int productId)
         {
             var reviews = await _reviewRepository.GetReviewsByProductId(productId);
+
+            if (!reviews.Any())
+            {
+                return Ok(new GetReviewsByProductResponse
+                {
+                    Reviews = new List<object>(), // Return an empty list for reviews
+                    AverageRating = 0, // Default average rating
+                    TotalReviews = 0, // No reviews
+                    RatingsCount = new Dictionary<int, int>() // Empty dictionary for ratings count
+                });
+            }
+
             var averageRating = reviews.Average(r => r.Rating);
             var totalReviews = reviews.Count();
             var ratingsCount = reviews.GroupBy(r => r.Rating)
                 .ToDictionary(g => g.Key, g => g.Count());
-            return Ok(new {
+
+            return Ok(new GetReviewsByProductResponse
+            {
                 Reviews = reviews,
                 AverageRating = averageRating,
                 TotalReviews = totalReviews,

@@ -2,13 +2,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Ecommerce.BackendAPI.Services;
 using Ecommerce.SharedViewModel.Models;
+using Ecommerce.BackendAPI.Interfaces;
 
 namespace Ecommerce.BackendAPI.FiltersAction
 {
     public class UpdateAndDeleteProductFilter : ActionFilterAttribute
     {
-        private readonly AuthService _authService;
-        public UpdateAndDeleteProductFilter(AuthService authService)
+        private readonly IAuthService _authService;
+        public UpdateAndDeleteProductFilter(IAuthService authService)
         {
             _authService = authService;
         }

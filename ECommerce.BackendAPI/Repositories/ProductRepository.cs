@@ -62,7 +62,7 @@ namespace Ecommerce.BackendAPI.Repositories
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
 
-        public async Task<(int TotalProducts, IEnumerable<GetAllProductsResponse> Products)> GetAllProducts
+        public async Task<(int TotalProducts, IEnumerable<ProductsGetAllProductsResponse> Products)> GetAllProducts
         (
             int pageNumber,
             int pageSize,
@@ -109,7 +109,7 @@ namespace Ecommerce.BackendAPI.Repositories
 
             // Fetch the paginated list of products with additional details
             var productsWithRatings = await query
-                .Select(p => new GetAllProductsResponse
+                .Select(p => new ProductsGetAllProductsResponse
                 {
                     Id = p.Id,
                     Name = p.Name,

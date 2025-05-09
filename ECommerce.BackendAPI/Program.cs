@@ -16,7 +16,7 @@ builder.Services.AddControllers().AddJsonOptions(x =>
                 x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
 // Add custom filters and services
-builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<VerifyToken>();
 builder.Services.AddScoped<CheckUserExists>();
 builder.Services.AddScoped<CategoryAndParentAndClassificationFilter>();

@@ -11,8 +11,8 @@ namespace Ecommerce.BackendAPI.Repositories
     public class AuthRepository : IAuthRepository
     {
         private readonly DataContext _context;
-        private readonly AuthService _authService;
-        public AuthRepository(DataContext context, AuthService authService)
+        private readonly IAuthService _authService;
+        public AuthRepository(DataContext context, IAuthService authService)
         {
             _context = context;
             _authService = authService;
@@ -35,7 +35,7 @@ namespace Ecommerce.BackendAPI.Repositories
                 Address = request.Address,
                 PhoneNumber = request.PhoneNumber
             };
-            // Add the customer to the database
+            
             await _context.Customers.AddAsync(customer);
             await _context.SaveChangesAsync();
 

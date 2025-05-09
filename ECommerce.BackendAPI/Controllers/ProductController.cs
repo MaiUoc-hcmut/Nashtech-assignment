@@ -17,14 +17,14 @@ namespace Ecommerce.BackendAPI.Controllers
     {
         private readonly IProductRepository _productRepository;
         private readonly IVariantRepository _variantRepository;
-        private readonly AuthService _authService;
+        private readonly IAuthService _authService;
         private readonly IClassificationRepository _classificationRepository;
 
         public ProductController
         (
             IProductRepository productRepository, 
             IVariantRepository variantRepository,
-            AuthService authService,
+            IAuthService authService,
             IClassificationRepository classificationRepository
         )
         {
@@ -61,22 +61,6 @@ namespace Ecommerce.BackendAPI.Controllers
                     maxPrice,
                     search
                 );
-
-                if (simplest == true)
-                {
-                    // Return a simplified response if requested
-                    var simpleProducts = products.Select(p => new
-                    {
-                        p.Id,
-                        p.Name
-                    }).ToList();
-
-                    return Ok(new
-                    {
-                        TotalProducts = totalProducts,
-                        Products = simpleProducts
-                    });
-                }
 
                 // Return the full response
                 return Ok(new

@@ -12,9 +12,9 @@ namespace Ecommerce.BackendAPI.Repositories
     public class CustomerRepository : ICustomerRepository
     {
         private readonly DataContext _context;
-        private readonly AuthService _authService;
+        private readonly IAuthService _authService;
 
-        public CustomerRepository(DataContext context, AuthService authService)
+        public CustomerRepository(DataContext context, IAuthService authService)
         {
             _context = context;
             _authService = authService;
