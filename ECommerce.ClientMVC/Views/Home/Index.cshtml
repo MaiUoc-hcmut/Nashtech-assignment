@@ -1,7 +1,7 @@
 ﻿@* @using Ecommerce.SharedViewModel.Models *@
 @using Ecommerce.SharedViewModel.Responses
 
-@model IEnumerable<GetAllProductsResponse>
+@model GetAllProductsResponse
 @{
     ViewData["Title"] = "Home Page";
 }
@@ -62,13 +62,13 @@
     </div>
     
     <div class="products-container">
-        <div class="navigation-arrow arrow-prev">
+        @* <div class="navigation-arrow arrow-prev">
             <i class="fas fa-chevron-left"></i>
-        </div>
+        </div> *@
         
-        @if (Model.Any())
+        @if (Model.Products.Any())
         {
-            @foreach (var product in Model)
+            @foreach (var product in Model.Products)
             {
                 <partial name="_ProductCardPartial" model='new {
                     IsNew = (DateTime.UtcNow - product.CreatedAt).TotalDays <= 7,
@@ -83,9 +83,9 @@
             }
         }
         
-        <div class="navigation-arrow arrow-next">
+        @* <div class="navigation-arrow arrow-next">
             <i class="fas fa-chevron-right"></i>
-        </div>
+        </div> *@
     </div>
 </div>
 
@@ -97,14 +97,14 @@
     </div>
     
     <div class="products-container">
-        <div class="navigation-arrow arrow-prev">
+        @* <div class="navigation-arrow arrow-prev">
             <i class="fas fa-chevron-left"></i>
-        </div>
+        </div> *@
         
         <!-- Sport Product Card 1 -->
-        @if (Model.Any())
+        @if (Model.Products.Any())
         {
-            @foreach (var product in Model)
+            @foreach (var product in Model.Products)
             {
                 <partial name="_ProductCardPartial" model='new {
                     IsNew = (DateTime.UtcNow - product.CreatedAt).TotalDays <= 7,
@@ -119,9 +119,9 @@
             }
         }
         
-        <div class="navigation-arrow arrow-next">
+        @* <div class="navigation-arrow arrow-next">
             <i class="fas fa-chevron-right"></i>
-        </div>
+        </div> *@
     </div>
 </div>
 

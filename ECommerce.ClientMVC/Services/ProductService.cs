@@ -18,7 +18,7 @@ namespace Ecommerce.ClientMVC.Services
             _apiBaseUrl = "http://localhost:5113";
         }
 
-        public async Task<List<GetAllProductsResponse>> GetAllProductsAsync
+        public async Task<GetAllProductsResponse> GetAllProductsAsync
         (
             int pageNumber = 1,
             int pageSize = 10,
@@ -30,6 +30,8 @@ namespace Ecommerce.ClientMVC.Services
             string? search = null
         )
         {
+            
+            Console.WriteLine("==================================================");
             var client = _httpClientFactory.CreateClient();
             var response = await client.GetAsync
             (
@@ -37,9 +39,9 @@ namespace Ecommerce.ClientMVC.Services
             );
             if (response.IsSuccessStatusCode)
             {
-                return await response.Content.ReadFromJsonAsync<List<GetAllProductsResponse>>() ?? new List<GetAllProductsResponse>();
+                return await response.Content.ReadFromJsonAsync<GetAllProductsResponse>() ?? new GetAllProductsResponse();
             }
-            return new List<GetAllProductsResponse>();
+            return new GetAllProductsResponse();
         }
 
         public async Task<ProductDetail?> GetProductByIdAsync(int id)

@@ -5,7 +5,7 @@ namespace Ecommerce.ClientMVC.Interface
 {
     public interface IProductService
     {
-        Task<List<GetAllProductsResponse>> GetAllProductsAsync
+        Task<GetAllProductsResponse> GetAllProductsAsync
         (
             int pageNumber = 1,
             int pageSize = 10,

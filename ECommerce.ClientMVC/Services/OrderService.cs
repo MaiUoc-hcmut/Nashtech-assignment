@@ -122,6 +122,7 @@ namespace Ecommerce.ClientMVC.Services
                 // Send the request
                 var response = await client.SendAsync(request);
                 var content = await response.Content.ReadAsStringAsync();
+                Console.WriteLine(content);
                 var orders = JsonSerializer.Deserialize<IEnumerable<GetOrdersOfCustomerResponse>>(content, new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true

@@ -20,7 +20,7 @@ namespace Ecommerce.ClientMVC.Controllers
         public async Task<IActionResult> Index
         (
             int pageNumber = 1,
-            int pageSize = 10,
+            int pageSize = 15,
             string sortBy = "UpdatedAt",
             bool isAsc = true,
             int? classificationId = null,
