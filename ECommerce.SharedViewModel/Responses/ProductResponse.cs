@@ -47,8 +47,8 @@ namespace Ecommerce.SharedViewModel.Responses
         public required string Description { get; set; }
         public IEnumerable<Sizes> Sizes { get; set; } = new List<Sizes>();
     }
-    
-    public class GetAllProductsResponse
+
+    public class ProductsGetAllProductsResponse
     {
         public int Id { get; set; }
         public required string Name { get; set; }
@@ -60,6 +60,12 @@ namespace Ecommerce.SharedViewModel.Responses
         public double AverageRating { get; set; }
         public int TotalReviews { get; set; }
         public int TotalOrders { get; set; }
+    }
+    
+    public class GetAllProductsResponse
+    {
+        public int TotalProducts { get; set; }
+        public ProductsGetAllProductsResponse[] Products { get; set; }
     }
 
     public class ProductDetail
