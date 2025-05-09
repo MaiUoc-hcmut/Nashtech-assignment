@@ -29,6 +29,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactElement }) => {
 // App component with authentication checking
 const App: React.FC = () => {
   const dispatch = useAppDispatch();
+  const { isAuthenticated } = useAppSelector((state) => state.auth);
   const [authChecked, setAuthChecked] = useState(false);
   const { status } = useAppSelector(state => state.auth);
 
@@ -38,7 +39,7 @@ const App: React.FC = () => {
       .finally(() => {
         setAuthChecked(true);
       });
-  }, [dispatch]);
+  }, [dispatch, isAuthenticated]);
 
   // Show loading spinner while checking authentication
   if (!authChecked && status === 'loading') {

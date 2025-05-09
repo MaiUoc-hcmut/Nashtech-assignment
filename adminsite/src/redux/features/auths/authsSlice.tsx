@@ -41,6 +41,18 @@ export const checkAuthState = createAsyncThunk(
   }
 );
 
+export const logout = createAsyncThunk(
+  'auth/logout',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axiosConfig.post('http://localhost:5113/api/Auth/logout');
+      return response.data;
+    } catch (error) {
+      return rejectWithValue('Authentication failed');
+    }
+  }
+);
+
 const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -78,6 +90,14 @@ const authSlice = createSlice({
       .addCase(checkAuthState.rejected, (state) => {
         state.admin = null;
         state.status = 'failed';
+      })
+      .addCase(logout.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(logout.fulfilled, (state) => {
+        state.status = 'succeeded';
+        state.isAuthenticated = false;
+        state.admin = null;
       });
   }
 });

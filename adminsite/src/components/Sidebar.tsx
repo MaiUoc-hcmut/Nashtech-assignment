@@ -2,6 +2,9 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Home, ShoppingBag, Package, Grid, Layers, Tag, Star, Users, Settings, Info, LogOut, ChevronRight as ChevronRightSmall } from 'lucide-react';
 import { MenuItem } from '../types/dashboardTypes';
+import { useAppDispatch } from '../redux/hooks/redux';
+import { logout } from '../redux/features/auths/authsSlice';
+import { useNavigate } from 'react-router-dom';
 
 interface SidebarProps {
   collapsed: boolean;
@@ -17,6 +20,9 @@ const Sidebar: React.FC<SidebarProps> = ({
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [showAbove, setShowAbove] = useState(false);
   const settingsRef = useRef<HTMLDivElement>(null);
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const [isLogout, setIsLogout] = useState(false);
   
   // Check if settings item is near the bottom of the viewport
   useEffect(() => {
@@ -41,16 +47,25 @@ const Sidebar: React.FC<SidebarProps> = ({
     { id: 'customers', label: 'Customers', icon: Users }
   ];
 
-  // Settings submenu items
-  const settingsSubMenuItems = [
-    { id: 'information', label: 'Information', icon: Info },
-    { id: 'logout', label: 'Logout', icon: LogOut }
-  ];
-
   const toggleSettingsMenu = (e: React.MouseEvent) => {
     e.preventDefault();
     setSettingsOpen(!settingsOpen);
   };
+
+  const handleLogout = async () => {
+    try {
+      await dispatch(logout()).unwrap();
+      setSettingsOpen(false);
+      setIsLogout(true);
+      navigate('/login', { replace: true });
+    } catch (error) {
+      console.error('Failed to logout:', error);
+    }
+  };
+
+  useEffect(() => {
+
+  }, [isLogout]);
 
   return (
     <div className={`bg-black text-white transition-all duration-300 ${collapsed ? 'w-16' : 'w-64'} flex flex-col h-full`}>
@@ -106,16 +121,21 @@ const Sidebar: React.FC<SidebarProps> = ({
           {/* Submenu - show on the right side as a flyout for both collapsed and expanded states */}
           {settingsOpen && (
             <div className={`absolute left-full ${showAbove ? 'bottom-full mb-2' : 'top-0 mt-0'} ml-2 bg-gray-900 rounded shadow-lg py-1 z-10 w-48`}>
-              {settingsSubMenuItems.map((subItem) => (
-                <Link
-                  key={subItem.id}
-                  to={`/admin/${subItem.id}`}
-                  className="flex items-center w-full px-4 py-2 text-gray-300 hover:bg-gray-700"
-                >
-                  <subItem.icon size={18} className="flex-shrink-0" />
-                  <span className="ml-3">{subItem.label}</span>
-                </Link>
-              ))}
+              <Link
+                to="/admin/information"
+                className="flex items-center w-full px-4 py-2 text-gray-300 hover:bg-gray-700"
+              >
+                <Info size={18} className="flex-shrink-0" />
+                <span className="ml-3">Information</span>
+              </Link>
+              <div
+                style={{cursor: "pointer"}}
+                className="flex items-center w-full px-4 py-2 text-gray-300 hover:bg-gray-700"
+                onClick={handleLogout}
+              >
+                <LogOut size={18} className="flex-shrink-0" />
+                <span className="ml-3">Logout</span>
+              </div>
             </div>
           )}
         </div>
