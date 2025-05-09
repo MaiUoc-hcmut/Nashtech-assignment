@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, Home, ShoppingBag, Package, Grid, Layers, Tag, Star, Users, Settings, BarChart } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Home, ShoppingBag, Package, Grid, Layers, Tag, Star, Users, Settings, Info, LogOut, ChevronRight as ChevronRightSmall } from 'lucide-react';
 import { MenuItem } from '../types/dashboardTypes';
 
 interface SidebarProps {
@@ -14,6 +14,22 @@ const Sidebar: React.FC<SidebarProps> = ({
   setCollapsed, 
   currentPage 
 }) => {
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [showAbove, setShowAbove] = useState(false);
+  const settingsRef = useRef<HTMLDivElement>(null);
+  
+  // Check if settings item is near the bottom of the viewport
+  useEffect(() => {
+    if (settingsOpen && settingsRef.current) {
+      const rect = settingsRef.current.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+      const bottomSpace = windowHeight - rect.bottom;
+      
+      // If there's not enough space below (less than 150px), show menu above
+      setShowAbove(bottomSpace < 150);
+    }
+  }, [settingsOpen]);
+  
   const menuItems: MenuItem[] = [
     { id: 'dashboard', label: 'Dashboard', icon: Home },
     { id: 'classifications', label: 'Classifications', icon: Grid },
@@ -22,12 +38,19 @@ const Sidebar: React.FC<SidebarProps> = ({
     { id: 'products', label: 'Products', icon: ShoppingBag },
     { id: 'orders', label: 'Orders', icon: Package },
     { id: 'reviews', label: 'Reviews', icon: Star },
-    { id: 'customers', label: 'Customers', icon: Users },
-    { id: 'analytics', label: 'Analytics', icon: BarChart }
+    { id: 'customers', label: 'Customers', icon: Users }
   ];
 
-  // Settings menu item separate from the main navigation
-  const settingsItem: MenuItem = { id: 'settings', label: 'Settings', icon: Settings };
+  // Settings submenu items
+  const settingsSubMenuItems = [
+    { id: 'information', label: 'Information', icon: Info },
+    { id: 'logout', label: 'Logout', icon: LogOut }
+  ];
+
+  const toggleSettingsMenu = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setSettingsOpen(!settingsOpen);
+  };
 
   return (
     <div className={`bg-black text-white transition-all duration-300 ${collapsed ? 'w-16' : 'w-64'} flex flex-col h-full`}>
@@ -59,17 +82,43 @@ const Sidebar: React.FC<SidebarProps> = ({
         ))}
       </div>
       
-      {/* Settings at the bottom */}
+      {/* Settings with submenu */}
       <div className="border-t border-gray-800 py-2">
-        <Link 
-          to={`/admin/${settingsItem.id}`}
-          className={`flex items-center w-full px-4 py-3 transition-colors duration-200 
-            ${currentPage === settingsItem.id ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700'}
-            ${collapsed ? 'justify-center' : 'justify-start'}`}
-        >
-          <settingsItem.icon size={20} className="flex-shrink-0" />
-          {!collapsed && <span className="ml-3">{settingsItem.label}</span>}
-        </Link>
+        <div className="relative" ref={settingsRef}>
+          <a 
+            href="#"
+            onClick={toggleSettingsMenu}
+            className={`flex items-center w-full px-4 py-3 transition-colors duration-200 
+              ${['profile', 'information', 'logout'].includes(currentPage) ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700'}
+              ${collapsed ? 'justify-center' : 'justify-between'}`}
+          >
+            <div className="flex items-center">
+              <Settings size={20} className="flex-shrink-0" />
+              {!collapsed && <span className="ml-3">Settings</span>}
+            </div>
+            {!collapsed && (
+              <div>
+                <ChevronRightSmall size={16} />
+              </div>
+            )}
+          </a>
+          
+          {/* Submenu - show on the right side as a flyout for both collapsed and expanded states */}
+          {settingsOpen && (
+            <div className={`absolute left-full ${showAbove ? 'bottom-full mb-2' : 'top-0 mt-0'} ml-2 bg-gray-900 rounded shadow-lg py-1 z-10 w-48`}>
+              {settingsSubMenuItems.map((subItem) => (
+                <Link
+                  key={subItem.id}
+                  to={`/admin/${subItem.id}`}
+                  className="flex items-center w-full px-4 py-2 text-gray-300 hover:bg-gray-700"
+                >
+                  <subItem.icon size={18} className="flex-shrink-0" />
+                  <span className="ml-3">{subItem.label}</span>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

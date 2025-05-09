@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axiosConfig from '../../config/axios.config';
+import { AddProduct } from '../../../types/globalTypes';
 
 // Define types for your state
 interface Product {
@@ -12,26 +13,8 @@ interface Product {
   updatedAt: Date
 }
 
-interface Variant {
-  id: number;
-  price: number;
-  colorId: number;
-  sizeId: number;
-  sku: string;
-  stock: number;
-  imagePreview: string;
-}
-
-interface AddProduct {
-  name: string;
-  description: string;
-  price: string;
-  classifications: string;
-  image: File[] | null;
-  variants: Variant[] | null;
-}
-
 interface ProductsState {
+  totalProducts: number;
   products: Product[];
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
@@ -39,6 +22,7 @@ interface ProductsState {
 
 // Initial state
 const initialState: ProductsState = {
+  totalProducts: 0,
   products: [],
   status: 'idle',
   error: null,
@@ -47,8 +31,8 @@ const initialState: ProductsState = {
 // Create async thunk for fetching products
 export const fetchProducts = createAsyncThunk(
   'products/fetchProducts',
-  async () => {
-    const response = await axiosConfig.get('http://localhost:5113/api/Product');
+  async (currentPage: number) => {
+    const response = await axiosConfig.get(`http://localhost:5113/api/Product?pageNumber=${currentPage}`);
     if (response.status !== 200) throw new Error('Failed to fetch products');
     return response.data;
   }
@@ -57,6 +41,7 @@ export const fetchProducts = createAsyncThunk(
 export const addProduct = createAsyncThunk(
   'products/addProduct',
   async (data: AddProduct) => {
+    console.log(data);
     const formData = new FormData();
     formData.append('name', data.name);
     formData.append('description', data.description);
@@ -64,9 +49,11 @@ export const addProduct = createAsyncThunk(
     formData.append('classifications', data.classifications);
 
     if (data.variants !== null) {
-      const transformedVariants = data.variants.map(({ id, colorId, sizeId, sku, imagePreview, ...rest }) => ({
+      const transformedVariants = data.variants.map(({ id, colorId, sizeId, sku, price, stockQuantity, imagePreview, ...rest }) => ({
         ...rest,
         SKU: sku,
+        Price: price,
+        StockQuantity: stockQuantity,
         Categories: [colorId, sizeId],
       }));
 
@@ -106,9 +93,11 @@ const productsSlice = createSlice({
       .addCase(fetchProducts.pending, (state) => {
         state.status = 'loading';
       })
-      .addCase(fetchProducts.fulfilled, (state, action: PayloadAction<Product[]>) => {
+      .addCase(fetchProducts.fulfilled, (state, action: PayloadAction<{ totalProducts: number; products: Product[] }>) => {
         state.status = 'succeeded';
-        state.products = action.payload;
+        state.totalProducts = action.payload.totalProducts;
+        state.products = action.payload.products;
+        console.log(action.payload);
         state.error = null;
       })
       .addCase(fetchProducts.rejected, (state, action) => {

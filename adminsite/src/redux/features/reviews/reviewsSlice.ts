@@ -3,12 +3,14 @@ import { Review } from '../../../types/globalTypes';
 import axiosConfig from '../../config/axios.config';
 
 interface ReviewsState {
+  totalReviews: number;
   reviews: Review[];
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
 }
 
 const initialState: ReviewsState = {
+  totalReviews: 0,
   reviews: [],
   status: 'idle',
   error: null
@@ -17,8 +19,8 @@ const initialState: ReviewsState = {
 // Async thunks
 export const fetchReviews = createAsyncThunk(
   'reviews/fetchReviews',
-  async () => {
-    const response = await axiosConfig.get('http://localhost:5113/api/Review');
+  async (currentPage: number) => {
+    const response = await axiosConfig.get(`http://localhost:5113/api/Review?pageNumber=${currentPage}&isAsc=false`);
     if (response.status !== 200) {
       throw new Error('Failed to fetch reviews');
     }
@@ -48,9 +50,10 @@ const reviewsSlice = createSlice({
       .addCase(fetchReviews.pending, (state) => {
         state.status = 'loading';
       })
-      .addCase(fetchReviews.fulfilled, (state, action: PayloadAction<Review[]>) => {
+      .addCase(fetchReviews.fulfilled, (state, action: PayloadAction<{ totalReviews: number; reviews: Review[] }>) => {
         state.status = 'succeeded';
-        state.reviews = action.payload;
+        state.totalReviews = action.payload.totalReviews;
+        state.reviews = action.payload.reviews;
         state.error = null;
       })
       .addCase(fetchReviews.rejected, (state, action) => {

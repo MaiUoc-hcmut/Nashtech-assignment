@@ -3,12 +3,14 @@ import { Order } from '../../../types/globalTypes';
 import axiosConfig from '../../config/axios.config';
 
 interface OrdersState {
+  totalOrders: number;
   orders: Order[];
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
 }
 
 const initialState: OrdersState = {
+  totalOrders: 0,
   orders: [],
   status: 'idle',
   error: null
@@ -33,10 +35,12 @@ const ordersSlice = createSlice({
       .addCase(fetchOrders.pending, (state) => {
         state.status = 'loading';
       })
-      .addCase(fetchOrders.fulfilled, (state, action: PayloadAction<Order[]>) => {
+      .addCase(fetchOrders.fulfilled, (state, action: PayloadAction<{ totalOrders: number; orders: Order[] }>) => {
         state.status = 'succeeded';
-        state.orders = action.payload;
+        state.totalOrders = action.payload.totalOrders;
+        state.orders = action.payload.orders;
         state.error = null;
+        console.log(action.payload);
       })
       .addCase(fetchOrders.rejected, (state, action) => {
         state.status = 'failed';

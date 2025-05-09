@@ -267,8 +267,7 @@ const CategoriesManagement: React.FC = () => {
                   type="text"
                   className={`mt-1 block w-full border ${errors.name ? 'border-red-500' : 'border-gray-300'} rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500`}
                   {...register("name", { 
-                    required: "Name is required",
-                    minLength: { value: 2, message: "Name must be at least 2 characters" }
+                    required: "Name is required"
                   })}
                 />
                 {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}

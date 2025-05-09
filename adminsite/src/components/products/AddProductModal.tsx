@@ -3,17 +3,12 @@ import { useForm } from 'react-hook-form';
 
 // Import the VariantTab component
 import VariantTab from './VariantTab';
+import RichTextEditor from './RichTextEditor'; // Import our new RichTextEditor component
 import { useAppSelector } from '../../redux/hooks/redux';
 import axiosConfig from '../../redux/config/axios.config';
+import { AddProduct } from '../../types/globalTypes';
+import LoadingSpinner from '../LoadingSpiner';
 
-interface AddProduct {
-  name: string;
-  description: string;
-  price: string;
-  classifications: string;
-  image: File[] | null;
-  variants?: any[]; // Add variants to the product data
-}
 
 interface FormValues {
   name: string;
@@ -31,6 +26,7 @@ interface Classification {
 
 interface ProductModalProps {
   isOpen: boolean;
+  isPending: boolean;
   onClose: () => void;
   onSubmit: (data: AddProduct) => Promise<void>;
   error: string | null;
@@ -50,7 +46,7 @@ const debounce = (func: (value: string) => void, wait: number): ((value: string)
   };
 };
 
-const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSubmit, error: serverError }) => {
+const ProductModal: React.FC<ProductModalProps> = ({ isOpen, isPending, onClose, onSubmit, error: serverError }) => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [clsft, setClsft] = useState<Classification[]>([]);
   const [selectedClassifications, setSelectedClassifications] = useState<Classification[]>([]);
@@ -63,6 +59,14 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSubmit, 
   // Reference to the classification container div for handling outside clicks
   const classificationContainerRef = useRef<HTMLDivElement>(null);
   const { classifications } = useAppSelector((state) => state.classifications);
+
+  const convertToHTML = (text: string): string => {
+    return text
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      .replace(/^## (.*?)$/gm, '<h2>$1</h2>')
+      .replace(/^- (.*?)$/gm, '<li>$1</li>');
+  };
 
   const {
     register,
@@ -85,6 +89,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSubmit, 
 
   const imageFile: FileList | null = watch('image');
   const allFieldsWatched = watch(['name', 'description', 'price', 'classifications', 'image']);
+  const description = watch('description'); // Watch description for the rich text editor
   
   // Get name and price for passing to VariantTab
   const productName = watch('name');
@@ -218,12 +223,27 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSubmit, 
     }
   };
 
+  // Handle rich text editor changes
+  const handleDescriptionChange = (e: { target: { value: string } }) => {
+    setValue('description', e.target.value, { shouldValidate: true });
+  }
+
+  // Handle rich text editor blur for validation
+  const handleDescriptionBlur = () => {
+    if (description.trim() === '') {
+      setValue('description', '', { shouldValidate: true });
+    }
+  };
+
   const handleFormSubmit = handleSubmit(async (data: FormValues): Promise<void> => {
+    data.description = convertToHTML(data.description);
     const formData: AddProduct = {
       ...data,
       image: data.image ? Array.from(data.image) : null,
-      variants: data.variants
+      variants: data.variants ?? null
     };
+
+    console.log(data.variants);
     
     await onSubmit(formData);
   });
@@ -254,6 +274,8 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSubmit, 
   };
 
   if (!isOpen) return null;
+
+  if(isPending) return <LoadingSpinner />
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -305,16 +327,15 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSubmit, 
                   {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
                 </div>
                 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Description</label>
-                  <textarea
-                    className={`mt-1 block w-full border ${errors.description ? 'border-red-500' : 'border-gray-300'} rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500`}
-                    {...register("description", { 
-                      required: "Description is required"
-                    })}
-                  />
-                  {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>}
-                </div>
+                {/* Replace the textarea with the Rich Text Editor component */}
+                <RichTextEditor 
+                  value={description} 
+                  onChange={handleDescriptionChange}
+                  onBlur={handleDescriptionBlur}
+                  error={!!errors.description}
+                  errorMessage={errors.description?.message}
+                  id="product-description"
+                />
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Price</label>

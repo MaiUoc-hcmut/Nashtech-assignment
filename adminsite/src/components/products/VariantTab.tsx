@@ -54,8 +54,6 @@ const VariantTab: React.FC<VariantTabProps> = ({
   productImagePreview,
   register,
   setValue,
-  watch,
-  errors
 }) => {
   // State for search terms
   const [colorSearchTerm, setColorSearchTerm] = useState('');
@@ -91,7 +89,6 @@ const VariantTab: React.FC<VariantTabProps> = ({
       // Replace with your actual API endpoint
       const response = await axiosConfig.get(`http://localhost:5113/api/Category/search?pattern=${encodeURIComponent(term)}`);
       if (response.status !== 200) throw new Error('Failed to fetch sizes');
-      console.log('Colors:', response.data);
       setAvailableColors(response.data);
     } catch (error) {
       console.error('Error fetching colors:', error);
