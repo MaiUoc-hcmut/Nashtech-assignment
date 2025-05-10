@@ -19,7 +19,7 @@ namespace Ecommerce.ClientMVC.Middleware
             // Resolve the scoped service from the request service provider
             var authService = context.RequestServices.GetRequiredService<IAuthService>();
             
-            if (await authService.IsAuthenticated())
+            if (await authService.IsAuthenticatedAsync())
             {
                 var user = authService.GetCurrentUser();
                 context.Items["CurrentUser"] = user;

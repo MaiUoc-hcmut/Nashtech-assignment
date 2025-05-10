@@ -21,7 +21,7 @@ namespace Ecommerce.ClientMVC.Services
             _apiBaseUrl = "http://localhost:5113";
         }
 
-        public async Task<CreateOrderResponse?> CreateOrder(
+        public async Task<CreateOrderResponse?> CreateOrderAsync(
             string customerName,
             string customerEmail,
             string customerPhoneNumber,
@@ -103,7 +103,7 @@ namespace Ecommerce.ClientMVC.Services
             }
         }
     
-        public async Task<IEnumerable<GetOrdersOfCustomerResponse>> GetOrdersOfCustomer(int customerId)
+        public async Task<IEnumerable<GetOrdersOfCustomerResponse>> GetOrdersOfCustomerAsync(int customerId)
         {
             try
             {

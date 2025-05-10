@@ -5,7 +5,7 @@ namespace Ecommerce.ClientMVC.Interface
 {
     public interface IOrderService
     {
-        Task<CreateOrderResponse?> CreateOrder
+        Task<CreateOrderResponse?> CreateOrderAsync
         (
             string customerName,
             string customerEmail,
@@ -14,7 +14,7 @@ namespace Ecommerce.ClientMVC.Interface
             string variantIdList,
             int totalAmount 
         );
-        Task<IEnumerable<GetOrdersOfCustomerResponse>> GetOrdersOfCustomer(int customerId);
+        Task<IEnumerable<GetOrdersOfCustomerResponse>> GetOrdersOfCustomerAsync(int customerId);
         // Task<bool> CancelOrder(int orderId);
         // Task<bool> UpdateOrderStatus(int orderId, string status);
         // Task<bool> GetOrderDetails(int orderId);

@@ -15,7 +15,7 @@ namespace Ecommerce.ClientMVC.Filters
 
         public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            bool isAuthenticated = await _authService.IsAuthenticated();
+            bool isAuthenticated = await _authService.IsAuthenticatedAsync();
             if (!isAuthenticated)
             {
                 context.Result = new RedirectToActionResult("Login", "Account", null);

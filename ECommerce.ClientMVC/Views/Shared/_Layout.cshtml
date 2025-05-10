@@ -63,7 +63,7 @@
                 
                 <!-- Part 3: Authentication and Cart -->
                 <div class="col-md-3 col-lg-3 d-flex justify-content-end align-items-center">
-                    @if (await AuthService.IsAuthenticated())
+                    @if (await AuthService.IsAuthenticatedAsync())
                     {
                         var customer = AuthService.GetCurrentUser();
                         <div class="dropdown me-3">

@@ -1,7 +1,7 @@
 @using Ecommerce.ClientMVC.Interface
 @inject IAuthService AuthService
 
-@if (await AuthService.IsAuthenticated())
+@if (await AuthService.IsAuthenticatedAsync())
 {
     var user = AuthService.GetCurrentUser();
     <li class="nav-item dropdown">

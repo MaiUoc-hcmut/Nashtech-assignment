@@ -21,7 +21,7 @@ namespace Ecommerce.ClientMVC.Services
             _apiBaseUrl = "http://localhost:5113";
         }
 
-        public async Task<IEnumerable<Review>> GetReviewsOfCustomer(int customerId)
+        public async Task<IEnumerable<Review>> GetReviewsOfCustomerAsync(int customerId)
         {
             try
             {
@@ -54,7 +54,7 @@ namespace Ecommerce.ClientMVC.Services
             }
         }
 
-        public async Task<Review?> CreateReview(int productId, int Rating, string Text)
+        public async Task<Review?> CreateReviewAsync(int productId, int Rating, string Text)
         {
             var client = _httpClientFactory.CreateClient();
             var httpContext = _httpContextAccessor.HttpContext;

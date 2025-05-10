@@ -42,14 +42,14 @@ namespace Ecommerce.ClientMVC.Controllers
         [HttpGet]
         public async Task<IActionResult> GetOrdersPartial(int customerId)
         {
-            var orders = await _orderService.GetOrdersOfCustomer(customerId);
+            var orders = await _orderService.GetOrdersOfCustomerAsync(customerId);
             return PartialView("_OrdersPartial", orders);
         }
 
         [HttpGet]
         public async Task<IActionResult> GetReviewsPartial(int customerId)
         {
-            var reviews = await _reviewService.GetReviewsOfCustomer(customerId);
+            var reviews = await _reviewService.GetReviewsOfCustomerAsync(customerId);
             return PartialView("_ReviewsPartial", reviews);
         }
     }

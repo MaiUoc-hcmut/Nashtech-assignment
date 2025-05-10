@@ -24,7 +24,7 @@ namespace Ecommerce.ClientMVC.Controllers
             int totalAmount 
         )
         {
-            var result = await _orderService.CreateOrder
+            var result = await _orderService.CreateOrderAsync
                 (
                     customerName, 
                     customerEmail, 

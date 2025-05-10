@@ -19,7 +19,7 @@ namespace Ecommerce.ClientMVC.Services
         }
 
 
-        public async Task<CartItemResponse> GetCartOfCustomer(int customerId)
+        public async Task<CartItemResponse> GetCartOfCustomerAsync(int customerId)
         {
             try
             {
@@ -52,7 +52,7 @@ namespace Ecommerce.ClientMVC.Services
             }
         }
         
-        public async Task<bool> AddToCart(int cartId, int variantId, int quantity = 1)
+        public async Task<bool> AddToCartAsync(int cartId, int variantId, int quantity = 1)
         {
             try
             {
@@ -98,7 +98,7 @@ namespace Ecommerce.ClientMVC.Services
             }
         }
         
-        public async Task<bool> DeleteFromCart(int cartId, int variantId)
+        public async Task<bool> DeleteFromCartAsync(int cartId, int variantId)
         {
             try
             {

@@ -4,7 +4,7 @@ namespace Ecommerce.ClientMVC.Interface
 {
     public interface IReviewService
     {
-        Task<IEnumerable<Review>> GetReviewsOfCustomer(int customerId);
-        Task<Review?> CreateReview(int productId, int Rating, string Text);
+        Task<IEnumerable<Review>> GetReviewsOfCustomerAsync(int customerId);
+        Task<Review?> CreateReviewAsync(int productId, int Rating, string Text);
     }
 }

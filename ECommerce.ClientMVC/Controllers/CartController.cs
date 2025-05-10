@@ -35,7 +35,7 @@ namespace Ecommerce.ClientMVC.Controllers
         [ServiceFilter(typeof(CustomerFilter))]
         public async Task<IActionResult> Index(int customerId)
         {
-            var cartItems = await _cartService.GetCartOfCustomer(customerId);
+            var cartItems = await _cartService.GetCartOfCustomerAsync(customerId);
             return View(cartItems);
         }
 
@@ -43,7 +43,7 @@ namespace Ecommerce.ClientMVC.Controllers
         [ServiceFilter(typeof(CustomerFilter))]
         public async Task<IActionResult> AddToCart([FromBody] AddToCartParameter model)
         {
-            var result = await _cartService.AddToCart(model.cartId, model.variantId, model.quantity);
+            var result = await _cartService.AddToCartAsync(model.cartId, model.variantId, model.quantity);
             
             return Json(new
             {
@@ -56,7 +56,7 @@ namespace Ecommerce.ClientMVC.Controllers
         [ServiceFilter(typeof(CustomerFilter))]
         public async Task<IActionResult> DeleteFromCart(int customerId, int cartId, int variantId)
         {
-            var result = await _cartService.DeleteFromCart(cartId, variantId);
+            var result = await _cartService.DeleteFromCartAsync(cartId, variantId);
 
             if (result)
             {
@@ -67,7 +67,7 @@ namespace Ecommerce.ClientMVC.Controllers
                 TempData["ErrorMessage"] = "Failed to remove the item from the cart.";
             }
             
-            var cartItems = await _cartService.GetCartOfCustomer(9);
+            var cartItems = await _cartService.GetCartOfCustomerAsync(customerId);
             return View("Index", cartItems);
         }
     }

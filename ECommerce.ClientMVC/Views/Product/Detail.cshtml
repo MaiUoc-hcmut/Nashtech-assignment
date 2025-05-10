@@ -95,7 +95,7 @@
         <div class="action-buttons">
             @{
                 var cartId = AuthService.GetCurrentUser()?.CartId;
-                var isAuthenticated = await AuthService.IsAuthenticated();
+                var isAuthenticated = await AuthService.IsAuthenticatedAsync();
                 <button type="submit" class="add-to-cart-btn">
                     <input type="hidden" id="cartId" value="@cartId" />
                     <input type="hidden" id="variantIdInput" value="" />

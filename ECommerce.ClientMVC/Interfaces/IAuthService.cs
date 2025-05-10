@@ -10,7 +10,7 @@ namespace Ecommerce.ClientMVC.Interface
         Task<RegisterResponse> RegisterAsync(RegisterParameter model);
         void StoreUserData(LoginResponse response);
         CustomerResponse? GetCurrentUser();
-        Task<bool> IsAuthenticated();
-        Task<bool> Logout();
+        Task<bool> IsAuthenticatedAsync();
+        Task<bool> LogoutAsync();
     }
 }

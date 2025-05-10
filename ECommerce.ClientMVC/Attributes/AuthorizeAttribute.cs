@@ -11,7 +11,7 @@ namespace Ecommerce.ClientMVC.Attributes
         {
             var authService = context.HttpContext.RequestServices.GetService<IAuthService>();
             
-            if (authService == null || !await authService.IsAuthenticated())
+            if (authService == null || !await authService.IsAuthenticatedAsync())
             {
                 // User is not authenticated, redirect to login
                 context.Result = new RedirectToActionResult("Login", "Account", null);

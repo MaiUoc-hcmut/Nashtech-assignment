@@ -17,7 +17,7 @@ namespace Ecommerce.ClientMVC.Controllers
         [HttpGet]
         public async Task<IActionResult> Login()
         {
-            if (await _authService.IsAuthenticated())
+            if (await _authService.IsAuthenticatedAsync())
             {
                 return RedirectToAction("Index", "Home");
             }
@@ -48,7 +48,7 @@ namespace Ecommerce.ClientMVC.Controllers
         [HttpGet]
         public async Task<IActionResult> Register()
         {
-            if (await _authService.IsAuthenticated())
+            if (await _authService.IsAuthenticatedAsync())
             {
                 return RedirectToAction("Index", "Home");
             }
@@ -78,7 +78,7 @@ namespace Ecommerce.ClientMVC.Controllers
         [HttpPost]
         public async Task<IActionResult> Logout()
         {
-            var result = await _authService.Logout();
+            var result = await _authService.LogoutAsync();
 
             if (result)
             {

@@ -36,7 +36,7 @@ namespace Ecommerce.ClientMVC.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateReview([FromBody] CreateReviewParameter model)
         {  
-            var result = await _reviewService.CreateReview(model.productId, model.rating, model.text);
+            var result = await _reviewService.CreateReviewAsync(model.productId, model.rating, model.text);
 
             return Json(new { success = true, redirectUrl = Url.Action("Index", "Profile") });
         }

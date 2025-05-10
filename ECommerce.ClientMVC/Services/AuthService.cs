@@ -89,14 +89,14 @@ namespace Ecommerce.ClientMVC.Services
             return null;
         }
 
-        public async Task<bool> IsAuthenticated()
+        public async Task<bool> IsAuthenticatedAsync()
         {
             var client = _httpClientFactory.CreateClient();
             bool IsAuthenticated = await client.GetFromJsonAsync<bool>($"{_apiBaseUrl}/api/Auth/customer/validate");
             return IsAuthenticated;
         }
         
-        public async Task<bool> Logout()
+        public async Task<bool> LogoutAsync()
         {
             try
             {
