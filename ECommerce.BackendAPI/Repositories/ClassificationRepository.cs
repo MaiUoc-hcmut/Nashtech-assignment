@@ -17,17 +17,17 @@ namespace Ecommerce.BackendAPI.Repositories
             _context = context;
         }
 
-        public async Task<IEnumerable<Classification>> GetAllClassifications()
+        public async Task<IEnumerable<Classification>> GetAllClassificationsAsync()
         {
             return await _context.Classifications.ToListAsync();
         }
 
-        public async Task<Classification?> GetClassificationById(int Id)
+        public async Task<Classification?> GetClassificationByIdAsync(int Id)
         {
             return await _context.Classifications.FindAsync(Id);
         }
 
-        public async Task<IEnumerable<Classification>> SearchClassificationByPattern(string pattern)
+        public async Task<IEnumerable<Classification>> SearchClassificationByPatternAsync(string pattern)
         {
             var query = _context.Classifications.AsQueryable();
             var term = pattern.ToLower();
@@ -38,13 +38,13 @@ namespace Ecommerce.BackendAPI.Repositories
             return response;
         }
 
-        public async Task<Classification?> CreateClassification(Classification classification)
+        public async Task<Classification?> CreateClassificationAsync(Classification classification)
         {
             var response = await _context.Classifications.AddAsync(classification);
             return (await SaveAsync() == true) ? response.Entity : null;
         }
 
-        public async Task<Classification?> UpdateClassification(ClassificationDTO request)
+        public async Task<Classification?> UpdateClassificationAsync(ClassificationDTO request)
         {
             var classification = await _context.Classifications.FindAsync(request.Id);
             if (classification == null) return null;
@@ -56,7 +56,7 @@ namespace Ecommerce.BackendAPI.Repositories
             return (await SaveAsync() == true) ? classification : null;
         }
 
-        public async Task<bool> DeleteClassification(Classification classification)
+        public async Task<bool> DeleteClassificationAsync(Classification classification)
         {
             _context.Classifications.Remove(classification);
             return await SaveAsync();

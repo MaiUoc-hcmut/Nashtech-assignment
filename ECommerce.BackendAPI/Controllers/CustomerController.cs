@@ -26,7 +26,7 @@ namespace Ecommerce.BackendAPI.Controllers
         {
             try
             {
-                var (totalCustomers, customers) = await _customerRepository.GetCustomers(pageNumber);
+                var (totalCustomers, customers) = await _customerRepository.GetCustomersAsync(pageNumber);
 
                 // Return the response
                 return Ok(new
@@ -53,7 +53,7 @@ namespace Ecommerce.BackendAPI.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetCustomerById(int id)
         {
-            var customer = await _customerRepository.GetCustomerById(id);
+            var customer = await _customerRepository.GetCustomerByIdAsync(id);
             if (customer == null)
             {
                 return NotFound(new { Message = "Customer not found." });
@@ -90,7 +90,7 @@ namespace Ecommerce.BackendAPI.Controllers
                 Address = customerDTO.Address
             };
             customer.Id = userId;
-            var updatedCustomer = await _customerRepository.UpdateCustomer(customer);
+            var updatedCustomer = await _customerRepository.UpdateCustomerAsync(customer);
             if (updatedCustomer == null)
             {
                 return NotFound(new { Message = "Customer not found." });
@@ -124,7 +124,7 @@ namespace Ecommerce.BackendAPI.Controllers
                 return BadRequest(new { Message = "New password and confirmation do not match." });
             }
 
-            var result = await _customerRepository.ChangePassword(userId, request);
+            var result = await _customerRepository.ChangePasswordAsync(userId, request);
             if (result == 1)
             {
                 return NotFound(new { Message = "Customer not found." });

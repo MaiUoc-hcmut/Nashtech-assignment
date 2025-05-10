@@ -39,7 +39,7 @@ namespace Ecommerce.BackendAPI.FiltersAction
 
             if (isParentCategoryEndpoint)
             {
-                var parentCategory = await _parentCategoryRepository.GetParentCategoryById(int.Parse(Id));
+                var parentCategory = await _parentCategoryRepository.GetParentCategoryByIdAsync(int.Parse(Id));
                 if (parentCategory == null) 
                 {
                     context.Result = new BadRequestObjectResult(new { Error = "ParentCategory not found" });
@@ -50,7 +50,7 @@ namespace Ecommerce.BackendAPI.FiltersAction
             }
             else if (isCategoryEndpoint)
             {
-                var category = await _categoryRepository.GetCategoryById(int.Parse(Id));
+                var category = await _categoryRepository.GetCategoryByIdAsync(int.Parse(Id));
                 if (category == null) 
                 {
                     context.Result = new BadRequestObjectResult(new { Error = "Category not found" });
@@ -61,7 +61,7 @@ namespace Ecommerce.BackendAPI.FiltersAction
             }
             else if (isClassificationEndpoint)
             {
-                var classification = await _classificationRepository.GetClassificationById(int.Parse(Id));
+                var classification = await _classificationRepository.GetClassificationByIdAsync(int.Parse(Id));
                 if (classification == null) 
                 {
                     context.Result = new BadRequestObjectResult(new { Error = "Classification not found" });

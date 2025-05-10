@@ -7,11 +7,11 @@ namespace Ecommerce.BackendAPI.Interfaces
     public interface IVariantRepository
     {
         Task<IDbContextTransaction> BeginTransactionAsync();
-        Task<Variant?> GetVariantById(int id);
-        Task<IEnumerable<Variant>> GetVariantsByProductId(int productId);
-        Task<bool> CreateVariant(Variant variant);
-        Task<bool> UpdateVariant(Variant variant);
-        Task<bool> DeleteVariant(int id);
-        Task<bool> Save();
+        Task<Variant?> GetVariantByIdAsync(int id);
+        Task<IEnumerable<Variant>> GetVariantsByProductIdAsync(int productId);
+        Task<bool> CreateVariantAsync(Variant variant);
+        Task<bool> UpdateVariantAsync(Variant variant);
+        Task<bool> DeleteVariantAsync(int id);
+        Task<bool> SaveAsync();
     }
 }

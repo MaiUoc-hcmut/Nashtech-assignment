@@ -21,14 +21,14 @@ namespace Ecommerce.BackendAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllClassifications()
         {
-            var classifications = await _classificationRepository.GetAllClassifications();
+            var classifications = await _classificationRepository.GetAllClassificationsAsync();
             return Ok(classifications);
         }
 
         [HttpGet("{Id}")]
         public async Task<IActionResult> GetClassificationById(int Id)
         {
-            var classification = await _classificationRepository.GetClassificationById(Id);
+            var classification = await _classificationRepository.GetClassificationByIdAsync(Id);
             if (classification == null) {
                 return NotFound(new { Error = "Classification not found" });
             }
@@ -38,7 +38,7 @@ namespace Ecommerce.BackendAPI.Controllers
         [HttpGet("search")]
         public async Task<IActionResult> SearchClassificationByPattern ([FromQuery] string pattern)
         {
-            var response = await _classificationRepository.SearchClassificationByPattern(pattern);
+            var response = await _classificationRepository.SearchClassificationByPatternAsync(pattern);
             return Ok(response);
         }
 
@@ -55,7 +55,7 @@ namespace Ecommerce.BackendAPI.Controllers
                 Description = request.Description
             };
 
-            var response = await _classificationRepository.CreateClassification(classification);
+            var response = await _classificationRepository.CreateClassificationAsync(classification);
             return Ok(response);
         }
 
@@ -68,7 +68,7 @@ namespace Ecommerce.BackendAPI.Controllers
             if (request == null)   return BadRequest("Invalid category data");
             request.Id = Id;
 
-            var response = await _classificationRepository.UpdateClassification(request);
+            var response = await _classificationRepository.UpdateClassificationAsync(request);
             if (response == null) return NotFound(new { Error = "Classification not found" });
             return Ok(response);
         }
@@ -82,7 +82,7 @@ namespace Ecommerce.BackendAPI.Controllers
             var classification = HttpContext.Items["Classification"] as Classification;
             if (classification == null) return BadRequest("Bad request");
 
-            if (!await _classificationRepository.DeleteClassification(classification))
+            if (!await _classificationRepository.DeleteClassificationAsync(classification))
             {
                 return NotFound(new { Error = "Classification not found" });
             }

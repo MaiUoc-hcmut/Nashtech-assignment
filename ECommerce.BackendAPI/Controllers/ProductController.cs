@@ -40,7 +40,7 @@ namespace Ecommerce.BackendAPI.Controllers
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 10,
             [FromQuery] string sortBy = "UpdatedAt",
-            [FromQuery] bool isAsc = true,
+            [FromQuery] bool isAsc = false,
             [FromQuery] int? classificationId = null,
             [FromQuery] int minPrice = 0,
             [FromQuery] int maxPrice = 999999999,
@@ -51,7 +51,7 @@ namespace Ecommerce.BackendAPI.Controllers
             try
             {
                 // Retrieve total products and paginated products
-                var (totalProducts, products) = await _productRepository.GetAllProducts(
+                var (totalProducts, products) = await _productRepository.GetAllProductsAsync(
                     pageNumber,
                     pageSize,
                     sortBy,
@@ -79,7 +79,7 @@ namespace Ecommerce.BackendAPI.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetProductById(int id, [FromQuery] string? includeVariant = null)
         {
-            var product = await _productRepository.GetProductById(id);
+            var product = await _productRepository.GetProductByIdAsync(id);
             if (product == null)
             {
                 return NotFound();
@@ -140,7 +140,7 @@ namespace Ecommerce.BackendAPI.Controllers
             List<object>? variants = null;
             if (includeVariant != null && includeVariant.ToLower() == "true")
             {
-                var variantEntities = await _variantRepository.GetVariantsByProductId(id);
+                var variantEntities = await _variantRepository.GetVariantsByProductIdAsync(id);
                 variants = variantEntities.Select(v => new
                 {
                     v.Id,
@@ -246,7 +246,7 @@ namespace Ecommerce.BackendAPI.Controllers
                 }           
                 var classificationList = new List<Classification>();
                 foreach (var Id in classificationIdList) {
-                    var classification = await _classificationRepository.GetClassificationById(int.Parse(Id));
+                    var classification = await _classificationRepository.GetClassificationByIdAsync(int.Parse(Id));
                     if (classification == null) return BadRequest(new { Error = $"Classification with Id = {Id} not found"});
                     classificationList.Add(classification);
                 }
@@ -257,7 +257,7 @@ namespace Ecommerce.BackendAPI.Controllers
                     Description = productDto.Description,
                     ImageUrl = productDto.ImageUrl
                 };
-                var productCreated = await _productRepository.CreateProduct(product, classificationList);
+                var productCreated = await _productRepository.CreateProductAsync(product, classificationList);
 
                 if (variantList.Count > 0)
                 {
@@ -282,7 +282,7 @@ namespace Ecommerce.BackendAPI.Controllers
                         };
                         variantEntity.Product = productCreated;
                         variantEntity.VariantCategories = variantCategories;
-                        await _variantRepository.CreateVariant(variantEntity);
+                        await _variantRepository.CreateVariantAsync(variantEntity);
                     }
                 }
 
@@ -315,7 +315,7 @@ namespace Ecommerce.BackendAPI.Controllers
                 Id = id
             };
 
-            if (!await _productRepository.UpdateProduct(product))
+            if (!await _productRepository.UpdateProductAsync(product))
             {
                 return NotFound($"Product with ID {id} not found.");
             }
@@ -334,7 +334,7 @@ namespace Ecommerce.BackendAPI.Controllers
             {
                 return BadRequest("You do not have permission to perform this action.");
             }
-            if (!await _productRepository.DeleteProduct(id))
+            if (!await _productRepository.DeleteProductAsync(id))
             {
                 return NotFound($"Product with ID {id} not found.");
             }

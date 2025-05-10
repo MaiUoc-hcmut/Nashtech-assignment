@@ -23,7 +23,7 @@ namespace Ecommerce.BackendAPI.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Variant>> GetVariantById(int id)
         {
-            var variant = await _variantRepository.GetVariantById(id);
+            var variant = await _variantRepository.GetVariantByIdAsync(id);
             if (variant == null) return NotFound();
             return Ok(variant);
         }
@@ -31,7 +31,7 @@ namespace Ecommerce.BackendAPI.Controllers
         [HttpGet("product/{productId}")]
         public async Task<ActionResult<IEnumerable<Variant>>> GetVariantsByProductId(int productId)
         {
-            var response = await _variantRepository.GetVariantsByProductId(productId);
+            var response = await _variantRepository.GetVariantsByProductIdAsync(productId);
             var variants = response.Select(v => new Variant {
                 Id = v.Id,
                 SKU = v.SKU,
@@ -57,7 +57,7 @@ namespace Ecommerce.BackendAPI.Controllers
             if (variantDto == null) return BadRequest("Invalid variant data.");
             if (Categories == null) return BadRequest("Invalid category data.");
 
-            var product = await _productRepository.GetProductById(productId);
+            var product = await _productRepository.GetProductByIdAsync(productId);
             if (product == null) return BadRequest(new { Error = "Invalid productId" });
 
             var variant = new Variant {
@@ -84,7 +84,7 @@ namespace Ecommerce.BackendAPI.Controllers
 
             variant.ImageUrl = url != null ? url : "";
             variant.VariantCategories = categoryList;
-            await _variantRepository.CreateVariant(variant);
+            await _variantRepository.CreateVariantAsync(variant);
             return Ok("Variant created successfully.");
         }
     
@@ -98,7 +98,7 @@ namespace Ecommerce.BackendAPI.Controllers
         {
             if (variantDto == null) return BadRequest("Invalid variant data.");
 
-            var variant = await _variantRepository.GetVariantById(id);
+            var variant = await _variantRepository.GetVariantByIdAsync(id);
             if (variant == null) return NotFound("Variant not found.");
 
             var url = HttpContext.Items["Url"] as string;
@@ -113,17 +113,17 @@ namespace Ecommerce.BackendAPI.Controllers
                 }
             }
 
-            await _variantRepository.UpdateVariant(variant);
+            await _variantRepository.UpdateVariantAsync(variant);
             return Ok("Variant updated successfully.");
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteVariant(int id)
         {
-            var variant = await _variantRepository.GetVariantById(id);
+            var variant = await _variantRepository.GetVariantByIdAsync(id);
             if (variant == null) return NotFound("Variant not found.");
 
-            await _variantRepository.DeleteVariant(id);
+            await _variantRepository.DeleteVariantAsync(id);
             return Ok("Variant deleted successfully.");
         }
     }

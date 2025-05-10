@@ -23,7 +23,7 @@ namespace Ecommerce.BackendAPI.Repositories
             return await _context.Database.BeginTransactionAsync();
         }
 
-        public async Task<Customer> Register(RegisterParameter request)
+        public async Task<Customer> RegisterAsync(RegisterParameter request)
         {
             
             var customer = new Customer
@@ -42,7 +42,7 @@ namespace Ecommerce.BackendAPI.Repositories
             return customer;
         }
 
-        public async Task<Customer?> Login(LoginParameter request)
+        public async Task<Customer?> LoginAsync(LoginParameter request)
         {
             var customer = await _context.Customers.FirstOrDefaultAsync(x => x.Email == request.Email);
             if (customer == null) return null;
@@ -56,7 +56,7 @@ namespace Ecommerce.BackendAPI.Repositories
             return null;
         }
     
-        public async Task<Admin?> AdminLogin(LoginParameter request)
+        public async Task<Admin?> AdminLoginAsync(LoginParameter request)
         {
             var admin = await _context.Admins.FirstOrDefaultAsync(x => x.Email == request.Email);
             if (admin == null) return null;

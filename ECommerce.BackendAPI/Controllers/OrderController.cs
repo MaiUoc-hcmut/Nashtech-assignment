@@ -28,7 +28,7 @@ namespace Ecommerce.BackendAPI.Controllers
             try
             {
                 // Retrieve total orders and paginated list of orders
-                var (totalOrders, orders) = await _orderRepository.GetAllOrders(pageNumber);
+                var (totalOrders, orders) = await _orderRepository.GetAllOrdersAsync(pageNumber);
 
                 // Format the response
                 var response = new
@@ -57,7 +57,7 @@ namespace Ecommerce.BackendAPI.Controllers
         [ServiceFilter(typeof(GetOrderFilter))]
         public async Task<IActionResult> GetOrderById(int orderId)
         {
-            var order = await _orderRepository.GetOrderById(orderId);
+            var order = await _orderRepository.GetOrderByIdAsync(orderId);
             if (order == null) return NotFound();
 
             return Ok(order);
@@ -68,7 +68,7 @@ namespace Ecommerce.BackendAPI.Controllers
         [ServiceFilter(typeof(GetOrderFilter))]
         public async Task<IActionResult> GetOrdersByUserId(int customerId)
         {
-            var orders = await _orderRepository.GetOrderByUserId(customerId);
+            var orders = await _orderRepository.GetOrderByUserIdAsync(customerId);
             if (orders == null) return NotFound();
 
             var response = orders.Select(order => new
@@ -107,7 +107,7 @@ namespace Ecommerce.BackendAPI.Controllers
         [ServiceFilter(typeof(GetOrderFilter))]
         public async Task<IActionResult> GetOrdersOfProduct(int productId)
         {
-            var orders = await _orderRepository.GetOrdersOfProduct(productId);
+            var orders = await _orderRepository.GetOrdersOfProductAsync(productId);
 
             return Ok(orders);
         }
@@ -128,7 +128,7 @@ namespace Ecommerce.BackendAPI.Controllers
             var variantList = new List<Variant>();
             foreach(var id in request.Variants)
             {
-                var variant = await _variantRepository.GetVariantById(id);
+                var variant = await _variantRepository.GetVariantByIdAsync(id);
                 if (variant == null) {
                     return BadRequest(new { message = $"Variant with Id={id} not found" });
                 }
@@ -146,7 +146,7 @@ namespace Ecommerce.BackendAPI.Controllers
                     Variant = v
                 }).ToList()
             };
-            var result = await _orderRepository.CreateOrder(order);
+            var result = await _orderRepository.CreateOrderAsync(order);
 
             if (!result) return StatusCode(500, "Something went wrong while creating the order");
 

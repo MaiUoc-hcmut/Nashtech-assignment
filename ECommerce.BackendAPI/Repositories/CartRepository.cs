@@ -16,7 +16,7 @@ namespace Ecommerce.BackendAPI.Repositories
             _context = context;
         }
 
-        public async Task<Cart?> GetCartOfCustomer(int customerId, bool? includeVariants = true)
+        public async Task<Cart?> GetCartOfCustomerAsync(int customerId, bool? includeVariants = true)
         {
             if (includeVariants == true)
             {
@@ -37,7 +37,7 @@ namespace Ecommerce.BackendAPI.Repositories
                 .FirstOrDefaultAsync(c => c.Customer.Id == customerId);
         }
 
-        public async Task<bool> AddToCart(Cart cart, Variant variant, int quantity)
+        public async Task<bool> AddToCartAsync(Cart cart, Variant variant, int quantity)
         {
             var variantCartExist = await _context.VariantCarts
                 .AnyAsync(vc => vc.Cart.Id == cart.Id && vc.Variant.Id == variant.Id);
@@ -59,7 +59,7 @@ namespace Ecommerce.BackendAPI.Repositories
             return true;
         }
     
-        public async Task<bool> RemoveFromCart(Cart cart, Variant variant)
+        public async Task<bool> RemoveFromCartAsync(Cart cart, Variant variant)
         {
             var variantCart = await _context.VariantCarts
                 .FirstOrDefaultAsync(vc => vc.Cart.Id == cart.Id && vc.Variant.Id == variant.Id);

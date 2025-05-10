@@ -22,14 +22,14 @@ namespace Ecommerce.BackendAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllCategories()
         {
-            var categories = await _categoryRepository.GetAllCategories();
+            var categories = await _categoryRepository.GetAllCategoriesAsync();
             return Ok(categories);
         }
 
         [HttpGet("{Id}")]
         public async Task<IActionResult> GetCategoryById(int Id)
         {
-            var category = await _categoryRepository.GetCategoryById(Id);
+            var category = await _categoryRepository.GetCategoryByIdAsync(Id);
             if (category == null) return NotFound("Category not found");
             return Ok(category);
         }
@@ -37,7 +37,7 @@ namespace Ecommerce.BackendAPI.Controllers
         [HttpGet("GetCategoriesByParentId/{parentId}")]
         public async Task<IActionResult> GetCategoriesByParentId(int parentId)
         {
-            var categories = await _categoryRepository.GetCategoriesByParentId(parentId);
+            var categories = await _categoryRepository.GetCategoriesByParentIdAsync(parentId);
             if (categories == null || categories.Count == 0) return NotFound("No categories found for this parent ID");
             return Ok(categories);
         }
@@ -45,7 +45,7 @@ namespace Ecommerce.BackendAPI.Controllers
         [HttpGet("search")]
         public async Task<IActionResult> SearchCategoryByPattern([FromQuery] string pattern)
         {
-            var categories = await _categoryRepository.SearchCategoryByPattern(pattern);
+            var categories = await _categoryRepository.SearchCategoryByPatternAsync(pattern);
             return Ok(categories);
         }
 
@@ -56,10 +56,10 @@ namespace Ecommerce.BackendAPI.Controllers
         {
             if (categoryDto == null) return BadRequest("Invalid category data");
 
-            var parentCategory = await _parentCategoryRepo.GetParentCategoryById(parentId);
+            var parentCategory = await _parentCategoryRepo.GetParentCategoryByIdAsync(parentId);
             if (parentCategory == null) return NotFound("Parent category not found");
 
-            var categoryCreated = await _categoryRepository.CreateCategory(categoryDto, parentCategory);
+            var categoryCreated = await _categoryRepository.CreateCategoryAsync(categoryDto, parentCategory);
             return Ok(categoryCreated);
         }
 
@@ -72,7 +72,7 @@ namespace Ecommerce.BackendAPI.Controllers
             if (request == null) return BadRequest("Invalid category data");
             request.Id = Id;
 
-            var categoryUpdated = await _categoryRepository.UpdateCategory(request);
+            var categoryUpdated = await _categoryRepository.UpdateCategoryAsync(request);
             if (categoryUpdated == null) return NotFound("Category not found or update failed");
 
             return Ok(categoryUpdated);
@@ -84,7 +84,7 @@ namespace Ecommerce.BackendAPI.Controllers
         [ServiceFilter(typeof(CategoryAndParentAndClassificationFilter))]
         public async Task<IActionResult> DeleteCategory(int Id)
         {
-            var deleted = await _categoryRepository.DeleteCategory(Id);
+            var deleted = await _categoryRepository.DeleteCategoryAsync(Id);
             if (!deleted) return NotFound("Category not found or delete failed");
 
             return Ok("Category deleted successfully");

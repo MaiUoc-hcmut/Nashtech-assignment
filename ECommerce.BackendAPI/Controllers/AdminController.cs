@@ -41,7 +41,7 @@ namespace Ecommerce.BackendAPI.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetAdminById(int id)
         {
-            var admin = await _adminRepository.GetAdminById(id);
+            var admin = await _adminRepository.GetAdminByIdAsync(id);
             if (admin == null)
             {
                 return NotFound(new { Message = "Customer not found" });
@@ -63,7 +63,7 @@ namespace Ecommerce.BackendAPI.Controllers
                 Address = request.Address,
             };
 
-            var response = await _adminRepository.CreateAdminAccount(admin);
+            var response = await _adminRepository.CreateAdminAccountAsync(admin);
             return Ok(response);
         }
     

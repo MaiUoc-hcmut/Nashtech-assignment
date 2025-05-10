@@ -16,7 +16,7 @@ namespace Ecommerce.BackendAPI.Repositories
             _context = context;
         }
 
-        public async Task<IList<Category>> GetAllCategories()
+        public async Task<IList<Category>> GetAllCategoriesAsync()
         {
             return await _context.Categories
                 .Include(c => c.ParentCategory)
@@ -30,17 +30,17 @@ namespace Ecommerce.BackendAPI.Repositories
                 .ToListAsync();
         }
 
-        public async Task<Category?> GetCategoryById(int id)
+        public async Task<Category?> GetCategoryByIdAsync(int id)
         {
             return await _context.Categories.FindAsync(id);
         }
 
-        public async Task<IList<Category>> GetCategoriesByParentId(int parentId)
+        public async Task<IList<Category>> GetCategoriesByParentIdAsync(int parentId)
         {
             return await _context.Categories.Where(c => c.ParentCategory.Id == parentId).ToListAsync();
         }
 
-        public async Task<IEnumerable<Category>> SearchCategoryByPattern(string pattern)
+        public async Task<IEnumerable<Category>> SearchCategoryByPatternAsync(string pattern)
         {
             var query = _context.Categories.AsQueryable();
             var term = pattern.ToLower();
@@ -51,7 +51,7 @@ namespace Ecommerce.BackendAPI.Repositories
             return response;
         }
 
-        public async Task<Category?> CreateCategory(CategoryDTO request, ParentCategory parentCategory)
+        public async Task<Category?> CreateCategoryAsync(CategoryDTO request, ParentCategory parentCategory)
         {
             var category = new Category
             {
@@ -64,7 +64,7 @@ namespace Ecommerce.BackendAPI.Repositories
             return (await SaveAsync() == true) ? response.Entity : null;
         }
 
-        public async Task<Category?> UpdateCategory(CategoryDTO request)
+        public async Task<Category?> UpdateCategoryAsync(CategoryDTO request)
         {
             var category = await _context.Categories.FindAsync(request.Id);
             if (category == null) return null;
@@ -75,7 +75,7 @@ namespace Ecommerce.BackendAPI.Repositories
             return (await SaveAsync() == true) ? category : null;
         }
 
-        public async Task<bool> DeleteCategory(int id)
+        public async Task<bool> DeleteCategoryAsync(int id)
         {
             var category = await _context.Categories.FindAsync(id);
             if (category == null) return false;

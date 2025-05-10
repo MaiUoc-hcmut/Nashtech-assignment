@@ -37,10 +37,10 @@ namespace Ecommerce.BackendAPI.FiltersAction
                 return;
             }
 
-            var admin = await _adminRepository.GetAdminById(int.Parse(userId));
+            var admin = await _adminRepository.GetAdminByIdAsync(int.Parse(userId));
 
             if (orderId != null) {
-                var order = await _orderRepository.GetOrderById(int.Parse(orderId));
+                var order = await _orderRepository.GetOrderByIdAsync(int.Parse(orderId));
                 if (order == null)
                 {
                     context.Result = new NotFoundObjectResult(new { Error = "Order not found" });
@@ -53,7 +53,7 @@ namespace Ecommerce.BackendAPI.FiltersAction
                     return;
                 }
             } else if (customerId != null) {
-                var customer = await _customerRepository.GetCustomerById(int.Parse(customerId));
+                var customer = await _customerRepository.GetCustomerByIdAsync(int.Parse(customerId));
                 if (customer == null)
                 {
                     context.Result = new NotFoundObjectResult(new { Error = "Customer not found" });
@@ -66,7 +66,7 @@ namespace Ecommerce.BackendAPI.FiltersAction
                     return;
                 }
             } else if (productId != null) {
-                var product = await _orderRepository.GetOrdersOfProduct(int.Parse(productId));
+                var product = await _orderRepository.GetOrdersOfProductAsync(int.Parse(productId));
                 if (product == null)
                 {
                     context.Result = new NotFoundObjectResult(new { Error = "Product not found" });
@@ -103,7 +103,7 @@ namespace Ecommerce.BackendAPI.FiltersAction
                 return;
             }
 
-            var admin = await _adminrepository.GetAdminById(int.Parse(adminId));
+            var admin = await _adminrepository.GetAdminByIdAsync(int.Parse(adminId));
             if (admin == null)
             {
                 context.Result = new NotFoundObjectResult(new { Error = "Admin not found" });
@@ -131,7 +131,7 @@ namespace Ecommerce.BackendAPI.FiltersAction
 
             var customerId = httpContext.Items["UserId"]?.ToString();
             var customer = customerId != null 
-                ? await _customerRepository.GetCustomerById(int.Parse(customerId)) 
+                ? await _customerRepository.GetCustomerByIdAsync(int.Parse(customerId)) 
                 : null;
             if (customer == null) {
                 context.Result = new BadRequestObjectResult(new { Error = "Invalid customer" });

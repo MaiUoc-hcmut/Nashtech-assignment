@@ -47,13 +47,13 @@ namespace Ecommerce.BackendAPI.Controllers
                 var hashedPassword = _authService.HashPassword(request.Password);
                 request.Password = hashedPassword;
 
-                var customer = await _customerRepository.GetCustomerByEmail(request.Email);
+                var customer = await _customerRepository.GetCustomerByEmailAsync(request.Email);
                 if (customer != null) 
                 {
                     return BadRequest("This email already exist!");
                 }
                 
-                var registeredUser = await _authRepository.Register(request);
+                var registeredUser = await _authRepository.RegisterAsync(request);
 
                 if (registeredUser == null)
                 {
@@ -75,13 +75,13 @@ namespace Ecommerce.BackendAPI.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginParameter request)
         {
-            var customer = await _authRepository.Login(request);
+            var customer = await _authRepository.LoginAsync(request);
 
             if (customer == null)
             {
                 return Unauthorized(new { message = "Invalid username or password." });
             }
-            var cart = await _cartRepository.GetCartOfCustomer(customer.Id, false);
+            var cart = await _cartRepository.GetCartOfCustomerAsync(customer.Id, false);
             if (cart == null)
             {
                 return NotFound(new { message = "Cart not found." });
@@ -118,7 +118,7 @@ namespace Ecommerce.BackendAPI.Controllers
         [HttpPost("admin/login")]
         public async Task<IActionResult> AdminLogin([FromBody] LoginParameter request)
         {
-            var admin = await _authRepository.AdminLogin(request);
+            var admin = await _authRepository.AdminLoginAsync(request);
 
             if (admin == null)
             {

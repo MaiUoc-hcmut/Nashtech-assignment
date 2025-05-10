@@ -28,7 +28,7 @@ namespace Ecommerce.BackendAPI.Repositories
             return await _context.Database.BeginTransactionAsync();
         }
 
-        public async Task<Product?> GetProductById(int id, bool includeRelated = true)
+        public async Task<Product?> GetProductByIdAsync(int id, bool includeRelated = true)
         {
             if (!includeRelated)
             {
@@ -62,7 +62,7 @@ namespace Ecommerce.BackendAPI.Repositories
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
 
-        public async Task<(int TotalProducts, IEnumerable<ProductsGetAllProductsResponse> Products)> GetAllProducts
+        public async Task<(int TotalProducts, IEnumerable<ProductsGetAllProductsResponse> Products)> GetAllProductsAsync
         (
             int pageNumber,
             int pageSize,
@@ -128,7 +128,7 @@ namespace Ecommerce.BackendAPI.Repositories
             return (totalProducts, productsWithRatings);
         }
 
-        public async Task<Product> CreateProduct(Product product, IList<Classification> classificationList)
+        public async Task<Product> CreateProductAsync(Product product, IList<Classification> classificationList)
         {
             var response = await _context.Products.AddAsync(product);
             foreach (var classification in classificationList) {
@@ -139,26 +139,26 @@ namespace Ecommerce.BackendAPI.Repositories
                 };
                 await _context.ProductClassifications.AddAsync(newItems);
             }
-            await Save();
+            await SaveAsync();
             return response.Entity;
         }
 
-        public async Task<bool> UpdateProduct(Product product)
+        public async Task<bool> UpdateProductAsync(Product product)
         {
             _context.Products.Update(product);
-            return await Save();
+            return await SaveAsync();
         }
         
-        public async Task<bool> DeleteProduct(int id)
+        public async Task<bool> DeleteProductAsync(int id)
         {
-            var product = await GetProductById(id);
+            var product = await GetProductByIdAsync(id);
             if (product == null) return false;
 
             _context.Products.Remove(product);
-            return await Save();
+            return await SaveAsync();
         }
 
-        public async Task<bool> Save()
+        public async Task<bool> SaveAsync()
         {
             return await _context.SaveChangesAsync() > 0;
         }

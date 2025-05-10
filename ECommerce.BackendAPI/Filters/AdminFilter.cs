@@ -37,7 +37,7 @@ namespace Ecommerce.BackendAPI.FiltersAction
                 return;
             }
 
-            var admin = await _adminrepository.GetAdminById(int.Parse(Id));
+            var admin = await _adminrepository.GetAdminByIdAsync(int.Parse(Id));
             if (admin == null) 
             {
                 if (isValidateEndpoint)

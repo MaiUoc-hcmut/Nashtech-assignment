@@ -30,7 +30,7 @@ namespace Ecommerce.BackendAPI.FiltersAction
             }
 
             Console.WriteLine("End");
-            var cart = await _cartRepository.GetCartOfCustomer(int.Parse(cartId));
+            var cart = await _cartRepository.GetCartOfCustomerAsync(int.Parse(cartId));
             if (cart == null)
             {
                 context.Result = new NotFoundObjectResult(new { Error = "Cart not found" });
@@ -45,7 +45,7 @@ namespace Ecommerce.BackendAPI.FiltersAction
             }
 
             Console.WriteLine("End");
-            var variant = await _variantRepository.GetVariantById(int.Parse(variantId));
+            var variant = await _variantRepository.GetVariantByIdAsync(int.Parse(variantId));
             if (variant == null)
             {
                 context.Result = new NotFoundObjectResult(new { Error = "Variant not found" });
@@ -83,7 +83,7 @@ namespace Ecommerce.BackendAPI.FiltersAction
                 return;
             }
 
-            var cart = await _cartRepository.GetCartOfCustomer(int.Parse(cartId));
+            var cart = await _cartRepository.GetCartOfCustomerAsync(int.Parse(cartId));
             if (cart == null)
             {
                 context.Result = new NotFoundObjectResult(new { Error = "Cart not found" });
@@ -95,7 +95,7 @@ namespace Ecommerce.BackendAPI.FiltersAction
                 context.Result = new UnauthorizedObjectResult(new { Error = "Unauthorized access to cart" });
                 return;
             }
-            var variant = await _variantRepository.GetVariantById(int.Parse(variantId));
+            var variant = await _variantRepository.GetVariantByIdAsync(int.Parse(variantId));
             if (variant == null)
             {
                 context.Result = new NotFoundObjectResult(new { Error = "Variant not found" });

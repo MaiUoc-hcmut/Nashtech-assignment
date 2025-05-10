@@ -5,13 +5,13 @@ namespace Ecommerce.BackendAPI.Interfaces
 {
     public interface IOrderRepository
     {
-        Task<(int TotalOrders, IEnumerable<Order> Orders)> GetAllOrders(int pageNumber = 1); // For admin
-        Task<Order?> GetOrderById(int orderId);
-        Task<IEnumerable<Order>> GetOrderByUserId(int customerId);
-        Task<IEnumerable<Order>> GetOrdersOfProduct(int productId);
-        Task<bool> CreateOrder(Order order);
+        Task<(int TotalOrders, IEnumerable<Order> Orders)> GetAllOrdersAsync(int pageNumber = 1); // For admin
+        Task<Order?> GetOrderByIdAsync(int orderId);
+        Task<IEnumerable<Order>> GetOrderByUserIdAsync(int customerId);
+        Task<IEnumerable<Order>> GetOrdersOfProductAsync(int productId);
+        Task<bool> CreateOrderAsync(Order order);
         // Task<bool> UpdateOrder(Order order);
-        Task<bool> DeleteOrder(int orderId);
-        Task<bool> Save();
+        Task<bool> DeleteOrderAsync(int orderId);
+        Task<bool> SaveAsync();
     }
 }

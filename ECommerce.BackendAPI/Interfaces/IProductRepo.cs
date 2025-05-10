@@ -11,7 +11,7 @@ namespace Ecommerce.BackendAPI.Interfaces
     {
         public void AttachProductClassification(ProductClassification productClassification);
         Task<IDbContextTransaction> BeginTransactionAsync();
-        Task<(int TotalProducts, IEnumerable<ProductsGetAllProductsResponse> Products)> GetAllProducts(
+        Task<(int TotalProducts, IEnumerable<ProductsGetAllProductsResponse> Products)> GetAllProductsAsync(
             int pageNumber,
             int pageSize,
             string sortBy,
@@ -21,12 +21,12 @@ namespace Ecommerce.BackendAPI.Interfaces
             int maxPrice,
             string? search
         );
-        Task<Product?> GetProductById(int id, bool includeRelated = true);
-        Task<Product> CreateProduct(Product product, IList<Classification> classificationList);
-        Task<bool> UpdateProduct(Product product);
-        Task<bool> DeleteProduct(int id);
+        Task<Product?> GetProductByIdAsync(int id, bool includeRelated = true);
+        Task<Product> CreateProductAsync(Product product, IList<Classification> classificationList);
+        Task<bool> UpdateProductAsync(Product product);
+        Task<bool> DeleteProductAsync(int id);
         // Task<IEnumerable<ProductDTO>> GetProductsByCategory(int categoryId);
         // Task<IEnumerable<ProductDTO>> SearchProducts(string searchTerm);
-        Task<bool> Save();
+        Task<bool> SaveAsync();
     }
 }

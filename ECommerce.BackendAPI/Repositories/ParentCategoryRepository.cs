@@ -17,22 +17,22 @@ namespace Ecommerce.BackendAPI.Repositories
             _context = context;
         }
 
-        public async Task<List<ParentCategory>> GetAllParentCategories()
+        public async Task<List<ParentCategory>> GetAllParentCategoriesAsync()
         {
             return await _context.ParentCategories.AsNoTracking().ToListAsync();
         }
 
-        public async Task<ParentCategory?> GetParentCategoryById(int id)
+        public async Task<ParentCategory?> GetParentCategoryByIdAsync(int id)
         {
             return await _context.ParentCategories.FindAsync(id);
         }
 
-        public async Task<ParentCategory?> GetParentCategoryByName(string name)
+        public async Task<ParentCategory?> GetParentCategoryByNameAsync(string name)
         {
             return await _context.ParentCategories.FirstOrDefaultAsync(pc => pc.Name == name);
         }
 
-        public async Task<List<ParentCategory>> SearchParentCategoryByPattern(string pattern)
+        public async Task<List<ParentCategory>> SearchParentCategoryByPatternAsync(string pattern)
         {
             var query = _context.ParentCategories.AsQueryable();
             var term = pattern.ToLower();
@@ -43,13 +43,13 @@ namespace Ecommerce.BackendAPI.Repositories
             return response;
         }
 
-        public async Task<ParentCategory?> CreateParentCategory(string Name)
+        public async Task<ParentCategory?> CreateParentCategoryAsync(string Name)
         {
             var parentCategory = await _context.ParentCategories.AddAsync(new ParentCategory { Name = Name });
             return (await SaveAsync() == true) ? parentCategory.Entity : null;
         }
 
-        public async Task<ParentCategory?> UpdateParentCategory(ParentCategoryDTO request)
+        public async Task<ParentCategory?> UpdateParentCategoryAsync(ParentCategoryDTO request)
         {
             var parentCategory = await _context.ParentCategories.FindAsync(request.Id);
             if (parentCategory == null) return null;
@@ -60,7 +60,7 @@ namespace Ecommerce.BackendAPI.Repositories
             return (await SaveAsync() == true) ? parentCategory : null;
         }
 
-        public async Task<bool> DeleteParentCategory(int id)
+        public async Task<bool> DeleteParentCategoryAsync(int id)
         {
             var parentCategory = await _context.ParentCategories.FindAsync(id);
             if (parentCategory == null) return false;

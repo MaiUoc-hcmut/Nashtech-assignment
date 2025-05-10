@@ -8,8 +8,8 @@ namespace Ecommerce.BackendAPI.Interfaces
     public interface IAuthRepository
     {
         Task<IDbContextTransaction> BeginTransactionAsync();
-        Task<Customer> Register(RegisterParameter request);
-        Task<Customer?> Login(LoginParameter request);
-        Task<Admin?> AdminLogin(LoginParameter request);
+        Task<Customer> RegisterAsync(RegisterParameter request);
+        Task<Customer?> LoginAsync(LoginParameter request);
+        Task<Admin?> AdminLoginAsync(LoginParameter request);
     }
 }

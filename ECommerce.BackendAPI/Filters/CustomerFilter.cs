@@ -93,7 +93,7 @@ namespace Ecommerce.BackendAPI.FiltersAction
                 await next();
                 return;
             }
-            var customer = await _customerRepository.GetCustomerById(int.Parse(customerId));
+            var customer = await _customerRepository.GetCustomerByIdAsync(int.Parse(customerId));
             if (customer == null)
             {
                 context.HttpContext.Items["isAuthenticated"] = false;
@@ -121,7 +121,7 @@ namespace Ecommerce.BackendAPI.FiltersAction
                 context.Result = new BadRequestObjectResult(new { Error = "User ID is missing or invalid." });
                 return;
             }
-            var user = await _customerRepository.GetCustomerById(int.Parse(userId));
+            var user = await _customerRepository.GetCustomerByIdAsync(int.Parse(userId));
             if (user == null)
             {
                 context.Result = new NotFoundObjectResult(new { Error = "User not found." });

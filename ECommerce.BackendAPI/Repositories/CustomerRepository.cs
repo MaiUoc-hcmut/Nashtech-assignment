@@ -20,7 +20,7 @@ namespace Ecommerce.BackendAPI.Repositories
             _authService = authService;
         }
 
-        public async Task<(int TotalCustomers, IEnumerable<Customer> Customers)> GetCustomers(int pageNumber = 1)
+        public async Task<(int TotalCustomers, IEnumerable<Customer> Customers)> GetCustomersAsync(int pageNumber = 1)
         {
             int pageSize = 10;
 
@@ -39,22 +39,22 @@ namespace Ecommerce.BackendAPI.Repositories
             return (totalCustomers, customers);
         }
 
-        public async Task<Customer?> GetCustomerById(int Id)
+        public async Task<Customer?> GetCustomerByIdAsync(int Id)
         {
             return await _context.Customers.FindAsync(Id);
         }
 
-        public async Task<Customer?> GetCustomerByUsername(string username)
+        public async Task<Customer?> GetCustomerByUsernameAsync(string username)
         {
             return await _context.Customers.AsNoTracking().FirstOrDefaultAsync(c => c.Username == username);
         }
 
-        public async Task<Customer?> GetCustomerByEmail(string email)
+        public async Task<Customer?> GetCustomerByEmailAsync(string email)
         {
             return await _context.Customers.AsNoTracking().FirstOrDefaultAsync(c => c.Email == email);
         }
 
-        public async Task<Customer?> UpdateCustomer(UpdateCustomerParameter customer)
+        public async Task<Customer?> UpdateCustomerAsync(UpdateCustomerParameter customer)
         {
             var existingCustomer = await _context.Customers.FindAsync(customer.Id);
             if (existingCustomer == null) return null;
@@ -71,7 +71,7 @@ namespace Ecommerce.BackendAPI.Repositories
             return existingCustomer;
         }
 
-        public async Task<int> ChangePassword(int Id, ChangePasswordParameter request)
+        public async Task<int> ChangePasswordAsync(int Id, ChangePasswordParameter request)
         {
             var customer = await _context.Customers.FindAsync(Id);
             if (customer == null) return 1;

@@ -21,7 +21,7 @@ namespace Ecommerce.BackendAPI.Controllers
         [HttpGet("{customerId}")]
         public async Task<IActionResult> GetCartOfCustomer(int customerId)
         {
-            var cart = await _cartRepository.GetCartOfCustomer(customerId, true);
+            var cart = await _cartRepository.GetCartOfCustomerAsync(customerId, true);
             if (cart == null)
             {
                 return NotFound(new { message = "Cart not found" });
@@ -79,7 +79,7 @@ namespace Ecommerce.BackendAPI.Controllers
                 return BadRequest(new { message = "Invalid cart or variant ID" });
             }
 
-            var result = await _cartRepository.AddToCart(cart, variant, quantity);
+            var result = await _cartRepository.AddToCartAsync(cart, variant, quantity);
             if (!result)
             {
                 return Conflict("Item already exists in the cart");
@@ -101,7 +101,7 @@ namespace Ecommerce.BackendAPI.Controllers
                 return BadRequest(new { message = "Invalid cart or variant ID" });
             }
 
-            var result = await _cartRepository.RemoveFromCart(cart, variant);
+            var result = await _cartRepository.RemoveFromCartAsync(cart, variant);
             if (!result)
             {
                 return NotFound("Item not found in the cart");

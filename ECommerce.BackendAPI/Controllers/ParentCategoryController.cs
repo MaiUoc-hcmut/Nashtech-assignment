@@ -22,14 +22,14 @@ namespace Ecommerce.BackendAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllParentCategories()
         {
-            var parentCategories = await _parentCategoryRepo.GetAllParentCategories();
+            var parentCategories = await _parentCategoryRepo.GetAllParentCategoriesAsync();
             return Ok(parentCategories);
         }
 
         [HttpGet("{Id}")]
         public async Task<IActionResult> GetParentCategoryById(int id)
         {
-            var parentCategory = await _parentCategoryRepo.GetParentCategoryById(id);
+            var parentCategory = await _parentCategoryRepo.GetParentCategoryByIdAsync(id);
             if (parentCategory == null)
             {
                 return NotFound();
@@ -40,7 +40,7 @@ namespace Ecommerce.BackendAPI.Controllers
         [HttpGet("search")]
         public async Task<IActionResult> SearchParentCategoryByPattern([FromQuery] string pattern)
         {
-            var parentCategories = await _parentCategoryRepo.SearchParentCategoryByPattern(pattern);
+            var parentCategories = await _parentCategoryRepo.SearchParentCategoryByPatternAsync(pattern);
             return Ok(parentCategories);
         }
 
@@ -54,7 +54,7 @@ namespace Ecommerce.BackendAPI.Controllers
                 return BadRequest("Parent category cannot be null.");
             }
 
-            var parentCategories = await _parentCategoryRepo.GetAllParentCategories();
+            var parentCategories = await _parentCategoryRepo.GetAllParentCategoriesAsync();
             var checkedParentCategory = parentCategories
                 .Where(pc => pc.Name.Trim().ToUpper() == request.Name.Trim().ToUpper())
                 .FirstOrDefault();
@@ -63,7 +63,7 @@ namespace Ecommerce.BackendAPI.Controllers
                 return BadRequest($"Parent category {request.Name} already exists.");
             }
 
-            var createdParentCategory = await _parentCategoryRepo.CreateParentCategory(request.Name);
+            var createdParentCategory = await _parentCategoryRepo.CreateParentCategoryAsync(request.Name);
             if (createdParentCategory == null) return BadRequest("Can not create parent category");
             return Ok(createdParentCategory);
         }
@@ -79,7 +79,7 @@ namespace Ecommerce.BackendAPI.Controllers
             request.Id = Id;
             
 
-            var response = await _parentCategoryRepo.UpdateParentCategory(request);
+            var response = await _parentCategoryRepo.UpdateParentCategoryAsync(request);
             if (response == null) {
                 return NotFound($"Parent category with ID {Id} not found.");
             }
@@ -93,7 +93,7 @@ namespace Ecommerce.BackendAPI.Controllers
         [ServiceFilter(typeof(CategoryAndParentAndClassificationFilter))]
         public async Task<IActionResult> DeleteParentCategory(int id)
         {
-            if (!await _parentCategoryRepo.DeleteParentCategory(id))
+            if (!await _parentCategoryRepo.DeleteParentCategoryAsync(id))
             {
                 return NotFound($"Parent category with ID {id} not found.");
             }

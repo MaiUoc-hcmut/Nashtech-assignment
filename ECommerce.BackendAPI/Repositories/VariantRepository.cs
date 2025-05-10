@@ -21,12 +21,12 @@ namespace Ecommerce.BackendAPI.Repositories
             return await _context.Database.BeginTransactionAsync();
         }
 
-        public async Task<Variant?> GetVariantById(int id)
+        public async Task<Variant?> GetVariantByIdAsync(int id)
         {
             return await _context.Variants.FindAsync(id);
         }
 
-        public async Task<IEnumerable<Variant>> GetVariantsByProductId(int productId)
+        public async Task<IEnumerable<Variant>> GetVariantsByProductIdAsync(int productId)
         {
             return await _context.Variants
                 .Include(v => v.VariantCategories)
@@ -53,28 +53,28 @@ namespace Ecommerce.BackendAPI.Repositories
                 .ToListAsync();
         }
 
-        public async Task<bool> CreateVariant(Variant variant)
+        public async Task<bool> CreateVariantAsync(Variant variant)
         {
             await _context.Variants.AddAsync(variant);
-            return await Save();
+            return await SaveAsync();
         }
 
-        public async Task<bool> UpdateVariant(Variant variant)
+        public async Task<bool> UpdateVariantAsync(Variant variant)
         {
             _context.Variants.Update(variant);
-            return await Save();
+            return await SaveAsync();
         }
 
-        public async Task<bool> DeleteVariant(int id)
+        public async Task<bool> DeleteVariantAsync(int id)
         {
-            var variant = await GetVariantById(id);
+            var variant = await GetVariantByIdAsync(id);
             if (variant == null) return false;
 
             _context.Variants.Remove(variant);
-            return await Save();
+            return await SaveAsync();
         }
 
-        public async Task<bool> Save()
+        public async Task<bool> SaveAsync()
         {
             return await _context.SaveChangesAsync() > 0;
         }

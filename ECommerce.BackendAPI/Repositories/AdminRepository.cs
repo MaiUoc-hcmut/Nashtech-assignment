@@ -17,12 +17,12 @@ namespace Ecommerce.BackendAPI.Repositories
             _context = context;
         }
 
-        public async Task<Admin?> GetAdminById(int Id)
+        public async Task<Admin?> GetAdminByIdAsync(int Id)
         {
             return await _context.Admins.FindAsync(Id);
         }
 
-        public async Task<Admin?> CreateAdminAccount(Admin admin)
+        public async Task<Admin?> CreateAdminAccountAsync(Admin admin)
         {
             var response = await _context.Admins.AddAsync(admin);
             return (await SaveAsync() == true) ? response.Entity : null;

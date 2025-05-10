@@ -15,7 +15,7 @@ namespace Ecommerce.BackendAPI.Repositories
             _context = context;
         }
 
-        public async Task<(int TotalOrders, IEnumerable<Order> Orders)> GetAllOrders(int pageNumber = 1)
+        public async Task<(int TotalOrders, IEnumerable<Order> Orders)> GetAllOrdersAsync(int pageNumber = 1)
         {
             int pageSize = 10;
 
@@ -32,7 +32,7 @@ namespace Ecommerce.BackendAPI.Repositories
             return (totalOrders, orders);
         }
 
-        public async Task<Order?> GetOrderById(int orderId)
+        public async Task<Order?> GetOrderByIdAsync(int orderId)
         {
             return await _context.Orders
                 .Include(o => o.VariantOrders)
@@ -40,7 +40,7 @@ namespace Ecommerce.BackendAPI.Repositories
                 .FirstOrDefaultAsync(o => o.Id == orderId);
         }
 
-        public async Task<IEnumerable<Order>> GetOrderByUserId(int customerId)
+        public async Task<IEnumerable<Order>> GetOrderByUserIdAsync(int customerId)
         {
             return await _context.Orders
                 .Include(o => o.VariantOrders)
@@ -56,7 +56,7 @@ namespace Ecommerce.BackendAPI.Repositories
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<Order>> GetOrdersOfProduct(int productId)
+        public async Task<IEnumerable<Order>> GetOrdersOfProductAsync(int productId)
         {
             return await _context.Orders
                 .Include(o => o.VariantOrders)
@@ -65,22 +65,22 @@ namespace Ecommerce.BackendAPI.Repositories
                 .ToListAsync();
         }
 
-        public async Task<bool> CreateOrder(Order order)
+        public async Task<bool> CreateOrderAsync(Order order)
         {
             await _context.Orders.AddAsync(order);
-            return await Save();
+            return await SaveAsync();
         }
 
-        public async Task<bool> DeleteOrder(int orderId)
+        public async Task<bool> DeleteOrderAsync(int orderId)
         {
             var order = await _context.Orders.FindAsync(orderId);
             if (order == null) return false;
 
             _context.Orders.Remove(order);
-            return await Save();
+            return await SaveAsync();
         }
 
-        public async Task<bool> Save()
+        public async Task<bool> SaveAsync()
         {
             return await _context.SaveChangesAsync() > 0;
         }

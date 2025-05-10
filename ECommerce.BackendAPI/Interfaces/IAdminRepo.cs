@@ -5,8 +5,8 @@ namespace Ecommerce.BackendAPI.Interfaces
 {
     public interface IAdminRepository
     {
-        Task<Admin?> GetAdminById(int Id);
-        Task<Admin?> CreateAdminAccount(Admin admin);
+        Task<Admin?> GetAdminByIdAsync(int Id);
+        Task<Admin?> CreateAdminAccountAsync(Admin admin);
         // Task<int> ChangePassword(int Id, ChangePasswordParameter request);
         // Task<IEnumerable<Customer>> GetAllCustomers();
         Task<bool> SaveAsync();

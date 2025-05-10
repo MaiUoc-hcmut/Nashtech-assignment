@@ -4,7 +4,7 @@ namespace Ecommerce.BackendAPI.Interfaces
 {
     public interface IReviewRepository
     {
-        Task<(int TotalReviews, IEnumerable<Review> Reviews)> GetReviews
+        Task<(int TotalReviews, IEnumerable<Review> Reviews)> GetReviewsAsync
         (
             List<int> productIds, 
             int pageNumber,
@@ -15,12 +15,12 @@ namespace Ecommerce.BackendAPI.Interfaces
             string sortBy,
             bool isAsc
         );
-        Task<IEnumerable<Review>> GetReviewsByProductId(int productId);
-        Task<IEnumerable<Review>> GetReviewsOfCustomer(int customerId);
-        Task<Review?> GetReview(int id);
-        Task<Review> AddReview(Review review);
-        Task<bool> UpdateReview(Review review);
-        Task<bool> DeleteReview(int id);
+        Task<IEnumerable<Review>> GetReviewsByProductIdAsync(int productId);
+        Task<IEnumerable<Review>> GetReviewsOfCustomerAsync(int customerId);
+        Task<Review?> GetReviewAsync(int id);
+        Task<Review> AddReviewAsync(Review review);
+        Task<bool> UpdateReviewAsync(Review review);
+        Task<bool> DeleteReviewAsync(int id);
         Task<bool> SaveAsync();
     }
 }

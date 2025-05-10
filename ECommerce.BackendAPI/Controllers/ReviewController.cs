@@ -37,7 +37,7 @@ namespace Ecommerce.BackendAPI.Controllers
                 startDate ??= new DateTime(2025, 1, 1, 0, 0, 0);
                 endDate ??= new DateTime(2030, 12, 31, 23, 59, 59);
 
-                var (totalReviews, reviews) = await _reviewRepository.GetReviews(
+                var (totalReviews, reviews) = await _reviewRepository.GetReviewsAsync(
                     productIds,
                     pageNumber,
                     minRating,
@@ -74,7 +74,7 @@ namespace Ecommerce.BackendAPI.Controllers
         [HttpGet("product/{productId}")]
         public async Task<IActionResult> GetReviewsByProductId(int productId)
         {
-            var reviews = await _reviewRepository.GetReviewsByProductId(productId);
+            var reviews = await _reviewRepository.GetReviewsByProductIdAsync(productId);
 
             if (!reviews.Any())
             {
@@ -104,7 +104,7 @@ namespace Ecommerce.BackendAPI.Controllers
         [HttpGet("customer/{customerId}")]
         public async Task<IActionResult> GetReviewsOfCustomer(int customerId)
         {
-            var reviews = await _reviewRepository.GetReviewsOfCustomer(customerId);
+            var reviews = await _reviewRepository.GetReviewsOfCustomerAsync(customerId);
             if (reviews == null)
             {
                 return NotFound(new { message = "No reviews found for this customer." });
@@ -131,7 +131,7 @@ namespace Ecommerce.BackendAPI.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetReview(int id)
         {
-            var review = await _reviewRepository.GetReview(id);
+            var review = await _reviewRepository.GetReviewAsync(id);
             if (review == null) return NotFound();
             return Ok(new {
                 review.Id,
@@ -167,7 +167,7 @@ namespace Ecommerce.BackendAPI.Controllers
                 Product = Product,
             };
 
-            var createdReview = await _reviewRepository.AddReview(review);
+            var createdReview = await _reviewRepository.AddReviewAsync(review);
             return Ok(createdReview);
         }
 
@@ -184,7 +184,7 @@ namespace Ecommerce.BackendAPI.Controllers
             };
 
 
-            var updated = await _reviewRepository.UpdateReview(review);
+            var updated = await _reviewRepository.UpdateReviewAsync(review);
             if (!updated) return NotFound();
             return NoContent();
         }
@@ -194,7 +194,7 @@ namespace Ecommerce.BackendAPI.Controllers
         [ServiceFilter(typeof(VerifyWhenUpdateAndDeleteReview))]
         public async Task<IActionResult> DeleteReview(int id)
         {
-            var deleted = await _reviewRepository.DeleteReview(id);
+            var deleted = await _reviewRepository.DeleteReviewAsync(id);
             if (!deleted) return NotFound();
             return NoContent();
         }

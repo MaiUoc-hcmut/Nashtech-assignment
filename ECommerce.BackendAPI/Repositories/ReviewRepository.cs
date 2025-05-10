@@ -15,7 +15,7 @@ namespace Ecommerce.BackendAPI.Repositories
             _context = context;
         }
 
-        public async Task<(int TotalReviews, IEnumerable<Review> Reviews)> GetReviews
+        public async Task<(int TotalReviews, IEnumerable<Review> Reviews)> GetReviewsAsync
         (
             List<int> productIds,
             int pageNumber,
@@ -69,7 +69,7 @@ namespace Ecommerce.BackendAPI.Repositories
             return (totalReviews, reviews);
         }
 
-        public async Task<IEnumerable<Review>> GetReviewsByProductId(int productId)
+        public async Task<IEnumerable<Review>> GetReviewsByProductIdAsync(int productId)
         {
             return await _context.Reviews
                 .Include(r => r.Customer)
@@ -77,7 +77,7 @@ namespace Ecommerce.BackendAPI.Repositories
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<Review>> GetReviewsOfCustomer(int customerId)
+        public async Task<IEnumerable<Review>> GetReviewsOfCustomerAsync(int customerId)
         {
             return await _context.Reviews
                 .Include(r => r.Product)
@@ -100,7 +100,7 @@ namespace Ecommerce.BackendAPI.Repositories
                 .ToListAsync();
         }
 
-        public async Task<Review?> GetReview(int id)
+        public async Task<Review?> GetReviewAsync(int id)
         {
             return await _context.Reviews
                 .Include(r => r.Customer)
@@ -108,20 +108,20 @@ namespace Ecommerce.BackendAPI.Repositories
                 .FirstOrDefaultAsync(r => r.Id == id);
         }
 
-        public async Task<Review> AddReview(Review review)
+        public async Task<Review> AddReviewAsync(Review review)
         {
             var response = await _context.Reviews.AddAsync(review);
             await _context.SaveChangesAsync();
             return response.Entity;
         }
 
-        public async Task<bool> UpdateReview(Review review)
+        public async Task<bool> UpdateReviewAsync(Review review)
         {
             _context.Reviews.Update(review);
             return await SaveAsync();
         }
 
-        public async Task<bool> DeleteReview(int id)
+        public async Task<bool> DeleteReviewAsync(int id)
         {
             var review = await _context.Reviews.FindAsync(id);
             if (review == null) return false;

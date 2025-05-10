@@ -30,14 +30,14 @@ namespace Ecommerce.BackendAPI.FiltersAction
             var userId = int.Parse(httpContext.Items["UserId"]?.ToString() ?? "0");
             var productId = int.Parse(httpContext.Request.RouteValues["productId"]?.ToString() ?? "0");
 
-            var customer = await _customerRepository.GetCustomerById(userId);
+            var customer = await _customerRepository.GetCustomerByIdAsync(userId);
             if (customer == null)
             {
                 context.Result = new UnauthorizedObjectResult(new { Error = "User not authenticated" });
                 return;
             }
 
-            var product = await _productRepository.GetProductById(productId, false);
+            var product = await _productRepository.GetProductByIdAsync(productId, false);
             if (product == null)
             {
                 context.Result = new NotFoundObjectResult(new { Error = "Product not found" });
@@ -65,7 +65,7 @@ namespace Ecommerce.BackendAPI.FiltersAction
             var httpContext = context.HttpContext;
 
             var reviewId = int.Parse(httpContext.Request.RouteValues["id"]?.ToString() ?? "0");
-            var review = await _reviewRepository.GetReview(reviewId);
+            var review = await _reviewRepository.GetReviewAsync(reviewId);
             if (review == null)
             {
                 context.Result = new NotFoundObjectResult(new { Error = "Review not found" });
