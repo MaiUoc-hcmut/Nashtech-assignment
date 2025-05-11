@@ -37,6 +37,8 @@ namespace Ecommerce.BackendAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllProducts
         (
+            [FromQuery] string startDate,
+            [FromQuery] string endDate,
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 10,
             [FromQuery] string sortBy = "UpdatedAt",
@@ -44,8 +46,9 @@ namespace Ecommerce.BackendAPI.Controllers
             [FromQuery] int? classificationId = null,
             [FromQuery] int minPrice = 0,
             [FromQuery] int maxPrice = 999999999,
-            [FromQuery] string? search = null,
-            [FromQuery] bool? simplest = false
+            [FromQuery] int minRating = 0,
+            [FromQuery] int maxRating = 5,
+            [FromQuery] string? search = null
         )
         {
             try
@@ -59,6 +62,10 @@ namespace Ecommerce.BackendAPI.Controllers
                     classificationId,
                     minPrice,
                     maxPrice,
+                    minRating,
+                    maxRating,
+                    startDate,
+                    endDate,
                     search
                 );
 

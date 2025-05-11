@@ -19,6 +19,10 @@ namespace Ecommerce.BackendAPI.Interfaces
             int? classificationId,
             int minPrice,
             int maxPrice,
+            double minRating,
+            double maxRating,
+            string startDate,
+            string endDate,
             string? search
         );
         Task<Product?> GetProductByIdAsync(int id, bool includeRelated = true);

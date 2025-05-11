@@ -71,6 +71,10 @@ namespace Ecommerce.BackendAPI.Repositories
             int? classificationId,
             int minPrice,
             int maxPrice,
+            double minRating,
+            double maxRating,
+            string startDate,
+            string endDate,
             string? search
         )
         {
@@ -94,6 +98,19 @@ namespace Ecommerce.BackendAPI.Repositories
             if (!string.IsNullOrEmpty(search))
             {
                 query = query.Where(p => p.Name.Contains(search) || p.Description.Contains(search));
+            }
+
+            // Filter by date range if provided
+            if (!string.IsNullOrEmpty(startDate) && DateTime.TryParse(startDate, out var parsedStartDate))
+            {
+                query = query.Where(p => p.CreatedAt >= parsedStartDate);
+            }
+            
+            if (!string.IsNullOrEmpty(endDate) && DateTime.TryParse(endDate, out var parsedEndDate))
+            {
+                // Add one day to include the entire endDate
+                parsedEndDate = parsedEndDate.AddDays(1);
+                query = query.Where(p => p.CreatedAt < parsedEndDate);
             }
 
             // Get the total number of products before applying pagination
@@ -127,7 +144,6 @@ namespace Ecommerce.BackendAPI.Repositories
             // Return both total products and the paginated list
             return (totalProducts, productsWithRatings);
         }
-
         public async Task<Product> CreateProductAsync(Product product, IList<Classification> classificationList)
         {
             var response = await _context.Products.AddAsync(product);
