@@ -57,17 +57,6 @@ const RangeFilter: React.FC<RangeFilterProps> = ({
     });
   };
 
-  // Apply the input values to the actual range
-  const applyFilter = () => {
-    // Ensure min is not greater than max
-    const validRange = {
-      min: Math.min(rangeInput.min, rangeInput.max - step),
-      max: Math.max(rangeInput.min + step, rangeInput.max)
-    };
-    setRange(validRange);
-    setRangeInput(validRange);
-  };
-
   // Calculate the percentage for slider thumbs positioning
   const minThumbPosition = ((currentRange.min - minValue) / (maxValue - minValue)) * 100;
   const maxThumbPosition = ((currentRange.max - minValue) / (maxValue - minValue)) * 100;
@@ -147,14 +136,6 @@ const RangeFilter: React.FC<RangeFilterProps> = ({
           />
         </div>
       </div>
-      
-      {/* Apply button */}
-      <button
-        onClick={applyFilter}
-        className="mt-2 text-xs bg-blue-100 hover:bg-blue-200 text-blue-800 px-2 py-1 rounded"
-      >
-        Apply
-      </button>
     </div>
   );
 };

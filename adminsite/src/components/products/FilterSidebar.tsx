@@ -19,6 +19,8 @@ export interface FilterSidebarProps {
   // Rating range filters
   ratingRange: FilterRange;
   setRatingRange: (range: FilterRange) => void;
+  // Apply filter
+  applyFilter: () => void;
   // Reset filters
   resetFilters: () => void;
 }
@@ -32,6 +34,7 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
   setPriceRange,
   ratingRange,
   setRatingRange,
+  applyFilter,
   resetFilters
 }) => {
   return (
@@ -104,13 +107,21 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
 
       {/* Reset Filters Button at bottom */}
       {filtersOpen && (
-        <div className="p-4 border-t border-blue-100">
-          <button
-            onClick={resetFilters}
-            className="w-full bg-blue-100 hover:bg-blue-200 text-blue-800 font-medium py-2 px-4 rounded"
-          >
-            Reset Filters
-          </button>
+        <div className="border-t border-blue-100 p-4">
+          <div className="space-y-2">
+            <button
+              onClick={resetFilters}
+              className="w-full bg-blue-100 hover:bg-blue-200 text-blue-800 font-medium py-2 px-4 rounded"
+            >
+              Reset Filters
+            </button>
+            <button
+              onClick={applyFilter}
+              className="w-full bg-blue-500 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded"
+            >
+              Apply Filters
+            </button>
+          </div>
         </div>
       )}
     </div>

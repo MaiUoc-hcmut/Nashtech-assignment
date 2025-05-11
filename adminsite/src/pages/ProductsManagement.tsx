@@ -18,16 +18,20 @@ const ProductPage: React.FC = () => {
   const [idDelete, setIdDelete] = useState(0);
   const [isPending, setIsPending] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState<'updatedAt' | 'price' | 'rating'>('updatedAt');
+  const [sortBy, setSortBy] = useState<'CreatedAt' | 'Price' | 'Rating'>('CreatedAt');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc'); // Default to newest first
   const [filtersOpen, setFiltersOpen] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [productIdOpen, setProductIdOpen] = useState(0);
   
   // Filter states
+  const startDate = new Date('2025-01-01');
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate());
+  const formatDateToInput = (date: Date) => date.toISOString().split('T')[0];
   const [dateRange, setDateRange] = useState<{ from: string; to: string }>({
-    from: '',
-    to: ''
+    from: formatDateToInput(startDate),
+    to: formatDateToInput(tomorrow), 
   });
   const [priceRange, setPriceRange] = useState<FilterRange>({
     min: 0,
@@ -43,7 +47,17 @@ const ProductPage: React.FC = () => {
 
   useEffect(() => {
     if (status === "idle") {
-      dispatch(fetchProducts(currentPage));
+      dispatch(fetchProducts({
+      currentPage,
+      sortBy: "CreatedAt",
+      isAsc: false,
+      minPrice: priceRange.min,
+      maxPrice: priceRange.max,
+      minRating: ratingRange.min,
+      maxRating: ratingRange.max,
+      startDate: dateRange.from,
+      endDate: dateRange.to,
+    }));
     }
 
     if (status === "loading") {
@@ -56,8 +70,32 @@ const ProductPage: React.FC = () => {
   }, [dispatch, status, products]);
 
   useEffect(() => {
-    dispatch(fetchProducts(currentPage));
+    dispatch(fetchProducts({
+      currentPage,
+      sortBy,
+      isAsc: sortOrder === 'asc' ? true : false,
+      minPrice: priceRange.min,
+      maxPrice: priceRange.max,
+      minRating: ratingRange.min,
+      maxRating: ratingRange.max,
+      startDate: dateRange.from,
+      endDate: dateRange.to,
+    }));
   }, [currentPage]);
+
+  const handleApplyFilter = async () => {
+    dispatch(fetchProducts({
+      currentPage: 1,
+      sortBy: "CreatedAt",
+      isAsc: false,
+      minPrice: priceRange.min,
+      maxPrice: priceRange.max,
+      minRating: ratingRange.min,
+      maxRating: ratingRange.max,
+      startDate: dateRange.from,
+      endDate: dateRange.to,
+    }));
+  }
 
   const handleSubmit = async (data: AddProduct) => {
     await dispatch(addProduct(data)).unwrap();
@@ -78,17 +116,28 @@ const ProductPage: React.FC = () => {
     setIdDelete(id);
   };
 
-  const handleSort = (column: 'updatedAt' | 'price' | 'rating') => {
+  const handleSort = (column: 'CreatedAt' | 'Price' | 'Rating') => {
     if (sortBy === column) {
       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
     } else {
       setSortBy(column);
-      setSortOrder(column === 'updatedAt' ? 'desc' : 'asc');
+      setSortOrder(column === 'CreatedAt' ? 'desc' : 'asc');
     }
+    dispatch(fetchProducts({
+      currentPage: 1,
+      sortBy,
+      isAsc: sortOrder == 'asc' ? true : false,
+      minPrice: priceRange.min,
+      maxPrice: priceRange.max,
+      minRating: ratingRange.min,
+      maxRating: ratingRange.max,
+      startDate: dateRange.from,
+      endDate: dateRange.to,
+    }));
   };
 
   const resetFilters = () => {
-    setDateRange({ from: '', to: '' });
+    setDateRange({ from: startDate.toLocaleDateString('en-US'), to: tomorrow.toLocaleDateString('en-US') });
     setPriceRange({ min: 0, max: 1000000 });
     setRatingRange({ min: 0, max: 5 });
     setSearchTerm('');
@@ -107,7 +156,7 @@ const ProductPage: React.FC = () => {
     }, 500); // Simulate loading for UI feedback
   };
 
-  const SortIcon = ({ column }: { column: 'updatedAt' | 'price' | 'rating' }) => {
+  const SortIcon = ({ column }: { column: 'CreatedAt' | 'Price' | 'Rating' }) => {
     if (sortBy !== column) return <ArrowUpDown size={16} className="ml-1 text-gray-400" />;
     return sortOrder === 'asc' ? 
       <ArrowUpDown size={16} className="ml-1 text-blue-500" /> : 
@@ -128,6 +177,7 @@ const ProductPage: React.FC = () => {
         setPriceRange={setPriceRange}
         ratingRange={ratingRange}
         setRatingRange={setRatingRange}
+        applyFilter={handleApplyFilter}
         resetFilters={resetFilters}
       />
       
@@ -164,29 +214,29 @@ const ProductPage: React.FC = () => {
                     <th className="px-4 py-2 text-left">Name</th>
                     <th 
                       className="px-4 py-2 text-left cursor-pointer"
-                      onClick={() => handleSort('updatedAt')}
+                      onClick={() => handleSort('CreatedAt')}
                     >
                       <div className="flex items-center">
-                        Updated Date
-                        <SortIcon column="updatedAt" />
+                        Created Date
+                        <SortIcon column="CreatedAt" />
                       </div>
                     </th>
                     <th 
                       className="px-4 py-2 text-left cursor-pointer"
-                      onClick={() => handleSort('price')}
+                      onClick={() => handleSort('Price')}
                     >
                       <div className="flex items-center">
                         Price
-                        <SortIcon column="price" />
+                        <SortIcon column="Price" />
                       </div>
                     </th>
                     <th 
                       className="px-4 py-2 text-left cursor-pointer"
-                      onClick={() => handleSort('rating')}
+                      onClick={() => handleSort('Rating')}
                     >
                       <div className="flex items-center">
                         Rating
-                        <SortIcon column="rating" />
+                        <SortIcon column="Rating" />
                       </div>
                     </th>
                     <th className="px-4 py-2 text-left">
@@ -220,7 +270,7 @@ const ProductPage: React.FC = () => {
                           </div>
                         </td>
                         <td className="px-4 py-2 font-medium">{product.name}</td>
-                        <td className="px-4 py-2">{product.updatedAt ? new Date(product.updatedAt).toLocaleDateString() : '2025-04-28'}</td>
+                        <td className="px-4 py-2">{product.createdAt ? new Date(product.createdAt).toLocaleDateString() : '2025-04-28'}</td>
                         <td className="px-4 py-2 font-bold">{product.price}đ</td>
                         <td className="px-4 py-2">
                           <div className="flex items-center">

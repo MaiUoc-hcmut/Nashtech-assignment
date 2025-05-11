@@ -10,7 +10,21 @@ interface Product {
   price: number;
   imageUrl: string;
   rating: number;
-  updatedAt: Date
+  createdAt: Date
+}
+
+interface FetchProductProps {
+  currentPage: number;
+  sortBy: string;
+  isAsc: boolean;
+  classification?: number | undefined;
+  minPrice: number;
+  maxPrice: number;
+  minRating: number;
+  maxRating: number;
+  startDate: string;
+  endDate: string;
+  search?: string | undefined;
 }
 
 interface ProductsState {
@@ -31,8 +45,16 @@ const initialState: ProductsState = {
 // Create async thunk for fetching products
 export const fetchProducts = createAsyncThunk(
   'products/fetchProducts',
-  async (currentPage: number) => {
-    const response = await axiosConfig.get(`http://localhost:5113/api/Product?pageNumber=${currentPage}`);
+  async (data: FetchProductProps) => {
+    let query = `pageNumber=${data.currentPage}&sortBy=${data.sortBy}&isAsc=${data.isAsc}&minPrice=${data.minPrice}&maxPrice=${data.maxPrice}&minRating=${data.minRating}&maxRating=${data.maxRating}&startDate=${data.startDate}&endDate=${data.endDate}`;
+    if (data.search !== undefined && data.search !== "") {
+      query += `&search=${data.search}`;
+    }
+    if (data.classification !== undefined)
+    {
+      query += `&classificationId=${data.classification}`;
+    }
+    const response = await axiosConfig.get(`http://localhost:5113/api/Product?${query}`);
     if (response.status !== 200) throw new Error('Failed to fetch products');
     return response.data;
   }
@@ -97,7 +119,6 @@ const productsSlice = createSlice({
         state.status = 'succeeded';
         state.totalProducts = action.payload.totalProducts;
         state.products = action.payload.products;
-        console.log(action.payload);
         state.error = null;
       })
       .addCase(fetchProducts.rejected, (state, action) => {
