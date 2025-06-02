@@ -39,7 +39,8 @@ namespace Ecommerce.BackendAPI.FiltersAction
 
             var admin = await _adminRepository.GetAdminByIdAsync(int.Parse(userId));
 
-            if (orderId != null) {
+            if (orderId != null)
+            {
                 var order = await _orderRepository.GetOrderByIdAsync(int.Parse(orderId));
                 if (order == null)
                 {
@@ -52,7 +53,9 @@ namespace Ecommerce.BackendAPI.FiltersAction
                     context.Result = new UnauthorizedObjectResult(new { Error = "Unauthorized access to order" });
                     return;
                 }
-            } else if (customerId != null) {
+            }
+            else if (customerId != null)
+            {
                 var customer = await _customerRepository.GetCustomerByIdAsync(int.Parse(customerId));
                 if (customer == null)
                 {
@@ -65,7 +68,9 @@ namespace Ecommerce.BackendAPI.FiltersAction
                     context.Result = new UnauthorizedObjectResult(new { Error = "Unauthorized access to customer" });
                     return;
                 }
-            } else if (productId != null) {
+            }
+            else if (productId != null)
+            {
                 var product = await _orderRepository.GetOrdersOfProductAsync(int.Parse(productId));
                 if (product == null)
                 {

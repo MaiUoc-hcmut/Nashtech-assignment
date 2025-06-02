@@ -17,59 +17,52 @@
                 </div>
                 <div class="card-body">
                     <form id="filter-form" method="get">
-                        <!-- Categories -->
-                        <div class="filter-group mb-4">
-                            <h5 class="filter-title mb-3">Categories</h5>
-                            <div class="form-check mb-2">
-                                <input class="form-check-input category-filter" type="checkbox" value="men" id="men" name="categories" @(ViewBag.SelectedCategories != null && ViewBag.SelectedCategories.Contains("men") ? "checked" : "")>
-                                <label class="form-check-label" for="men">Men</label>
-                            </div>
-                            <div class="form-check mb-2">
-                                <input class="form-check-input category-filter" type="checkbox" value="women" id="women" name="categories" @(ViewBag.SelectedCategories != null && ViewBag.SelectedCategories.Contains("women") ? "checked" : "")>
-                                <label class="form-check-label" for="women">Women</label>
-                            </div>
-                            <div class="form-check mb-2">
-                                <input class="form-check-input category-filter" type="checkbox" value="kids" id="kids" name="categories" @(ViewBag.SelectedCategories != null && ViewBag.SelectedCategories.Contains("kids") ? "checked" : "")>
-                                <label class="form-check-label" for="kids">Kids</label>
-                            </div>
-                            <div class="form-check mb-2">
-                                <input class="form-check-input category-filter" type="checkbox" value="accessories" id="accessories" name="categories" @(ViewBag.SelectedCategories != null && ViewBag.SelectedCategories.Contains("accessories") ? "checked" : "")>
-                                <label class="form-check-label" for="accessories">Accessories</label>
-                            </div>
-                        </div>
-
-                        <!-- Types -->
-                        <div class="filter-group mb-4">
-                            <h5 class="filter-title mb-3">Product Type</h5>
-                            <div class="form-check mb-2">
-                                <input class="form-check-input type-filter" type="checkbox" value="shirts" id="shirts" name="types" @(ViewBag.SelectedTypes != null && ViewBag.SelectedTypes.Contains("shirts") ? "checked" : "")>
-                                <label class="form-check-label" for="shirts">Shirts</label>
-                            </div>
-                            <div class="form-check mb-2">
-                                <input class="form-check-input type-filter" type="checkbox" value="shorts" id="shorts" name="types" @(ViewBag.SelectedTypes != null && ViewBag.SelectedTypes.Contains("shorts") ? "checked" : "")>
-                                <label class="form-check-label" for="shorts">Shorts</label>
-                            </div>
-                            <div class="form-check mb-2">
-                                <input class="form-check-input type-filter" type="checkbox" value="pants" id="pants" name="types" @(ViewBag.SelectedTypes != null && ViewBag.SelectedTypes.Contains("pants") ? "checked" : "")>
-                                <label class="form-check-label" for="pants">Pants</label>
-                            </div>
-                            <div class="form-check mb-2">
-                                <input class="form-check-input type-filter" type="checkbox" value="dresses" id="dresses" name="types" @(ViewBag.SelectedTypes != null && ViewBag.SelectedTypes.Contains("dresses") ? "checked" : "")>
-                                <label class="form-check-label" for="dresses">Dresses</label>
-                            </div>
-                        </div>
-
-                        <!-- Price Range -->
+                        <!-- Price Range Slider -->
                         <div class="filter-group mb-4">
                             <h5 class="filter-title mb-3">Price Range</h5>
-                            <div class="row">
-                                <div class="col-6">
-                                    <label for="minPrice" class="form-label">Min</label>
-                                    <input type="number" class="form-control price-filter" id="minPrice" name="minPrice" value="@ViewBag.MinPrice" min="0">
+                            <div class="mb-2">
+                                <div class="range-slider">
+                                    <input type="range" class="form-range" id="priceRangeMin" min="0" max="1000000" step="1000" value="@(ViewBag.MinPrice ?? 0)">
+                                    <input type="range" class="form-range" id="priceRangeMax" min="0" max="1000000" step="1000" value="@(ViewBag.MaxPrice ?? 1000000)">
                                 </div>
-                                <div class="col-6">
-                                    <label for="maxPrice" class="form-label">Max</label>
-                                    <input type="number" class="form-control price-filter" id="maxPrice" name="maxPrice" value="@ViewBag.MaxPrice" min="0">
+                                <div class="row mt-3">
+                                    <div class="col-6">
+                                        <div class="input-group">
+                                            <input type="number" class="form-control" id="minPrice" name="minPrice" value="@(ViewBag.MinPrice ?? 0)" min="0" max="1000000" step="1000">
+                                            <span class="input-group-text">đ</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="input-group">
+                                            <input type="number" class="form-control" id="maxPrice" name="maxPrice" value="@(ViewBag.MaxPrice ?? 1000000)" min="0" max="1000000" step="1000">
+                                            <span class="input-group-text">đ</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Rating Slider -->
+                        <div class="filter-group mb-4">
+                            <h5 class="filter-title mb-3">Rating</h5>
+                            <div class="mb-2">
+                                <div class="range-slider">
+                                    <input type="range" class="form-range" id="ratingRangeMin" min="0" max="5" step="0.5" value="@(ViewBag.MinRating ?? 0)">
+                                    <input type="range" class="form-range" id="ratingRangeMax" min="0" max="5" step="0.5" value="@(ViewBag.MaxRating ?? 5)">
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-6">
+                                        <div class="input-group">
+                                            <input type="number" class="form-control" id="minRating" name="minRating" value="@(ViewBag.MinRating ?? 0)" min="0" max="5" step="0.5">
+                                            <span class="input-group-text">★</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="input-group">
+                                            <input type="number" class="form-control" id="maxRating" name="maxRating" value="@(ViewBag.MaxRating ?? 5)" min="0" max="5" step="0.5">
+                                            <span class="input-group-text">★</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -150,7 +143,7 @@
                         @if (ViewBag.CurrentPage > 1)
                         {
                             <li class="page-item">
-                                <a class="page-link" href="@Url.Action("Products", new { page = ViewBag.CurrentPage - 1, categories = ViewBag.SelectedCategories, types = ViewBag.SelectedTypes, minPrice = ViewBag.MinPrice, maxPrice = ViewBag.MaxPrice, isNew = ViewBag.IsNew, isBestSeller = ViewBag.IsBestSeller, hasDiscount = ViewBag.HasDiscount, minRating = ViewBag.MinRating, sortOrder = ViewBag.SortOrder })" aria-label="Previous">
+                                <a class="page-link" href="@Url.Action("Products", new { page = ViewBag.CurrentPage - 1, minPrice = ViewBag.MinPrice, maxPrice = ViewBag.MaxPrice, minRating = ViewBag.MinRating, maxRating = ViewBag.MaxRating, isNew = ViewBag.IsNew, isBestSeller = ViewBag.IsBestSeller, sortOrder = ViewBag.SortOrder })" aria-label="Previous">
                                     <span aria-hidden="true">&laquo;</span>
                                 </a>
                             </li>
@@ -167,14 +160,14 @@
                         @for (int i = 1; i <= ViewBag.TotalPages; i++)
                         {
                             <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-                                <a class="page-link" href="@Url.Action("Products", new { page = i, categories = ViewBag.SelectedCategories, types = ViewBag.SelectedTypes, minPrice = ViewBag.MinPrice, maxPrice = ViewBag.MaxPrice, isNew = ViewBag.IsNew, isBestSeller = ViewBag.IsBestSeller, hasDiscount = ViewBag.HasDiscount, minRating = ViewBag.MinRating, sortOrder = ViewBag.SortOrder })">@i</a>
+                                <a class="page-link" href="@Url.Action("Products", new { page = i, minPrice = ViewBag.MinPrice, maxPrice = ViewBag.MaxPrice, minRating = ViewBag.MinRating, maxRating = ViewBag.MaxRating, isNew = ViewBag.IsNew, isBestSeller = ViewBag.IsBestSeller, sortOrder = ViewBag.SortOrder })">@i</a>
                             </li>
                         }
 
                         @if (ViewBag.CurrentPage < ViewBag.TotalPages)
                         {
                             <li class="page-item">
-                                <a class="page-link" href="@Url.Action("Products", new { page = ViewBag.CurrentPage + 1, categories = ViewBag.SelectedCategories, types = ViewBag.SelectedTypes, minPrice = ViewBag.MinPrice, maxPrice = ViewBag.MaxPrice, isNew = ViewBag.IsNew, isBestSeller = ViewBag.IsBestSeller, hasDiscount = ViewBag.HasDiscount, minRating = ViewBag.MinRating, sortOrder = ViewBag.SortOrder })" aria-label="Next">
+                                <a class="page-link" href="@Url.Action("Products", new { page = ViewBag.CurrentPage + 1, minPrice = ViewBag.MinPrice, maxPrice = ViewBag.MaxPrice, minRating = ViewBag.MinRating, maxRating = ViewBag.MaxRating, isNew = ViewBag.IsNew, isBestSeller = ViewBag.IsBestSeller, sortOrder = ViewBag.SortOrder })" aria-label="Next">
                                     <span aria-hidden="true">&raquo;</span>
                                 </a>
                             </li>
@@ -197,37 +190,185 @@
 @section Scripts {
     <script>
         $(document).ready(function() {
+            // Price slider functionality
+            const priceMinSlider = document.getElementById('priceRangeMin');
+            const priceMaxSlider = document.getElementById('priceRangeMax');
+            const priceMinInput = document.getElementById('minPrice');
+            const priceMaxInput = document.getElementById('maxPrice');
+
+            priceMinSlider.addEventListener('input', function() {
+                if (parseInt(priceMinSlider.value) > parseInt(priceMaxSlider.value)) {
+                    priceMinSlider.value = priceMaxSlider.value;
+                }
+                priceMinInput.value = priceMinSlider.value;
+                updateRangeStyles();
+            });
+
+            priceMaxSlider.addEventListener('input', function() {
+                if (parseInt(priceMaxSlider.value) < parseInt(priceMinSlider.value)) {
+                    priceMaxSlider.value = priceMinSlider.value;
+                }
+                priceMaxInput.value = priceMaxSlider.value;
+                updateRangeStyles();
+            });
+
+            priceMinInput.addEventListener('change', function() {
+                if (parseInt(priceMinInput.value) > parseInt(priceMaxInput.value)) {
+                    priceMinInput.value = priceMaxInput.value;
+                }
+                priceMinSlider.value = priceMinInput.value;
+                updateRangeStyles();
+            });
+
+            priceMaxInput.addEventListener('change', function() {
+                if (parseInt(priceMaxInput.value) < parseInt(priceMinInput.value)) {
+                    priceMaxInput.value = priceMinInput.value;
+                }
+                priceMaxSlider.value = priceMaxInput.value;
+                updateRangeStyles();
+            });
+
+            // Rating slider functionality
+            const ratingMinSlider = document.getElementById('ratingRangeMin');
+            const ratingMaxSlider = document.getElementById('ratingRangeMax');
+            const ratingMinInput = document.getElementById('minRating');
+            const ratingMaxInput = document.getElementById('maxRating');
+
+            ratingMinSlider.addEventListener('input', function() {
+                if (parseFloat(ratingMinSlider.value) > parseFloat(ratingMaxSlider.value)) {
+                    ratingMinSlider.value = ratingMaxSlider.value;
+                }
+                ratingMinInput.value = ratingMinSlider.value;
+                updateRangeStyles();
+            });
+
+            ratingMaxSlider.addEventListener('input', function() {
+                if (parseFloat(ratingMaxSlider.value) < parseFloat(ratingMinSlider.value)) {
+                    ratingMaxSlider.value = ratingMinSlider.value;
+                }
+                ratingMaxInput.value = ratingMaxSlider.value;
+                updateRangeStyles();
+            });
+            
+            ratingMinInput.addEventListener('change', function() {
+                if (parseFloat(ratingMinInput.value) > parseFloat(ratingMaxInput.value)) {
+                    ratingMinInput.value = ratingMaxInput.value;
+                }
+                ratingMinSlider.value = ratingMinInput.value;
+                updateRangeStyles();
+            });
+
+            ratingMaxInput.addEventListener('change', function() {
+                if (parseFloat(ratingMaxInput.value) < parseFloat(ratingMinInput.value)) {
+                    ratingMaxInput.value = ratingMinInput.value;
+                }
+                ratingMaxSlider.value = ratingMaxInput.value;
+                updateRangeStyles();
+            });
+
             // Handle sort order change
             $('#sortOrder').change(function() {
                 $('#filter-form').append('<input type="hidden" name="sortOrder" value="' + $(this).val() + '">');
                 $('#filter-form').submit();
             });
 
-            // Optional: AJAX filtering without full page reload
-            // Uncomment and implement if you want client-side filtering
-            /*
-            $('.category-filter, .type-filter, .special-filter, .rating-filter').change(function() {
-                applyFilters();
-            });
-
-            $('.price-filter').on('change', function() {
-                applyFilters();
-            });
-
-            function applyFilters() {
-                var formData = $('#filter-form').serialize();
+            // Add some custom CSS for the range sliders
+            $('<style>').text(`
+                .range-slider {
+                    position: relative;
+                    width: 100%;
+                    height: 40px;
+                }
                 
-                $.ajax({
-                    url: '@Url.Action("ProductsPartial", "Shop")',
-                    type: 'GET',
-                    data: formData,
-                    success: function(result) {
-                        $('#products-container').html(result);
-                    }
-                });
+                .range-slider input[type="range"] {
+                    position: absolute;
+                    width: 100%;
+                    pointer-events: none;
+                    -webkit-appearance: none;
+                    z-index: 2;
+                    height: 10px;
+                    opacity: 0;
+                }
+                
+                .range-slider input[type="range"]::-moz-range-thumb {
+                    pointer-events: all;
+                    width: 30px;
+                    height: 30px;
+                    border-radius: 50%;
+                    border: 2px solid #ffffff;
+                    background-color: #0d6efd;
+                    box-shadow: 0 0 5px rgba(0,0,0,0.3);
+                    cursor: pointer;
+                    z-index: 3;
+                }
+                
+                .range-slider input[type="range"]::-ms-thumb {
+                    pointer-events: all;
+                    width: 30px;
+                    height: 30px;
+                    border-radius: 50%;
+                    border: 2px solid #ffffff;
+                    background-color: #0d6efd;
+                    box-shadow: 0 0 5px rgba(0,0,0,0.3);
+                    cursor: pointer;
+                    z-index: 3;
+                }
+                
+                .range-slider input[type="range"]::-webkit-slider-thumb {
+                    pointer-events: all;
+                    width: 30px;
+                    height: 30px;
+                    border-radius: 50%;
+                    border: 2px solid #ffffff;
+                    background-color: #0d6efd;
+                    box-shadow: 0 0 5px rgba(0,0,0,0.3);
+                    -webkit-appearance: none;
+                    cursor: pointer;
+                    z-index: 3;
+                }
+                
+                .range-slider:before {
+                    content: "";
+                    position: absolute;
+                    z-index: 1;
+                    left: 0;
+                    right: 0;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    height: 5px;
+                    border-radius: 5px;
+                    background: #e0e0e0;
+                }
+                
+                .range-slider:after {
+                    position: absolute;
+                    z-index: 1;
+                    left: var(--range-min);
+                    right: calc(100% - var(--range-max));
+                    top: 50%;
+                    transform: translateY(-50%);
+                    height: 5px;
+                    background: #0d6efd;
+                    content: "";
+                }
+            `).appendTo('head');
+
+            // Initialize the custom CSS variables for the range sliders
+            function updateRangeStyles() {
+                const priceTotal = priceMaxSlider.max - priceMinSlider.min;
+                const priceMinPct = ((priceMinSlider.value - priceMinSlider.min) / priceTotal) * 100;
+                const priceMaxPct = ((priceMaxSlider.value - priceMinSlider.min) / priceTotal) * 100;
+                
+                const ratingTotal = ratingMaxSlider.max - ratingMinSlider.min;
+                const ratingMinPct = ((ratingMinSlider.value - ratingMinSlider.min) / ratingTotal) * 100;
+                const ratingMaxPct = ((ratingMaxSlider.value - ratingMinSlider.min) / ratingTotal) * 100;
+                
+                $('.range-slider').eq(0).css('--range-min', priceMinPct + '%').css('--range-max', priceMaxPct + '%');
+                $('.range-slider').eq(1).css('--range-min', ratingMinPct + '%').css('--range-max', ratingMaxPct + '%');
             }
-            */
+            
+            // Initial update of range styles
+            updateRangeStyles();
         });
     </script>
 }
-

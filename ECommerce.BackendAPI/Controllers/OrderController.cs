@@ -3,6 +3,7 @@ using Ecommerce.BackendAPI.Interfaces;
 using Ecommerce.BackendAPI.FiltersAction;
 using Microsoft.AspNetCore.Mvc;
 using Ecommerce.SharedViewModel.ParametersType;
+using Ecommerce.SharedViewModel.Responses;
 
 
 namespace Ecommerce.BackendAPI.Controllers
@@ -59,8 +60,56 @@ namespace Ecommerce.BackendAPI.Controllers
         {
             var order = await _orderRepository.GetOrderByIdAsync(orderId);
             if (order == null) return NotFound();
+            
+            var variantsResponse = order.VariantOrders
+                .Select(vo => new VariantInGetOrderById
+                {
+                    Id = vo.Variant.Id,
+                    SKU = vo.Variant.SKU,
+                    Price = vo.Variant.Price,
+                    ImageUrl = vo.Variant.ImageUrl,
+                    Quantity = vo.Quantity,
+                    Color = vo.Variant.VariantCategories
+                        .Where(vc => vc.Category.ParentCategory != null && vc.Category.ParentCategory.Name.ToLower().Contains("color"))
+                        .Select(vc => vc.Category.Name)
+                        .FirstOrDefault(),
+                    Size = vo.Variant.VariantCategories
+                        .Where(vc => vc.Category.ParentCategory != null && vc.Category.ParentCategory.Name.ToLower().Contains("size"))
+                        .Select(vc => vc.Category.Name)
+                        .FirstOrDefault(),
+                    Product = new ProductInGetOrderById
+                    {
+                        Id = vo.Variant.Product.Id,
+                        Name = vo.Variant.Product.Name,
+                        Description = vo.Variant.Product.Description,
+                        ImageUrl = vo.Variant.Product.ImageUrl,
+                        Price = vo.Variant.Product.Price,
+                    }
+                })
+                .ToList();
 
-            return Ok(order);
+            order.VariantOrders = null;
+
+            return Ok(new GetOrderByIdResponse
+            {
+                Id = order.Id,
+                Amount = order.Amount,
+                Status = order.Status,
+                CustomerName = order.CustomerName,
+                Email = order.Email,
+                PhoneNumber = order.PhoneNumber,
+                Address = order.Address,
+                CreatedAt = order.CreatedAt,
+                Customer = new CustomerInOrderResponse
+                {
+                    Id = order.Customer.Id,
+                    Name = order.Customer.Name,
+                    Email = order.Customer.Email,
+                    PhoneNumber = order.Customer.PhoneNumber,
+                    Address = order.Customer.Address
+                },
+                Variants = variantsResponse
+            });
         }
 
         [HttpGet("customer/{customerId}")]

@@ -25,6 +25,14 @@ export const fetchOrders = createAsyncThunk(
   }
 );
 
+export const getDetailsOrder = createAsyncThunk(
+  'orders/getDetailsOrder',
+  async (id: number) => {
+    const response = await axiosConfig.get(`http://localhost:5113/api/Order/${id}`);
+    return response.data;
+  }
+)
+
 const ordersSlice = createSlice({
   name: 'orders',
   initialState,
@@ -40,7 +48,6 @@ const ordersSlice = createSlice({
         state.totalOrders = action.payload.totalOrders;
         state.orders = action.payload.orders;
         state.error = null;
-        console.log(action.payload);
       })
       .addCase(fetchOrders.rejected, (state, action) => {
         state.status = 'failed';

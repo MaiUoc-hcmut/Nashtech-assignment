@@ -26,6 +26,10 @@ namespace Ecommerce.ClientMVC.Controllers
             int? classificationId = null,
             int minPrice = 0,
             int maxPrice = 999999999,
+            double minRating = 0,
+            double maxRating = 5,
+            string startDate = "01/01/2025",
+            string? endDate = null,
             string? search = null
         )
         {
@@ -38,6 +42,10 @@ namespace Ecommerce.ClientMVC.Controllers
                 classificationId,
                 minPrice,
                 maxPrice,
+                minRating,
+                maxRating,
+                startDate,
+                endDate,
                 search
             );
             return View(products);

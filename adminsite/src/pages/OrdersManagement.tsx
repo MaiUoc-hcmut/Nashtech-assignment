@@ -1,18 +1,20 @@
 import { useState, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../redux/hooks/redux';
-import { fetchOrders } from '../redux/features/orders/ordersSlice';
-// import { RefreshCw } from 'lucide-react';
-// import { useNavigate } from 'react-router-dom';
+import { fetchOrders, getDetailsOrder } from '../redux/features/orders/ordersSlice';
 import PageHeader from '../components/commons/PageHeader';
 import PageFooter from '../components/commons/PageFooter';
+import OrderDetailModal, { OrderDetail } from '../components/orders/DetailsModal';
 import { RefreshCw } from 'lucide-react';
 
 const OrdersManagement: React.FC = () => {
   const [isPending, setIsPending] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedOrderDetail, setSelectedOrderDetail] = useState<OrderDetail | null>(null);
+  const [modalLoading, setModalLoading] = useState(false);
+  const [modalError, setModalError] = useState<string | null>(null);
 
-  // const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { totalOrders, orders, status, error } = useAppSelector((state) => state.orders);
 
@@ -51,22 +53,36 @@ const OrdersManagement: React.FC = () => {
     }).format(amount);
   };
 
-  // const handleViewOrder = (orderId: number) => {
-  //   navigate(`/orders/${orderId}`);
-  // };
-
   const handleSearch = (value: string) => {
     setSearchTerm(value);
     setCurrentPage(1); // Reset to first page when searching
   };
 
-  // const handleRefreshReviews = () => {
-  //   // UI only - actual logic to be implemented by the user
-  //   setIsPending(true);
-  //   setTimeout(() => {
-  //     setIsPending(false);
-  //   }, 500); // Simulate loading for UI feedback
-  // };
+  const handleRowClick = async (orderId: number) => {
+    setIsModalOpen(true);
+    setModalLoading(true);
+    setModalError(null);
+    setSelectedOrderDetail(null);
+
+    try {
+      // Fetch order details from API
+      const orderDetail = await dispatch(getDetailsOrder(orderId));
+      console.log(orderDetail.payload);
+      setSelectedOrderDetail(orderDetail.payload);
+    } catch (error) {
+      console.error('Error fetching order details:', error);
+      setModalError('Failed to load order details');
+    } finally {
+      setModalLoading(false);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedOrderDetail(null);
+    setModalError(null);
+    setModalLoading(false);
+  };
 
   const totalPages = Math.ceil(totalOrders / 10);
 
@@ -103,13 +119,6 @@ const OrdersManagement: React.FC = () => {
                     <th className="px-4 py-2 text-left">Address</th>
                     <th className="px-4 py-2 text-left">Status</th>
                     <th className="px-4 py-2 text-left">Created</th>
-                    {/* <th className="px-4 py-2 text-left">
-                      <RefreshCw 
-                        size={18} 
-                        className={`mr-2 ${isPending ? 'animate-spin' : ''} hover:cursor-pointer`}
-                        onClick={handleRefreshReviews}
-                      />
-                    </th> */}
                   </tr>
                 </thead>
                 <tbody>
@@ -119,7 +128,11 @@ const OrdersManagement: React.FC = () => {
                     </tr>
                   ) : (
                     orders.map((order) => (
-                      <tr key={order.id} className="border-b hover:bg-gray-50">
+                      <tr 
+                        key={order.id} 
+                        className="border-b hover:bg-gray-50 cursor-pointer transition-colors"
+                        onClick={() => handleRowClick(order.id)}
+                      >
                         <td className="px-4 py-2">#{order.id}</td>
                         <td className="px-4 py-2">{order.customer}</td>
                         <td className="px-4 py-2">{formatCurrency(order.amount)}</td>
@@ -152,6 +165,15 @@ const OrdersManagement: React.FC = () => {
           itemLabel="orders"
         />
       </div>
+
+      {/* Order Detail Modal */}
+      <OrderDetailModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        orderDetail={selectedOrderDetail}
+        loading={modalLoading}
+        error={modalError}
+      />
     </div>
   );
 };

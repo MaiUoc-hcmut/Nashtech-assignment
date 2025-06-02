@@ -35,8 +35,15 @@ namespace Ecommerce.BackendAPI.Repositories
         public async Task<Order?> GetOrderByIdAsync(int orderId)
         {
             return await _context.Orders
+                .Include(o => o.Customer)
                 .Include(o => o.VariantOrders)
-                .ThenInclude(vo => vo.Variant)
+                    .ThenInclude(vo => vo.Variant)
+                        .ThenInclude(v => v.Product)
+                .Include(o => o.VariantOrders)
+                    .ThenInclude(vo => vo.Variant)
+                        .ThenInclude(v => v.VariantCategories)
+                            .ThenInclude(vc => vc.Category)
+                                .ThenInclude(c => c.ParentCategory)
                 .FirstOrDefaultAsync(o => o.Id == orderId);
         }
 

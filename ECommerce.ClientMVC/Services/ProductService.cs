@@ -27,15 +27,20 @@ namespace Ecommerce.ClientMVC.Services
             int? classificationId = null,
             int minPrice = 0,
             int maxPrice = 999999999,
+            double minRating = 0,
+            double maxRating = 5,
+            string startDate = "01/01/2025",
+            string? endDate = null,
             string? search = null
         )
         {
             
             Console.WriteLine("==================================================");
+            endDate ??= DateTime.Now.ToString("yyyy-MM-dd");
             var client = _httpClientFactory.CreateClient();
             var response = await client.GetAsync
             (
-                $"{_apiBaseUrl}/api/Product?pageNumber={pageNumber}&pageSize={pageSize}&sortBy={sortBy}&isAsc={isAsc}&classificationId={classificationId}&minPrice={minPrice}&maxPrice={maxPrice}&search={search}"
+                $"{_apiBaseUrl}/api/Product?pageNumber={pageNumber}&pageSize={pageSize}&sortBy={sortBy}&isAsc={isAsc}&classificationId={classificationId}&minPrice={minPrice}&maxPrice={maxPrice}&search={search}&startDate={startDate}&endDate={endDate}"
             );
             if (response.IsSuccessStatusCode)
             {
@@ -48,6 +53,7 @@ namespace Ecommerce.ClientMVC.Services
         {
             var client = _httpClientFactory.CreateClient();
             var response = await client.GetAsync($"{_apiBaseUrl}/api/Product/{id}?includeVariant=true");
+            Console.WriteLine(await response.Content.ReadAsStringAsync());
             if (response.IsSuccessStatusCode)
             {
                 return await response.Content.ReadFromJsonAsync<ProductDetail>() ?? null;
