@@ -1,6 +1,8 @@
 using Ecommerce.ClientMVC.Interface;
 using Ecommerce.SharedViewModel.Responses;
 using Microsoft.AspNetCore.Mvc;
+using Ecommerce.SharedViewModel.ParametersType;
+using System.Text.Json;
 
 namespace Ecommerce.ClientMVC.Controllers
 {
@@ -20,10 +22,18 @@ namespace Ecommerce.ClientMVC.Controllers
             string customerPhoneNumber,
             string customerAddress,
             // int customerId,
-            string variantIdList,
+            string variantList,
             int totalAmount 
         )
         {
+            var variantListDeserialize = JsonSerializer.Deserialize<IList<VariantInCreateOrder>>(variantList);
+            foreach (var variant in variantListDeserialize)
+            {
+                if (variant.Quantity <= 0)
+                {
+                    return BadRequest("Quantity must be greater than zero for each variant.");
+                }
+            }
             var result = await _orderService.CreateOrderAsync
                 (
                     customerName, 
@@ -31,11 +41,10 @@ namespace Ecommerce.ClientMVC.Controllers
                     customerPhoneNumber, 
                     customerAddress, 
                     // customerId, 
-                    variantIdList, 
+                    variantListDeserialize, 
                     totalAmount
                 );
 
-            Console.WriteLine(result.TotalAmount);
             return View("OrderSuccess", result);
         }
     }

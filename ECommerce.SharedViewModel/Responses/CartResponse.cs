@@ -8,6 +8,7 @@ namespace Ecommerce.SharedViewModel.Responses
         public required string Name { get; set; }
         public string ImageUrl { get; set; } = string.Empty;
         public required string Description { get; set; }
+        public int Price { get; set; }
     }
     public class VariantOfCartResponse
     {

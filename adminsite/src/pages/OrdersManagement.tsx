@@ -67,7 +67,6 @@ const OrdersManagement: React.FC = () => {
     try {
       // Fetch order details from API
       const orderDetail = await dispatch(getDetailsOrder(orderId));
-      console.log(orderDetail.payload);
       setSelectedOrderDetail(orderDetail.payload);
     } catch (error) {
       console.error('Error fetching order details:', error);

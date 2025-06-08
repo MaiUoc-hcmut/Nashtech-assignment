@@ -137,17 +137,22 @@ namespace Ecommerce.BackendAPI.Repositories
                     UpdatedAt = p.UpdatedAt,
                     AverageRating = p.Reviews.Any() ? p.Reviews.Average(r => r.Rating) : 0,
                     TotalOrders = p.Variants.SelectMany(vo => vo.VariantOrders).Count(),
-                    TotalReviews = p.Reviews.Count()
+                    TotalReviews = p.Reviews.Count(),
+                    ClassificationNames = p.ProductClassifications
+                        .Select(pc => pc.Classification.Name)
+                        .ToList()
                 })
                 .ToListAsync();
 
             // Return both total products and the paginated list
             return (totalProducts, productsWithRatings);
         }
+        
         public async Task<Product> CreateProductAsync(Product product, IList<Classification> classificationList)
         {
             var response = await _context.Products.AddAsync(product);
-            foreach (var classification in classificationList) {
+            foreach (var classification in classificationList)
+            {
                 var newItems = new ProductClassification
                 {
                     Product = response.Entity,

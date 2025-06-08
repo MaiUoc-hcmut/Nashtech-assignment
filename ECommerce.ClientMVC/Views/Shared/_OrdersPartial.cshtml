@@ -25,20 +25,19 @@
             <div class="card-body">
                 @foreach (var item in order.Variants)
                 {
+                    var imageUrl = string.IsNullOrEmpty(item.ImageUrl) ? item.Product.ImageUrl : item.ImageUrl;
+                    var unitPrice = item.Price > 0 ? item.Price : item.Product.Price;
                     <div class="row mb-3">
                         <div class="col-md-2">
-                            @{
-                                var imageUrl = string.IsNullOrEmpty(item.ImageUrl) ? item.Product.ImageUrl : item.ImageUrl;
                                 <img src="@imageUrl" class="img-fluid" alt="@item.Product.Name">
                                 
-                                <input type="hidden" name="productId" id="productIdData" value="@item.Product.Id">
-                            }
+                                <input type="hidden" name="productId" id="@item.Id" value="@item.Product.Id">
                         </div>
                         <div class="col-md-7">
                             <h5>@item.Product.Name</h5>
                             <p class="text-muted">@item.Color / @item.Size</p>
                             <p>x @item.Quantity</p>
-                            <p class="fw-bold">@item.Price.ToString("N0")đ</p>
+                            <p class="fw-bold">@unitPrice.ToString("N0")đ</p>
                         </div>
                     </div>
                     @if (order.Variants.Last() != item)

@@ -26,7 +26,7 @@ namespace Ecommerce.ClientMVC.Services
             string customerEmail,
             string customerPhoneNumber,
             string customerAddress,
-            string variantIdList,
+            IList<VariantInCreateOrder> variantList,
             int totalAmount
         )
         {
@@ -36,14 +36,6 @@ namespace Ecommerce.ClientMVC.Services
                 var httpContext = _httpContextAccessor.HttpContext;
                 var apiUrl = $"{_apiBaseUrl}/api/Order";
 
-                // Convert comma-separated variantIdList to IList<int>
-                IList<int> variantIds = string.IsNullOrEmpty(variantIdList)
-                    ? new List<int>()
-                    : variantIdList.Split(',')
-                        .Where(s => int.TryParse(s, out _))
-                        .Select(int.Parse)
-                        .ToList();
-
                 // Create the request body matching CreateOrderParameter
                 var orderParams = new CreateOrderParameter
                 {
@@ -52,7 +44,7 @@ namespace Ecommerce.ClientMVC.Services
                     Email = customerEmail,
                     PhoneNumber = customerPhoneNumber,
                     Address = customerAddress,
-                    Variants = variantIds
+                    Variants = variantList,
                 };
 
                 // Serialize the request body to JSON
@@ -122,7 +114,6 @@ namespace Ecommerce.ClientMVC.Services
                 // Send the request
                 var response = await client.SendAsync(request);
                 var content = await response.Content.ReadAsStringAsync();
-                Console.WriteLine(content);
                 var orders = JsonSerializer.Deserialize<IEnumerable<GetOrdersOfCustomerResponse>>(content, new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true

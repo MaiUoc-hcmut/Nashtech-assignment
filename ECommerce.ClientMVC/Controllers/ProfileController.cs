@@ -4,6 +4,7 @@ using Ecommerce.ClientMVC.Interface;
 using Ecommerce.SharedViewModel.Models;
 using Ecommerce.SharedViewModel.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Ecommerce.ClientMVC.Filters;
 
 namespace Ecommerce.ClientMVC.Controllers
 {
@@ -21,6 +22,7 @@ namespace Ecommerce.ClientMVC.Controllers
             _reviewService = reviewService;
         }
 
+        [ServiceFilter(typeof(CustomerFilter))]
         public IActionResult Index()
         {
             var model = new ProfileViewModel
@@ -33,6 +35,8 @@ namespace Ecommerce.ClientMVC.Controllers
         }
 
         [HttpGet]
+        
+        [ServiceFilter(typeof(CustomerFilter))]
         public IActionResult GetAccountInfoPartial()
         {
             var Customer = _authService.GetCurrentUser();
@@ -40,6 +44,8 @@ namespace Ecommerce.ClientMVC.Controllers
         }
 
         [HttpGet]
+        
+        [ServiceFilter(typeof(CustomerFilter))]
         public async Task<IActionResult> GetOrdersPartial(int customerId)
         {
             var orders = await _orderService.GetOrdersOfCustomerAsync(customerId);
@@ -47,6 +53,8 @@ namespace Ecommerce.ClientMVC.Controllers
         }
 
         [HttpGet]
+        
+        [ServiceFilter(typeof(CustomerFilter))]
         public async Task<IActionResult> GetReviewsPartial(int customerId)
         {
             var reviews = await _reviewService.GetReviewsOfCustomerAsync(customerId);

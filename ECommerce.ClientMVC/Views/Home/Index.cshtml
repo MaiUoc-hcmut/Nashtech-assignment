@@ -62,30 +62,26 @@
     </div>
     
     <div class="products-container">
-        @* <div class="navigation-arrow arrow-prev">
-            <i class="fas fa-chevron-left"></i>
-        </div> *@
-        
         @if (Model.Products.Any())
         {
             @foreach (var product in Model.Products)
             {
-                <partial name="_ProductCardPartial" model='new {
-                    IsNew = (DateTime.UtcNow - product.CreatedAt).TotalDays <= 7,
-                    Id = product.Id,
-                    Rating = product.AverageRating,
-                    Reviews = product.TotalReviews,
-                    IsBestSeller = true,
-                    Image = product.ImageUrl,
-                    Name = product.Name,
-                    Price = product.Price,
-                }'/>
+                if (product.ClassificationNames.Contains("Daily"))
+                {
+                    Console.WriteLine($"Processing product: {product.Name}");
+                    <partial name="_ProductCardPartial" model='new {
+                        IsNew = (DateTime.UtcNow - product.CreatedAt).TotalDays <= 7,
+                        Id = product.Id,
+                        Rating = product.AverageRating,
+                        Reviews = product.TotalReviews,
+                        IsBestSeller = true,
+                        Image = product.ImageUrl,
+                        Name = product.Name,
+                        Price = product.Price,
+                    }'/>
+                }
             }
         }
-        
-        @* <div class="navigation-arrow arrow-next">
-            <i class="fas fa-chevron-right"></i>
-        </div> *@
     </div>
 </div>
 
@@ -97,31 +93,27 @@
     </div>
     
     <div class="products-container">
-        @* <div class="navigation-arrow arrow-prev">
-            <i class="fas fa-chevron-left"></i>
-        </div> *@
-        
         <!-- Sport Product Card 1 -->
         @if (Model.Products.Any())
         {
             @foreach (var product in Model.Products)
             {
-                <partial name="_ProductCardPartial" model='new {
-                    IsNew = (DateTime.UtcNow - product.CreatedAt).TotalDays <= 7,
-                    Id = product.Id,
-                    Rating = product.AverageRating,
-                    Reviews = product.TotalReviews,
-                    IsBestSeller = true,
-                    Image = product.ImageUrl,
-                    Name = product.Name,
-                    Price = product.Price,
-                }'/>
+                if (product.ClassificationNames.Contains("Sport"))
+                {
+                    Console.WriteLine($"Processing product: {product.Name}");
+                    <partial name="_ProductCardPartial" model='new {
+                        IsNew = (DateTime.UtcNow - product.CreatedAt).TotalDays <= 7,
+                        Id = product.Id,
+                        Rating = product.AverageRating,
+                        Reviews = product.TotalReviews,
+                        IsBestSeller = true,
+                        Image = product.ImageUrl,
+                        Name = product.Name,
+                        Price = product.Price,
+                    }'/>
+                }
             }
         }
-        
-        @* <div class="navigation-arrow arrow-next">
-            <i class="fas fa-chevron-right"></i>
-        </div> *@
     </div>
 </div>
 

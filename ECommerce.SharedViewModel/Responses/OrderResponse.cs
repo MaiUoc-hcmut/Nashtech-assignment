@@ -5,6 +5,7 @@ namespace Ecommerce.SharedViewModel.Responses
         public int Id { get; set; }
         public required string Name { get; set; }
         public required string ImageUrl { get; set; } = string.Empty;
+        public int Price { get; set; }
     }
 
     public class VariantInGetOrdersOfCustomer

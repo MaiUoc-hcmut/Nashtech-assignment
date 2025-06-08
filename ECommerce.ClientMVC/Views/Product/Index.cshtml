@@ -5,7 +5,14 @@
     ViewData["Title"] = "Products";
 }
 
-<div class="container mt-4">
+<!-- Add custom CSS for taller images on this page -->
+<style>
+    .products-page .product-card img {
+        height: 350px !important; /* Increased from 280px to 320px */
+    }
+</style>
+
+<div class="container mt-4 products-page">
     <h1 class="mb-4">Products</h1>
 
     <div class="row">

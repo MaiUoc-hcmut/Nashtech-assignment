@@ -60,6 +60,7 @@ namespace Ecommerce.SharedViewModel.Responses
         public double AverageRating { get; set; }
         public int TotalReviews { get; set; }
         public int TotalOrders { get; set; }
+        public IEnumerable<string> ClassificationNames { get; set; }
     }
     
     public class GetAllProductsResponse

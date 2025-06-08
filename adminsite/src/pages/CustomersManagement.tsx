@@ -36,6 +36,7 @@ const CustomerManagement: React.FC = () => {
   const showCustomerInfo = async (id: number) => {
     try {
       const customer = await dispatch(fetchCustomerInfo(id)).unwrap();
+      console.log('Fetched customer info:', customer);
       setCustomerToShow(customer);
       setIsOpenInfoModal(true);
     } catch (error) {

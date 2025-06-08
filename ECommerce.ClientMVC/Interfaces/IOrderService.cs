@@ -1,5 +1,6 @@
 using Ecommerce.SharedViewModel.Responses;
 using Ecommerce.SharedViewModel.Models;
+using Ecommerce.SharedViewModel.ParametersType;
 
 namespace Ecommerce.ClientMVC.Interface
 {
@@ -11,7 +12,7 @@ namespace Ecommerce.ClientMVC.Interface
             string customerEmail,
             string customerPhoneNumber,
             string customerAddress,
-            string variantIdList,
+            IList<VariantInCreateOrder> variantList,
             int totalAmount 
         );
         Task<IEnumerable<GetOrdersOfCustomerResponse>> GetOrdersOfCustomerAsync(int customerId);

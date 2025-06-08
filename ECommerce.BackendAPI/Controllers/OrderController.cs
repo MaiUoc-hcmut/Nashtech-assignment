@@ -14,11 +14,18 @@ namespace Ecommerce.BackendAPI.Controllers
     {
         private readonly IOrderRepository _orderRepository;
         private readonly IVariantRepository _variantRepository;
+        private readonly ICartRepository _cartRepository;
 
-        public OrderController(IOrderRepository orderRepository, IVariantRepository variantRepository)
+        public OrderController
+        (
+            IOrderRepository orderRepository,
+            IVariantRepository variantRepository,
+            ICartRepository cartRepository
+        )
         {
             _orderRepository = orderRepository;
             _variantRepository = variantRepository;
+            _cartRepository = cartRepository;
         }
 
         [HttpGet()]
@@ -143,7 +150,8 @@ namespace Ecommerce.BackendAPI.Controllers
                     {
                         vo.Variant.Product.Id,
                         vo.Variant.Product.Name,
-                        vo.Variant.Product.ImageUrl
+                        vo.Variant.Product.ImageUrl,
+                        vo.Variant.Product.Price
                     }
                 }).ToList()
             });
@@ -174,14 +182,18 @@ namespace Ecommerce.BackendAPI.Controllers
                 return BadRequest(new { Error = "Invalid customer" });
             }
 
-            var variantList = new List<Variant>();
-            foreach(var id in request.Variants)
+            var variantOrders = new List<VariantOrder>();
+            foreach(var item in request.Variants)
             {
-                var variant = await _variantRepository.GetVariantByIdAsync(id);
+                var variant = await _variantRepository.GetVariantByIdAsync(item.Id);
                 if (variant == null) {
-                    return BadRequest(new { message = $"Variant with Id={id} not found" });
+                    return BadRequest(new { message = $"Variant with Id={item.Id} not found" });
                 }
-                variantList.Add(variant);
+                variantOrders.Add(new VariantOrder
+                {
+                    Variant = variant,
+                    Quantity = item.Quantity
+                });
             }
 
             var order = new Order {
@@ -191,11 +203,13 @@ namespace Ecommerce.BackendAPI.Controllers
                 Email = request.Email,
                 PhoneNumber = request.PhoneNumber,
                 Address = request.Address,
-                VariantOrders = variantList.Select(v => new VariantOrder {
-                    Variant = v
-                }).ToList()
+                VariantOrders = variantOrders
             };
             var result = await _orderRepository.CreateOrderAsync(order);
+
+            // Clear the cart after order creation
+            var cart = await _cartRepository.GetCartOfCustomerAsync(customer.Id);
+            await _cartRepository.ClearCartAsync(cart);
 
             if (!result) return StatusCode(500, "Something went wrong while creating the order");
 

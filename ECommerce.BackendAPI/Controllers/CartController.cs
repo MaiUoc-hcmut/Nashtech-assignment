@@ -39,6 +39,7 @@ namespace Ecommerce.BackendAPI.Controllers
                         vc.Variant.Product.Name,
                         vc.Variant.Product.Description,
                         vc.Variant.Product.ImageUrl,
+                        vc.Variant.Product.Price
                     },
                     vc.Variant.Id,
                     vc.Quantity,

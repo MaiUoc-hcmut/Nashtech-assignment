@@ -58,7 +58,7 @@ namespace Ecommerce.BackendAPI.Repositories
             await _context.SaveChangesAsync();
             return true;
         }
-    
+
         public async Task<bool> RemoveFromCartAsync(Cart cart, Variant variant)
         {
             var variantCart = await _context.VariantCarts
@@ -70,6 +70,22 @@ namespace Ecommerce.BackendAPI.Repositories
             }
 
             _context.VariantCarts.Remove(variantCart);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> ClearCartAsync(Cart cart)
+        {
+            var variantCarts = await _context.VariantCarts
+                .Where(vc => vc.Cart.Id == cart.Id)
+                .ToListAsync();
+
+            if (variantCarts.Count == 0)
+            {
+                return false;
+            }
+
+            _context.VariantCarts.RemoveRange(variantCarts);
             await _context.SaveChangesAsync();
             return true;
         }

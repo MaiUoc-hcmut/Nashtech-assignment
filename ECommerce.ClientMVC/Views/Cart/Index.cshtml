@@ -4,8 +4,12 @@
 @using Ecommerce.ClientMVC.Interface
 @inject IAuthService AuthService
 
+@using Ecommerce.SharedViewModel.ParametersType
+@using System.Text.Json
+
 @{
     ViewData["Title"] = "Chi tiết sản phẩm";
+    var customer = AuthService.GetCurrentUser();
 }
 
 <link rel="stylesheet" href="~/css/cart.css" />
@@ -19,7 +23,6 @@
         <!-- Left Section - Customer Information -->
         <section class="customer-info">
             @{
-                var customer = AuthService.GetCurrentUser();
                 <!-- Anti-forgery token -->
                 <input type="hidden" name="__RequestVerificationToken" value="@Html.AntiForgeryToken().ToString()" />
                 <div class="validation-summary-errors"></div>
@@ -29,13 +32,12 @@
                     <input 
                         id="Customer_Name" 
                         name="Customer.Name" 
-    using Ecommerce.ClientMVC.Services;
                         class="form-control" 
                         required="required" 
                         type="text" 
                         value="@customer?.Name" 
                     />
-                    <span class="field-validation-error" data-valmsg-for="Customer.Name" data-valmsg-replace="true"></span>
+                    <span class="field-validation-error" data-valmsg-for="@customer.Name" data-valmsg-replace="true"></span>
                 </div>
                 
                 <div class="form-group">
@@ -88,6 +90,7 @@
                 foreach (var item in Model.Variants)
                 {
                     var imageUrl = !string.IsNullOrEmpty(item.ImageUrl) ? item.ImageUrl : item.Product?.ImageUrl;
+                    var unitPrice = item.Price != 0 ? item.Price : item.Product?.Price ?? 0;
                     <div class="product-card" id="product-@item.Id">
                         <img src="@imageUrl" alt="@item.Product?.Name" class="product-image" />
                         
@@ -119,8 +122,7 @@
                                     min="1" 
                                     id="quantity-@item.Id" 
                                     data-id="@item.Id" 
-                                    data-price="@item.Price.ToString("F2")"
-                                    value="@item.Quantity"
+                                    data-price="@unitPrice.ToString("F2")"
                                 />
                                 <button 
                                     type="button" 
@@ -130,12 +132,13 @@
                                     +
                                 </button>
                             </div>
-                            <div class="product-price" id="price-@item.Id">@((item.Price * item.Quantity).ToString("C"))</div>
+                            
+                            <div class="product-price" id="price-@item.Id">@((unitPrice * item.Quantity).ToString("N0"))đ</div>
+                            
                             @{
-                                var customerForRemove = AuthService.GetCurrentUser();
                                 <form asp-controller="Cart" asp-action="DeleteFromCart" method="POST">
-                                    <input type="hidden" name="cartId" value="@customerForRemove?.CartId">
-                                    <input type="hidden" name="customerId" value="@customerForRemove?.Id">
+                                    <input type="hidden" name="cartId" value="@customer?.CartId">
+                                    <input type="hidden" name="customerId" value="@customer?.Id">
                                     <input type="hidden" name="variantId" value="@item.Id">
                                     <button type="submit" class="delete-btn" data-id="@item.Id">Remove</button>
                                 </form>
@@ -156,18 +159,27 @@
             <div class="cart-summary">
                 <div class="cart-total">
                     <span>Total Amount:</span>
-                    <span id="total-amount">@Model?.Variants?.Sum(i => i.Price * i.Quantity).ToString("C")</span>
+                    <span id="total-amount">
+                        @{
+                            var totalAmount = Model?.Variants?.Sum(i => 
+                                (i.Price != 0 ? i.Price : (i.Product?.Price ?? 0)) * i.Quantity
+                            ) ?? 0;
+                        }
+                        @totalAmount.ToString("N0")đ
+                    </span>
                 </div>
                 @{
-                    var user = AuthService.GetCurrentUser();
-                    string variantIdList = string.Join(",", Model.Variants.Select(v => v.Id));
+                    var variantList = Model.Variants
+                        .Select(v => new VariantInCreateOrder { Id = v.Id, Quantity = v.Quantity })
+                        .ToList();
+                    var variantListJson = JsonSerializer.Serialize(variantList);
                     <form asp-controller="Order" asp-action="CreateOrder">
-                        <input type="hidden" name="customerName" id="customerName" value="@user?.Name" />
-                        <input type="hidden" name="customerEmail" id="customerEmail" value="@user?.Email" />
-                        <input type="hidden" name="customerPhoneNumber" id="customerPhoneNumber" value="@user?.PhoneNumber" />
-                        <input type="hidden" name="customerAddress" id="customerAddress" value="@user?.Address" />
-                        <input type="hidden" name="customerId" id="customerId" value="@user?.Id" />
-                        <input type="hidden" name="variantIdList" id="variantIdList" value="@variantIdList" />
+                        <input type="hidden" name="customerName" id="customerName" value="@customer?.Name" />
+                        <input type="hidden" name="customerEmail" id="customerEmail" value="@customer?.Email" />
+                        <input type="hidden" name="customerPhoneNumber" id="customerPhoneNumber" value="@customer?.PhoneNumber" />
+                        <input type="hidden" name="customerAddress" id="customerAddress" value="@customer?.Address" />
+                        <input type="hidden" name="customerId" id="customerId" value="@customer?.Id" />
+                        <input type="hidden" name="variantList" id="variantList" value="@variantListJson" />
                         <input type="hidden" name="totalAmount" id="totalAmountData" value="" />
                         <button type="submit" class="checkout-btn" id="btn-checkout">Checkout</button>
                     </form>
@@ -180,24 +192,43 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
 
+        let variantList = [];
+        const variantListInput = document.getElementById('variantList');
+        if (variantListInput && variantListInput.value) {
+            variantList = JSON.parse(variantListInput.value);
+        }
+
         function updatePrice(itemId, quantity, price) {
             const totalPriceElement = document.getElementById(`price-${itemId}`);
             const totalAmountElement = document.getElementById('total-amount');
             const totalAmountData = document.getElementById('totalAmountData');
+
+            // Update quantity in the variant list
+            const variant = variantList.find(v => v.Id == itemId);
+            console.log('Current variant list:', variantList);
+            console.log('Updating variant:', variant);
+            console.log(itemId);
+            if (variant) {
+                variant.Quantity = quantity;
+                variantListInput.value = JSON.stringify(variantList);
+                console.log('Updated variant list:', variantList);
+            }
             
-            // Calculate the new total price
-            const newTotalPrice = Math.floor(quantity * price); // Remove decimals
-            totalPriceElement.innerText = newTotalPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+            // Calculate the new total price for this item
+            const newTotalPrice = Math.floor(quantity * price);
+            totalPriceElement.innerText = newTotalPrice.toLocaleString('vi-VN') + 'đ';
             
-            // Update the total amount
+            // Update the total amount by calculating from all quantity inputs
             let totalAmount = 0;
-            const allPrices = document.querySelectorAll('.product-price');
-            allPrices.forEach(priceElement => {
-                const priceValue = priceElement.value;
-                totalAmount += priceValue;
+            const allQuantityInputs = document.querySelectorAll('.quantity-input');
+            allQuantityInputs.forEach(input => {
+                const itemQuantity = parseInt(input.value) || 0;
+                const itemPrice = parseFloat(input.getAttribute('data-price')) || 0;
+                totalAmount += itemQuantity * itemPrice;
             });
-            totalAmountElement.innerText = totalAmount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
-            totalAmountData.value = totalAmount;
+            
+            totalAmountElement.innerText = Math.floor(totalAmount).toLocaleString('vi-VN') + 'đ';
+            totalAmountData.value = Math.floor(totalAmount);
         }
         
         // User change information
@@ -211,18 +242,39 @@
         const Customer_PhoneNumber_Data = document.getElementById("customerPhoneNumber");
         const Customer_Address_Data = document.getElementById("customerAddress");
 
-        Customer_Name.addEventListener('input', function() {
-            Customer_Name_Data.value = this.value;
+        if (Customer_Name && Customer_Name_Data) {
+            Customer_Name.addEventListener('input', function() {
+                Customer_Name_Data.value = this.value;
+            });
+        }
+        if (Customer_Email && Customer_Email_Data) {
+            Customer_Email.addEventListener('input', function() {
+                Customer_Email_Data.value = this.value;
+            });
+        }
+        if (Customer_PhoneNumber && Customer_PhoneNumber_Data) {
+            Customer_PhoneNumber.addEventListener('input', function() {
+                Customer_PhoneNumber_Data.value = this.value;
+            });
+        }
+        if (Customer_Address && Customer_Address_Data) {
+            Customer_Address.addEventListener('input', function() {
+                Customer_Address_Data.value = this.value;
+            });
+        }
+
+        // Initialize total amount on page load
+        const allQuantityInputs = document.querySelectorAll('.quantity-input');
+        let initialTotalAmount = 0;
+        allQuantityInputs.forEach(input => {
+            const itemQuantity = parseInt(input.value) || 0;
+            const itemPrice = parseFloat(input.getAttribute('data-price')) || 0;
+            initialTotalAmount += itemQuantity * itemPrice;
         });
-        Customer_Email.addEventListener('input', function() {
-            Customer_Email_Data.value = this.value;
-        });
-        Customer_PhoneNumber.addEventListener('input', function() {
-            Customer_PhoneNumber_Data.value = this.value;
-        });
-        Customer_Address.addEventListener('input', function() {
-            Customer_Address_Data.value = this.value;
-        });
+        const totalAmountData = document.getElementById('totalAmountData');
+        if (totalAmountData) {
+            totalAmountData.value = Math.floor(initialTotalAmount);
+        }
 
         // Update quantity and total price
         const decreaseBtns = document.querySelectorAll('.decrease-btn');
@@ -233,8 +285,9 @@
             btn.addEventListener('click', function() {
                 const itemId = this.getAttribute('data-id');
                 const quantityInput = document.getElementById(`quantity-${itemId}`);
-                let quantity = parseInt(quantityInput.value);
-                const price = parseFloat(quantityInput.getAttribute('data-price'));
+                let quantity = parseInt(quantityInput.value) || 1;
+                const price = parseFloat(quantityInput.getAttribute('data-price')) || 0;
+                
                 if (quantity > 1) {
                     quantity--;
                     quantityInput.value = quantity;
@@ -247,8 +300,9 @@
             btn.addEventListener('click', function() {
                 const itemId = this.getAttribute('data-id');
                 const quantityInput = document.getElementById(`quantity-${itemId}`);
-                let quantity = parseInt(quantityInput.value);
-                const price = parseFloat(quantityInput.getAttribute('data-price'));
+                let quantity = parseInt(quantityInput.value) || 1;
+                const price = parseFloat(quantityInput.getAttribute('data-price')) || 0;
+                
                 quantity++;
                 quantityInput.value = quantity;
                 updatePrice(itemId, quantity, price);
@@ -258,15 +312,15 @@
         quantityInputs.forEach(input => {
             input.addEventListener('input', function() {
                 const itemId = this.getAttribute('data-id');
-                const quantity = parseInt(this.value);
-                const price = parseFloat(this.getAttribute('data-price'));
+                let quantity = parseInt(this.value);
+                const price = parseFloat(this.getAttribute('data-price')) || 0;
 
                 if (quantity < 1 || isNaN(quantity)) {
-                    this.value = 1;
-                    updatePrice(itemId, 1, price);
-                } else {
-                    updatePrice(itemId, quantity, price);
+                    quantity = 1;
+                    this.value = quantity;
                 }
+                
+                updatePrice(itemId, quantity, price);
             });
         });
     });
